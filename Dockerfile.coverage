@@ -1,0 +1,8 @@
+# Copyright 2019-2020 Hewlett Packard Enterprise Development LP
+
+FROM cray/meds-base
+
+# Run test coverage...
+RUN set -ex && \
+    go test -cover -v stash.us.cray.com/HMS/hms-meds/cmd/meds && \
+    go test -cover -v stash.us.cray.com/HMS/hms-meds/internal/model
