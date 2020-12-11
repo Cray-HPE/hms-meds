@@ -1,0 +1,87 @@
+# Please refer to https://stash.us.cray.com/projects/CLOUD/repos/cray-charts/browse/stable/cray-service/values.yaml?at=refs%2Fheads%2Fmaster
+# for more info on values you can set/override
+# Note that cray-service.containers[*].image and cray-service.initContainers[*].image map values are one of the only structures that
+# differ from the standard kubernetes container spec:
+# image:
+#   repository: ""
+#   tag: "" (default = "latest")
+#   pullPolicy: "" (default = "IfNotPresent")
+
+# Version of the kubectl pod to use when upgrading/downgrading charts
+dockerKubectlTag: &dockerKubectlTag 0.2.0
+hms_ca_uri: ""
+
+cray-service:
+  type: "Deployment"
+  nameOverride: "cray-meds"
+  fullnameOverride: "cray-meds"
+  serviceAccountName: "jobs-watcher"
+  containers:
+    cray-meds:
+      name: "cray-meds"
+      image:
+        repository: "cray/cray-meds"
+      env:
+        - name: MEDS_OPTS
+          valueFrom:
+            configMapKeyRef:
+              name: meds-opts
+              key: options
+              optional: true
+        - name: VAULT_ADDR
+          value: "http://cray-vault.vault:8200"
+        - name: VAULT_SKIP_VERIFY
+          value: "true"
+        - name: MEDS_SYSLOG_TARG
+          value: "rsyslog_agg_service_hmn.local:514"
+        - name: MEDS_NTP_TARG
+          valueFrom:
+            configMapKeyRef:
+              name: meds-nwproto-info
+              key: NTP_HOST
+        - name: MEDS_CA_URI
+          valueFrom:
+            configMapKeyRef:
+              name: meds-cacert-info
+              key: CA_URI
+      command: ["/bin/sh", "-c"]
+      args: ["until curl --head localhost:15000 ; do echo Waiting for Sidecar; sleep 3 ; done ; echo Sidecar available; meds ${MEDS_OPTS}"]
+      livenessProbe:
+        exec:
+          command:
+            - pgrep
+            - meds
+        initialDelaySeconds: 5
+        periodSeconds: 5
+      readinessProbe:
+        exec:
+          command:
+            - pgrep
+            - meds
+        initialDelaySeconds: 5
+        periodSeconds: 5
+      volumeMounts:
+        - name: cray-pki-cacert-vol
+          mountPath: /usr/local/cray-pki
+  initContainers:
+    - name: "wait-for-cray-meds-init"
+      env:
+        - name: MEDS_NTP_TARG
+          valueFrom:
+            configMapKeyRef:
+              name: meds-nwproto-info
+              key: NTP_HOST
+      image:
+        repository: "curlimages/curl"
+        tag: 7.73.0
+      command: ["/bin/sh", "-c"]
+      args: ["NTPT=`echo ${MEDS_NTP_TARG} | sed 's/:.*$//'` ; echo $NTPT ;  until getent hosts rsyslog_agg_service_hmn.local ; do echo Waiting for rsyslog_agg_service_hmn.local to resolve in DNS ; sleep 3 ; done ; echo rsyslog_agg_service_hmn.local resolves in DNS; until getent hosts ${NTPT} ; do echo Waiting for ${NTPT} to resolve in DNS ; sleep 3 ; done ; echo ${NTPT} resolves in DNS"]
+
+  volumes:
+    cray-pki-cacert-vol:
+      name: cray-pki-cacert-vol
+      configMap:
+        name: cray-configmap-ca-public-key
+
+  service:
+    enabled: true

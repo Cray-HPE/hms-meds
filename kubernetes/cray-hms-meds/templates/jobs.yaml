@@ -1,0 +1,51 @@
+---
+apiVersion: batch/v1
+kind:       Job
+metadata:
+  name: cray-meds-vault-loader
+spec:
+  template:
+    spec:
+      restartPolicy: OnFailure
+      serviceAccountName: "jobs-watcher"
+      containers:
+        - name: cray-meds-vault-loader
+          env:
+            - name: VAULT_ADDR
+              value: "http://cray-vault.vault:8200"
+            - name: VAULT_SKIP_VERIFY
+              value: "true"
+            - name: VAULT_REDFISH_DEFAULTS
+              valueFrom:
+                secretKeyRef:
+                  name: cray-meds-credentials
+                  key: vault_redfish_defaults
+          image: "{{ include "cray-hms-meds.image-prefix" .Values }}cray/cray-meds:{{ include "cray-hms-meds.imageTag" . }}"
+          command: ["vault_loader"]
+---
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: cray-meds-vault-loader-deleter
+  annotations:
+    "helm.sh/hook": pre-install,pre-upgrade,pre-rollback
+    "helm.sh/hook-delete-policy": before-hook-creation,hook-succeeded
+    "helm.sh/hook-weight": "0"
+spec:
+  template:
+    metadata:
+      annotations:
+        sidecar.istio.io/inject: "false"
+    spec:
+      restartPolicy: OnFailure
+      serviceAccountName: "cray-meds-vault-loader"
+      containers:
+        - name: job-deleter
+          image: "{{ include "cray-hms-meds.image-prefix" .Values }}loftsman/docker-kubectl:{{ .Values.dockerKubectlTag }}"
+          command:
+          - /bin/sh
+          - -c
+          - set -x;
+            echo "Deleteing job";
+            kubectl -n services delete job cray-meds-vault-loader;
+            exit 0
