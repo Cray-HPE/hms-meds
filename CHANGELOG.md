@@ -5,6 +5,12 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.11.6] - 2021-01-19
+
+### Changed
+
+- CASMINST-960 - Use `rsyslog-aggregator.hmnlb` as the host the syslog aggregator, as the host `rsyslog_agg_service_hmn.local` is no longer available in Shasta v1.4 or later.
+
 ## [1.11.5] - 2020-12-10
 
 ### Changed
