@@ -33,7 +33,7 @@ cray-service:
         - name: VAULT_SKIP_VERIFY
           value: "true"
         - name: MEDS_SYSLOG_TARG
-          value: "rsyslog_agg_service_hmn.local:514"
+          value: "rsyslog-aggregator.hmnlb:514"
         - name: MEDS_NTP_TARG
           valueFrom:
             configMapKeyRef:
@@ -75,7 +75,7 @@ cray-service:
         repository: "curlimages/curl"
         tag: 7.73.0
       command: ["/bin/sh", "-c"]
-      args: ["NTPT=`echo ${MEDS_NTP_TARG} | sed 's/:.*$//'` ; echo $NTPT ;  until getent hosts rsyslog_agg_service_hmn.local ; do echo Waiting for rsyslog_agg_service_hmn.local to resolve in DNS ; sleep 3 ; done ; echo rsyslog_agg_service_hmn.local resolves in DNS; until getent hosts ${NTPT} ; do echo Waiting for ${NTPT} to resolve in DNS ; sleep 3 ; done ; echo ${NTPT} resolves in DNS"]
+      args: ["NTPT=`echo ${MEDS_NTP_TARG} | sed 's/:.*$//'` ; echo $NTPT ;  until getent hosts rsyslog-aggregator.hmnlb ; do echo Waiting for rsyslog-aggregator.hmnlb to resolve in DNS ; sleep 3 ; done ; echo rsyslog-aggregator.hmnlb resolves in DNS; until getent hosts ${NTPT} ; do echo Waiting for ${NTPT} to resolve in DNS ; sleep 3 ; done ; echo ${NTPT} resolves in DNS"]
 
   volumes:
     cray-pki-cacert-vol:
