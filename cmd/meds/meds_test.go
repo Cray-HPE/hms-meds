@@ -12,6 +12,7 @@ import (
 	"strings"
 	"testing"
 	"time"
+
 	"stash.us.cray.com/HMS/hms-certs/pkg/hms_certs"
 )
 
@@ -623,7 +624,7 @@ func Test_notifyHSMXnamePresent(t *testing.T) {
 
 	defUser = "root"
 	defPass = "********"
-	client,_ = hms_certs.CreateHTTPClientPair("",clientTimeout)
+	client, _ = hms_certs.CreateHTTPClientPair("", clientTimeout)
 	setupRFHTTPStuff()
 
 	for i, test := range tests {
@@ -649,106 +650,6 @@ func Test_notifyHSMXnamePresent(t *testing.T) {
 		hsm = testServer.URL
 
 		err := (notifyHSMXnamePresent(test.nodeIn, "10.0.0.1"))
-		if !test.expectErr {
-			if err != nil {
-				t.Errorf("Test %v (%s) Failed: Received unexpected error - %v", i, test.description, err)
-			}
-		} else if err == nil {
-			t.Errorf("Test %v (%s) Failed: Expected an error", i, test.description)
-		}
-	}
-}
-
-func Test_notifyHSMXnameNotPresent(t *testing.T) {
-	type HTTPResponse struct {
-		respCode        int
-		respBody        string
-		expectedReqBody []byte
-	}
-
-	tests := []struct {
-		description string
-		responses   map[string]HTTPResponse
-		nodeIn      NetEndpoint
-		expectErr   bool
-	}{
-		{
-			"Patch node (200)",
-			map[string]HTTPResponse{
-				"/Inventory/RedfishEndpoints/x7c5s3b1": HTTPResponse{
-					200,
-					``,
-					json.RawMessage(`{"ID":"x7c5s3b1","Enabled":false}`),
-				},
-			},
-			NetEndpoint{
-				name:   "x7c5s3b1",
-				mac:    "02:00:07:05:33:10",
-				ip6g:   "fd66::7ff:fe05:3310",
-				ip6l:   "fe80::7ff:fe05:3310",
-				hwtype: TYPE_NODE_CARD,
-			},
-			false,
-		}, {
-			"Patch node (400)",
-			map[string]HTTPResponse{
-				"/Inventory/RedfishEndpoints/x7c5s3b1": HTTPResponse{
-					400,
-					`{"type":"about:blank","detail":"Bad request","instance":"","status":400,"title":"Bad request: details"}`,
-					json.RawMessage(`{"ID":"x7c5s3b1","Enabled":false}`),
-				},
-			},
-			NetEndpoint{
-				name:   "x7c5s3b1",
-				mac:    "02:00:07:05:33:10",
-				ip6g:   "fd66::7ff:fe05:3310",
-				ip6l:   "fe80::7ff:fe05:3310",
-				hwtype: TYPE_NODE_CARD,
-			},
-			true,
-		}, {
-			"Patch node (404)",
-			map[string]HTTPResponse{
-				"/Inventory/RedfishEndpoints/x7c5s3b1": HTTPResponse{
-					404,
-					`{"type":"about:blank","detail":"Not Found","instance":"","status":404,"title":"Not Found"}`,
-					json.RawMessage(`{"ID":"x7c5s3b1","Enabled":false}`),
-				},
-			},
-			NetEndpoint{
-				name:   "x7c5s3b1",
-				mac:    "02:00:07:05:33:10",
-				ip6g:   "fd66::7ff:fe05:3310",
-				ip6l:   "fe80::7ff:fe05:3310",
-				hwtype: TYPE_NODE_CARD,
-			},
-			true,
-		},
-	}
-
-	for i, test := range tests {
-		testServer := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-			requestPath := r.URL.Path
-			requestBody, _ := ioutil.ReadAll(r.Body)
-
-			httpr, ok := test.responses[requestPath]
-			if ok {
-				// Check the request is the one we expected
-				if bytes.Compare(httpr.expectedReqBody, requestBody) != 0 {
-					t.Errorf("Test %v (%s) Failed: Expected request body is '%v'; Received '%v'", i, test.description, string(httpr.expectedReqBody), string(requestBody))
-				}
-
-				w.WriteHeader(httpr.respCode)
-				w.Write(json.RawMessage(httpr.respBody))
-			} else {
-				w.WriteHeader(500)
-				w.Write([]byte("Couldn't find HTTPResponse to give for URL " + requestPath))
-			}
-		}))
-		defer testServer.Close()
-		hsm = testServer.URL
-
-		err := (notifyHSMXnameNotPresent(test.nodeIn))
 		if !test.expectErr {
 			if err != nil {
 				t.Errorf("Test %v (%s) Failed: Received unexpected error - %v", i, test.description, err)
