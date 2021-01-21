@@ -598,7 +598,9 @@ func notifyHSMXnameNotPresent(node NetEndpoint) *error {
 	//return nil
 	//log.Printf("DEBUG: DELETE to %s/Inventory/RedfishEndpoints/%s", hsm, node.name)
 
-	return patchXName(node.name, false)
+	log.Printf("DEBUG: Would remove %s, but MEDS no longer marks redfishEndpoints as disabled. This message is purely for your information; MEDS is operating as expected.", node.name)
+	//return patchXName(node.name, false)
+	return nil
 }
 
 func queryHSMState() error {
@@ -908,39 +910,39 @@ func getEnvVars() {
 		sls = envstr
 	}
 	envstr = os.Getenv("MEDS_CA_URI")
-	if (envstr != "") {
+	if envstr != "" {
 		hms_ca_uri = envstr
 	}
 	//These are for debugging/testing
 	envstr = os.Getenv("MEDS_CA_PKI_URL")
-	if (envstr != "") {
-		log.Printf("INFO: Using CA PKI URL: '%s'",envstr)
+	if envstr != "" {
+		log.Printf("INFO: Using CA PKI URL: '%s'", envstr)
 		hms_certs.ConfigParams.VaultCAUrl = envstr
 	}
 	envstr = os.Getenv("MEDS_VAULT_PKI_URL")
-	if (envstr != "") {
-		log.Printf("INFO: Using VAULT PKI URL: '%s'",envstr)
+	if envstr != "" {
+		log.Printf("INFO: Using VAULT PKI URL: '%s'", envstr)
 		hms_certs.ConfigParams.VaultPKIUrl = envstr
 	}
 	envstr = os.Getenv("MEDS_VAULT_JWT_FILE")
-	if (envstr != "") {
-		log.Printf("INFO: Using Vault JWT file: '%s'",envstr)
+	if envstr != "" {
+		log.Printf("INFO: Using Vault JWT file: '%s'", envstr)
 		hms_certs.ConfigParams.VaultJWTFile = envstr
 	}
 	envstr = os.Getenv("MEDS_K8S_AUTH_URL")
-	if (envstr != "") {
-		log.Printf("INFO: Using K8S AUTH URL: '%s'",envstr)
+	if envstr != "" {
+		log.Printf("INFO: Using K8S AUTH URL: '%s'", envstr)
 		hms_certs.ConfigParams.K8SAuthUrl = envstr
 	}
 	envstr = os.Getenv("MEDS_LOG_INSECURE_FAILOVER")
-	if (envstr != "") {
-		yn,_ := strconv.ParseBool(envstr)
-		if (yn == false) {
+	if envstr != "" {
+		yn, _ := strconv.ParseBool(envstr)
+		if yn == false {
 			log.Printf("INFO: Not logging Redfish insecure failovers.")
 			hms_certs.ConfigParams.LogInsecureFailover = false
 		}
 	}
-	__setenv_int("MEDS_HTTP_TIMEOUT",1,&clientTimeout)
+	__setenv_int("MEDS_HTTP_TIMEOUT", 1, &clientTimeout)
 }
 
 func init_cabinet(cab GenericHardware) error {
@@ -1075,7 +1077,7 @@ func deinit_cab(k string) {
 }
 
 // This function is used to set up an HTTP validated/non-validated client
-// pair for Redfish operations.  This is done at the start of things, and also 
+// pair for Redfish operations.  This is done at the start of things, and also
 // whenever the CA chain bundle is "rolled".
 
 func setupRFHTTPStuff() error {
@@ -1088,15 +1090,15 @@ func setupRFHTTPStuff() error {
 	defer rfClientLock.Unlock()
 
 	log.Printf("INFO: All RF threads paused.")
-	if (hms_ca_uri != "") {
-		log.Printf("INFO: Creating Redfish TLS-secured client, CA URI: '%s'",hms_ca_uri)
+	if hms_ca_uri != "" {
+		log.Printf("INFO: Creating Redfish TLS-secured client, CA URI: '%s'", hms_ca_uri)
 	} else {
 		log.Printf("INFO: Creating non-validated Redfish client, (no CA URI)")
 	}
 
-	rfClient,err = hms_certs.CreateHTTPClientPair(hms_ca_uri,clientTimeout)
-	if (err != nil) {
-		return fmt.Errorf("ERROR: Can't create TLS cert-enabled HTTP client: %v",err)
+	rfClient, err = hms_certs.CreateHTTPClientPair(hms_ca_uri, clientTimeout)
+	if err != nil {
+		return fmt.Errorf("ERROR: Can't create TLS cert-enabled HTTP client: %v", err)
 	}
 	log.Printf("INFO: TLS-secured Redfish client successfully created.")
 
@@ -1117,7 +1119,6 @@ func caChangeCB(caBundle string) {
 	setupRFHTTPStuff()
 	log.Printf("INFO: HTTP transports/clients now set up with new CA bundle.")
 }
-
 
 func main() {
 	var credentialsVault string
@@ -1166,39 +1167,39 @@ func main() {
 	hms_certs.Init(nil)
 
 	log.Printf("INFO: Setting up non-TLS-validated HTTP client for in-service use.")
-	client,_ = hms_certs.CreateHTTPClientPair("",clientTimeout)
+	client, _ = hms_certs.CreateHTTPClientPair("", clientTimeout)
 
 	//Set up RF HTTP transport.  Re-try for Vault, fail over on too many retries.
 
 	ok := false
-	for ix := 1; ix <= 10; ix ++ {
+	for ix := 1; ix <= 10; ix++ {
 		err := setupRFHTTPStuff()
-		if (err == nil) {
+		if err == nil {
 			log.Printf("INFO: Successfully set up Redfish transport.")
 			ok = true
 			break
 		}
-		log.Printf("ERROR: RF transport attempt %d: %v",ix,err)
-		time.Sleep(3*time.Second)
+		log.Printf("ERROR: RF transport attempt %d: %v", ix, err)
+		time.Sleep(3 * time.Second)
 	}
 
-	if (!ok) {
+	if !ok {
 		log.Printf("ERROR: exhausted all retries creating TLS-secured Redfish transport, failing over insecure.")
 		hms_ca_uri = ""
 		err = setupRFHTTPStuff()
-		if (err != nil) {
+		if err != nil {
 			panic("ERROR: can't create any RF HTTP transport!!!!!")
 		}
 	}
 
-	if (hms_ca_uri != "") {
-		err = hms_certs.CAUpdateRegister(hms_ca_uri,caChangeCB)
-		if (err != nil) {
+	if hms_ca_uri != "" {
+		err = hms_certs.CAUpdateRegister(hms_ca_uri, caChangeCB)
+		if err != nil {
 			log.Printf("WARNING: Unable to register CA bundle watcher for URI: '%s': %v",
-				hms_ca_uri,err)
+				hms_ca_uri, err)
 			log.Printf("   This means no updates when CA bundle is rolled.")
 		} else {
-			log.Printf("INFO: Registered CA bundle watcher for URI: '%s'",hms_ca_uri)
+			log.Printf("INFO: Registered CA bundle watcher for URI: '%s'", hms_ca_uri)
 		}
 	} else {
 		log.Printf("WARNING: No CA bundle URI specified, not watching for CA changes.")
