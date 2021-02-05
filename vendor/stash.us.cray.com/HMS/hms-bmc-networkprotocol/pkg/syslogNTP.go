@@ -1,4 +1,24 @@
-// Copyright 2019,2020 Hewlett Packard Enterprise Development LP
+// MIT License
+// 
+// (C) Copyright [2019-2021] Hewlett Packard Enterprise Development LP
+// 
+// Permission is hereby granted, free of charge, to any person obtaining a
+// copy of this software and associated documentation files (the "Software"),
+// to deal in the Software without restriction, including without limitation
+// the rights to use, copy, modify, merge, publish, distribute, sublicense,
+// and/or sell copies of the Software, and to permit persons to whom the
+// Software is furnished to do so, subject to the following conditions:
+// 
+// The above copyright notice and this permission notice shall be included
+// in all copies or substantial portions of the Software.
+// 
+// THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+// IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+// FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL
+// THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR
+// OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE,
+// ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR
+// OTHER DEALINGS IN THE SOFTWARE.
 
 package bmc_nwprotocol
 
@@ -9,6 +29,7 @@ import (
 	"log"
 	"net"
 	"net/http"
+	"os"
 	"strconv"
 	"strings"
 	"stash.us.cray.com/HMS/hms-certs/pkg/hms_certs"
@@ -67,6 +88,7 @@ type RedfishNWProtocol struct {
 
 var redfishNPSuffix string //comes from cmdline or env
 var http_client *hms_certs.HTTPClientPair
+var serviceName string
 
 // Split a NTP or syslog "uri" spec.  Format will be
 //    <ip_or_hostname,ip_or_hostname...:port>
@@ -128,9 +150,17 @@ func CopyRFNetworkProtocol(src *RedfishNWProtocol) RedfishNWProtocol {
 func Init(nwpData NWPData, rfSuffix string) (RedfishNWProtocol, error) {
 	var nwProtoInfo RedfishNWProtocol
 	var errstrs string
+	var err error
+
+	if (serviceName == "") {
+		serviceName,err = os.Hostname()
+		if (err != nil) {
+			serviceName = "NWP"	//Lame!  But, at least gives some indication.
+		}
+	}
+	hms_certs.InitInstance(nil,serviceName)
 
 	if (http_client == nil) {
-		var err error
 		http_client,err = hms_certs.CreateHTTPClientPair(nwpData.CAChainURI,17)
 		if (err != nil) {
 			return nwProtoInfo,fmt.Errorf("ERROR creating TLS cert-enabled HTTP client: %v",
@@ -216,6 +246,19 @@ func Init(nwpData NWPData, rfSuffix string) (RedfishNWProtocol, error) {
 	}
 
 	return nwProtoInfo, nil
+}
+
+// Same init process, but allows for setting the service name for User-Agent
+// purposes.
+//
+// nwpData:  Contains the specifications for Redfish NWP data parameters
+// rfSuffix: Formatted /redfish/v1/Managers/BMC/NetworkProtocol or similar
+// svcName:  Caller's application name.
+// Return:   Populated RedfishNWProtocol struct, and error data on failure
+
+func InitInstance(nwpData NWPData, rfSuffix string, svcName string) (RedfishNWProtocol, error) {
+	serviceName = svcName
+	return Init(nwpData, rfSuffix)
 }
 
 // Set NTP and syslog endpoint data for a newly-discovered mountain

@@ -1,3 +1,4 @@
 .vscode
 go/pkg
 kubernetes/cray-hms-meds/helm
+.idea/

@@ -8,7 +8,7 @@ github.com/hashicorp/errwrap
 github.com/hashicorp/go-cleanhttp
 # github.com/hashicorp/go-multierror v1.1.0
 github.com/hashicorp/go-multierror
-# github.com/hashicorp/go-retryablehttp v0.6.7
+# github.com/hashicorp/go-retryablehttp v0.6.8
 github.com/hashicorp/go-retryablehttp
 # github.com/hashicorp/go-rootcerts v1.0.1
 github.com/hashicorp/go-rootcerts
@@ -37,7 +37,7 @@ github.com/hashicorp/vault/sdk/helper/strutil
 github.com/konsorten/go-windows-terminal-sequences
 # github.com/mitchellh/go-homedir v1.1.0
 github.com/mitchellh/go-homedir
-# github.com/mitchellh/mapstructure v1.3.0
+# github.com/mitchellh/mapstructure v1.4.1
 github.com/mitchellh/mapstructure
 # github.com/pierrec/lz4 v2.4.1+incompatible
 github.com/pierrec/lz4
@@ -65,25 +65,25 @@ golang.org/x/text/unicode/bidi
 golang.org/x/text/unicode/norm
 # golang.org/x/time v0.0.0-20200630173020-3af7569d3a1e
 golang.org/x/time/rate
-# gopkg.in/square/go-jose.v2 v2.4.1
+# gopkg.in/square/go-jose.v2 v2.3.1
 gopkg.in/square/go-jose.v2
 gopkg.in/square/go-jose.v2/cipher
 gopkg.in/square/go-jose.v2/json
 gopkg.in/square/go-jose.v2/jwt
-# stash.us.cray.com/HMS/hms-base v1.8.1
+# stash.us.cray.com/HMS/hms-base v1.12.0
 stash.us.cray.com/HMS/hms-base
-# stash.us.cray.com/HMS/hms-bmc-networkprotocol v1.2.1
+# stash.us.cray.com/HMS/hms-bmc-networkprotocol v1.4.0
 stash.us.cray.com/HMS/hms-bmc-networkprotocol/pkg
-# stash.us.cray.com/HMS/hms-certs v1.0.6
+# stash.us.cray.com/HMS/hms-certs v1.2.0
 stash.us.cray.com/HMS/hms-certs/pkg/hms_certs
-# stash.us.cray.com/HMS/hms-compcredentials v1.7.0
+# stash.us.cray.com/HMS/hms-compcredentials v1.10.0
 stash.us.cray.com/HMS/hms-compcredentials
-# stash.us.cray.com/HMS/hms-dns-dhcp v1.1.1
+# stash.us.cray.com/HMS/hms-dns-dhcp v1.4.0
 stash.us.cray.com/HMS/hms-dns-dhcp/pkg
-# stash.us.cray.com/HMS/hms-securestorage v1.8.0
+# stash.us.cray.com/HMS/hms-securestorage v1.11.0
 stash.us.cray.com/HMS/hms-securestorage
-# stash.us.cray.com/HMS/hms-sls v1.5.1
+# stash.us.cray.com/HMS/hms-sls v1.8.1
 stash.us.cray.com/HMS/hms-sls/pkg/sls-common
-# stash.us.cray.com/HMS/hms-smd v1.25.1
+# stash.us.cray.com/HMS/hms-smd v1.28.0
 stash.us.cray.com/HMS/hms-smd/pkg/redfish
 stash.us.cray.com/HMS/hms-smd/pkg/sm
