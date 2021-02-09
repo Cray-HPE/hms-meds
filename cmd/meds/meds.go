@@ -844,24 +844,16 @@ func init_cabinet(cab GenericHardware) error {
 			xname = strings.TrimSuffix(xname, "b0")
 		}
 
+		// This xname gets used elsewhere to try to redfish ping things, so it needs to match.
+		v.name = xname
+
 		// Preload HSM EthernetInterfaces with the endpoints.
 		ethernetInterface := sm.CompEthInterface{
 			MACAddr: macWithoutColons,
 			CompID:  xname,
 		}
 
-		// TODO: CASMHMS-3617 - this hack should be removed. Delete records regardless before attempting to add.
-		deleteURL := fmt.Sprintf("%s/Inventory/EthernetInterfaces/%s", dhcpdnsClient.HSMURL, macWithoutColons)
-		request, requestErr := retryablehttp.NewRequest("DELETE", deleteURL, nil)
-		if requestErr != nil {
-			log.Printf("Failed to construct request: %s", requestErr)
-		}
-		_, doErr := dhcpdnsClient.HTTPClient.Do(request)
-		if doErr != nil {
-			fmt.Printf("Failed to execute PATCH request: %s", doErr)
-		}
-
-		// Add the new ethernet interface.
+		// Add the new ethernet interface. Patches instead if it's already present
 		addErr := dhcpdnsClient.AddNewEthernetInterface(ethernetInterface, true)
 
 		if addErr != nil {
