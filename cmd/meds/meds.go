@@ -564,7 +564,23 @@ func queryNetworkStatus(ne NetEndpoint) (HSMEndpointPresence, *string, *error) {
 		err := fmt.Errorf("endpoint name cannot be empty!")
 		return PRESENCE_NOT_PRESENT, nil, &err
 	}
-	res, errn = queryNetworkStatusViaAddress(ne.name)
+
+	// This is pretty ugly, but for "reasons" it's been requested that from a networking point of view cabinet
+	// controllers not end with `b0` at the end of their name. However, HSM expects this to be there. So, to keep
+	// this simple just strip bhe b0 from here and that will be the end of it.
+	xname := ne.name
+	if strings.HasSuffix(xname, "c0b0") ||
+		strings.HasSuffix(xname, "c1b0") ||
+		strings.HasSuffix(xname, "c2b0") ||
+		strings.HasSuffix(xname, "c3b0") ||
+		strings.HasSuffix(xname, "c4b0") ||
+		strings.HasSuffix(xname, "c5b0") ||
+		strings.HasSuffix(xname, "c6b0") ||
+		strings.HasSuffix(xname, "c7b0") {
+		xname = strings.TrimSuffix(xname, "b0")
+	}
+
+	res, errn = queryNetworkStatusViaAddress(xname)
 	if res == PRESENCE_PRESENT {
 		return PRESENCE_PRESENT, &(ne.name), nil
 	}
@@ -841,9 +857,6 @@ func init_cabinet(cab GenericHardware) error {
 			strings.HasSuffix(v.name, "c7b0") {
 			xname = strings.TrimSuffix(xname, "b0")
 		}
-
-		// This xname gets used elsewhere to try to redfish ping things, so it needs to match.
-		v.name = xname
 
 		// Preload HSM EthernetInterfaces with the endpoints.
 		ethernetInterface := sm.CompEthInterface{
