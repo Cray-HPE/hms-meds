@@ -35,6 +35,7 @@ import (
 	"testing"
 	"time"
 
+	"stash.us.cray.com/HMS/hms-base"
 	"stash.us.cray.com/HMS/hms-certs/pkg/hms_certs"
 )
 
@@ -530,6 +531,18 @@ func Test_watchForHardware_netQuery_FailureRecovery(t *testing.T) {
 	}
 }
 
+func userAgentHeaderPresent(r *http.Request) bool {
+	vlist,ok := r.Header[base.USERAGENT]
+	if (ok) {
+		for _,v := range(vlist) {
+			if (v == serviceName) {
+				return true
+			}
+		}
+	}
+	return false
+}
+
 func Test_notifyHSMXnamePresent(t *testing.T) {
 	type HTTPResponse struct {
 		respCode        int
@@ -644,6 +657,7 @@ func Test_notifyHSMXnamePresent(t *testing.T) {
 		true,
 	}}
 
+	serviceName = "MEDS_TEST"
 	defUser = "root"
 	defPass = "********"
 	client, _ = hms_certs.CreateHTTPClientPair("", clientTimeout)
@@ -656,6 +670,11 @@ func Test_notifyHSMXnamePresent(t *testing.T) {
 
 			httpr, ok := test.responses[requestPath]
 			if ok {
+				// Check for User-Agent headers
+				if !userAgentHeaderPresent(r) {
+					t.Errorf("Test %v had no User-Agent header.",i)
+				}
+
 				// Check the request is the one we expected
 				if bytes.Compare(httpr.expectedReqBody, requestBody) != 0 {
 					t.Errorf("Test %v (%s) Failed: Expected request body is '%v'; Received '%v'", i, test.description, string(httpr.expectedReqBody), string(requestBody))
@@ -720,9 +739,15 @@ func Test_queryHSMState(t *testing.T) {
 	}}
 	var responseCode int
 	var requestURI string
+	serviceName = "MEDS_TEST"
 	testServer := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		requestURI = r.URL.String()
 		if responseCode == 200 {
+			// Check for User-Agent headers
+			if !userAgentHeaderPresent(r) {
+				t.Errorf("Request %s had no User-Agent header.",requestURI)
+			}
+
 			w.Header().Set("Content-Type", "application/json")
 			w.WriteHeader(responseCode)
 			w.Write(json.RawMessage(`{"RedfishEndpoints":[{"ID":"x7c5s3b1","Type":"Node"}]}`))
@@ -782,9 +807,15 @@ func Test_queryNetworkStatus(t *testing.T) {
 	}}
 	var responseCode int
 	var requestURI string
+	serviceName = "MEDS_TEST"
 	testServer := httptest.NewTLSServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		requestURI = r.URL.String()
 		if responseCode == 200 {
+			// Check for User-Agent headers
+			if !userAgentHeaderPresent(r) {
+				t.Errorf("Request %s had no User-Agent header.",requestURI)
+			}
+
 			w.Header().Set("Content-Type", "application/json")
 			w.WriteHeader(responseCode)
 			// The response payload doesn't really matter since queryNetworkStatus() doesn't parse it.

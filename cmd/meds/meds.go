@@ -41,6 +41,7 @@ import (
 	"sync"
 	"time"
 
+	"stash.us.cray.com/HMS/hms-base"
 	dns_dhcp "stash.us.cray.com/HMS/hms-dns-dhcp/pkg"
 	sls_common "stash.us.cray.com/HMS/hms-sls/pkg/sls-common"
 	"stash.us.cray.com/HMS/hms-smd/pkg/sm"
@@ -152,6 +153,7 @@ var HSMEndpointPresenceToString map[HSMEndpointPresence]string = map[HSMEndpoint
 	PRESENCE_NOT_PRESENT: "not present",
 }
 
+var serviceName string
 var hsm string
 var sls string
 var printNodesUnder bool = false
@@ -477,6 +479,7 @@ func patchXName(xname string, enabled bool) *error {
 
 	req, err := http.NewRequest(http.MethodPatch, hsm+"/Inventory/RedfishEndpoints/"+xname, bytes.NewReader(rawPayload))
 	req.Header.Add("Content-Type", "application/json")
+	base.SetHTTPUserAgent(req,serviceName)
 	resp, err := client.Do(req)
 	if err != nil {
 		log.Printf("WARNING: Unable to patch %s: %v", xname, err)
@@ -593,7 +596,16 @@ func notifyHSMXnamePresent(node NetEndpoint, address string) *error {
 
 	log.Printf("DEBUG: POST to %s/Inventory/RedfishEndpoints with %s", hsm, string(rawPayload))
 
-	resp, err := client.Post(hsm+"/Inventory/RedfishEndpoints", "application/json", bytes.NewReader(rawPayload))
+	url := hsm+"/Inventory/RedfishEndpoints"
+	req,qerr := http.NewRequest(http.MethodPost,url,bytes.NewReader(rawPayload))
+	if qerr != nil {
+		log.Printf("WARNING: Unable to create HTTP request for %s: %v",
+			node.name,qerr)
+		return &qerr
+	}
+	req.Header.Add("Content-Type","application/json")
+	base.SetHTTPUserAgent(req,serviceName)
+	resp, err := client.Do(req)
 	if err != nil {
 		log.Printf("WARNING: Unable to send information for %s: %v", node.name, err)
 		return &err
@@ -636,7 +648,14 @@ func queryHSMState() error {
 
 	log.Printf("DEBUG: GET from %s/Inventory/RedfishEndpoints", hsm)
 
-	resp, err := client.Get(hsm + "/Inventory/RedfishEndpoints")
+	url := hsm + "/Inventory/RedfishEndpoints"
+	req,qerr := http.NewRequest(http.MethodGet,url,nil)
+	if qerr != nil {
+		log.Printf("WARNING: Unable to create HTTP request for HSM query: %v",
+			qerr)
+		return qerr
+	}
+	resp, err := client.Do(req)
 	if err != nil {
 		log.Printf("WARNING: Unable to get RedfishEndpoints from HSM: %v", err)
 		return err
@@ -1053,6 +1072,7 @@ func init_cabinet(cab GenericHardware) error {
 		if requestErr != nil {
 			log.Printf("Failed to construct request: %s", requestErr)
 		}
+		base.SetHTTPUserAgent(request.Request,serviceName)
 		_, doErr := dhcpdnsClient.HTTPClient.Do(request)
 		if doErr != nil {
 			fmt.Printf("Failed to execute PATCH request: %s", doErr)
@@ -1128,7 +1148,7 @@ func setupRFHTTPStuff() error {
 	nwp.SyslogSpec = syslogTarg
 	nwp.NTPSpec = ntpTarg
 	nwp.CAChainURI = hms_ca_uri
-	rfNWPStatic, err = bmc_nwprotocol.Init(nwp, redfishNPSuffix)
+	rfNWPStatic, err = bmc_nwprotocol.InitInstance(nwp, redfishNPSuffix, serviceName)
 	if err != nil {
 		return fmt.Errorf("ERROR setting up NW protocol handling: %v", err)
 	}
@@ -1170,6 +1190,13 @@ func main() {
 
 	getEnvVars()
 
+	serviceName,err = base.GetServiceInstanceName()
+	if (err != nil) {
+		log.Printf("Can't get service instance (hostname)!  Setting to 'MEDS'")
+		serviceName = "MEDS"
+	}
+	log.Printf("Service Instance Name: '%s'",serviceName)
+
 	log.Printf("Connecting to secure store (Vault)...")
 	// Start a connection to Vault
 	if ss, err := sstorage.NewVaultAdapter("secret"); err != nil {
@@ -1182,11 +1209,11 @@ func main() {
 	}
 
 	//Set up DNS/DHCP
-	dhcpdnsClient = dns_dhcp.NewDHCPDNSHelper(hsm, nil)
+	dhcpdnsClient = dns_dhcp.NewDHCPDNSHelperInstance(hsm, nil, serviceName)
 
 	//Set up RF HTTP client and NWP stuff
 
-	hms_certs.Init(nil)
+	hms_certs.InitInstance(nil, serviceName)
 
 	log.Printf("INFO: Setting up non-TLS-validated HTTP client for in-service use.")
 	client, _ = hms_certs.CreateHTTPClientPair("", clientTimeout)
@@ -1230,7 +1257,7 @@ func main() {
 	var nwp bmc_nwprotocol.NWPData
 	nwp.SyslogSpec = syslogTarg
 	nwp.NTPSpec = ntpTarg
-	rfNWPStatic, err = bmc_nwprotocol.Init(nwp, redfishNPSuffix)
+	rfNWPStatic, err = bmc_nwprotocol.InitInstance(nwp, redfishNPSuffix, serviceName)
 	if err != nil {
 		log.Println("ERROR setting up NW protocol handling:", err)
 		//TODO: should we exit??
