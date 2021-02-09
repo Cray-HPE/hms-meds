@@ -5,6 +5,11 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.14.0] - 2021-2-09
+
+### Changed
+
+- MEDS no longer expects specific IP addresses for nodes and instead looks them up using DNS.
 
 ## [1.13.0] - 2021-02-05
 
