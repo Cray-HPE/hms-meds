@@ -10,10 +10,10 @@ import (
 	"io/ioutil"
 	"net/http"
 	"net/http/httptest"
+	"stash.us.cray.com/HMS/hms-certs/pkg/hms_certs"
 	"strings"
 	"testing"
 	"time"
-	"stash.us.cray.com/HMS/hms-certs/pkg/hms_certs"
 )
 
 func NetEndpointEquals(a NetEndpoint, b NetEndpoint) bool {
@@ -554,7 +554,7 @@ func Test_notifyHSMXnamePresent(t *testing.T) {
 
 	defUser = "root"
 	defPass = "********"
-	client,_ = hms_certs.CreateHTTPClientPair("",clientTimeout)
+	client, _ = hms_certs.CreateHTTPClientPair("", clientTimeout)
 	setupRFHTTPStuff()
 
 	for i, test := range tests {
@@ -615,8 +615,6 @@ func Test_notifyHSMXnameNotPresent(t *testing.T) {
 			NetEndpoint{
 				name:   "x7c5s3b1",
 				mac:    "02:00:07:05:33:10",
-				ip6g:   "fd66::7ff:fe05:3310",
-				ip6l:   "fe80::7ff:fe05:3310",
 				hwtype: TYPE_NODE_CARD,
 			},
 			false,
@@ -632,8 +630,6 @@ func Test_notifyHSMXnameNotPresent(t *testing.T) {
 			NetEndpoint{
 				name:   "x7c5s3b1",
 				mac:    "02:00:07:05:33:10",
-				ip6g:   "fd66::7ff:fe05:3310",
-				ip6l:   "fe80::7ff:fe05:3310",
 				hwtype: TYPE_NODE_CARD,
 			},
 			true,
@@ -649,8 +645,6 @@ func Test_notifyHSMXnameNotPresent(t *testing.T) {
 			NetEndpoint{
 				name:   "x7c5s3b1",
 				mac:    "02:00:07:05:33:10",
-				ip6g:   "fd66::7ff:fe05:3310",
-				ip6l:   "fe80::7ff:fe05:3310",
 				hwtype: TYPE_NODE_CARD,
 			},
 			true,
