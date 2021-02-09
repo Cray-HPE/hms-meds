@@ -51,8 +51,6 @@ import (
 
 	bmc_nwprotocol "stash.us.cray.com/HMS/hms-bmc-networkprotocol/pkg"
 	"stash.us.cray.com/HMS/hms-certs/pkg/hms_certs"
-
-	"github.com/hashicorp/go-retryablehttp"
 )
 
 // A general understanding of the hardware in a Mountain rack is neccessary

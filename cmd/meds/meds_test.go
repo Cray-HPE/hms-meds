@@ -32,11 +32,10 @@ import (
 	"io/ioutil"
 	"net/http"
 	"net/http/httptest"
+	"stash.us.cray.com/HMS/hms-certs/pkg/hms_certs"
 	"strings"
 	"testing"
 	"time"
-
-	"stash.us.cray.com/HMS/hms-certs/pkg/hms_certs"
 )
 
 func NetEndpointEquals(a NetEndpoint, b NetEndpoint) bool {
