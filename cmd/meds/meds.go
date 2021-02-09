@@ -375,8 +375,21 @@ func notifyXnamePresent(node NetEndpoint, address string) *error {
 		tmpBMCCreds.Oem.SSHAdmin = nil
 		tmpBMCCreds.Oem.SSHConsole = nil
 	}
+
+	rfNWProtoAddr := address
+	if strings.HasSuffix(rfNWProtoAddr, "c0b0") ||
+		strings.HasSuffix(rfNWProtoAddr, "c1b0") ||
+		strings.HasSuffix(rfNWProtoAddr, "c2b0") ||
+		strings.HasSuffix(rfNWProtoAddr, "c3b0") ||
+		strings.HasSuffix(rfNWProtoAddr, "c4b0") ||
+		strings.HasSuffix(rfNWProtoAddr, "c5b0") ||
+		strings.HasSuffix(rfNWProtoAddr, "c6b0") ||
+		strings.HasSuffix(rfNWProtoAddr, "c7b0") {
+		rfNWProtoAddr = strings.TrimSuffix(rfNWProtoAddr, "b0")
+	}
+
 	rfClientLock.RLock()
-	nstError := bmc_nwprotocol.SetXNameNWPInfo(tmpBMCCreds, address, creds.Username, creds.Password)
+	nstError := bmc_nwprotocol.SetXNameNWPInfo(tmpBMCCreds, rfNWProtoAddr, creds.Username, creds.Password)
 	rfClientLock.RUnlock()
 
 	perNodeCred := compcreds.CompCredentials{
