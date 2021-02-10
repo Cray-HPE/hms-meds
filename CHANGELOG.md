@@ -4,11 +4,24 @@ All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
-## [1.14.0] - 2021-2-09
+
+## [1.11.9] - 2021-2-09
 
 ### Changed
 
 - MEDS no longer expects specific IP addresses for nodes and instead looks them up using DNS.
+
+## [1.11.8] - 2021-02-08
+
+### Changed
+
+- Update Copyright/License info
+
+## [1.11.7] - 2021-01-22
+
+### Changed
+
+- CASMHMS-4367 - MEDS no longer marks redfishEndpoints as disabled in HSM when they are no longer on the network, as this is not necessary.
 
 ## [1.11.6] - 2021-01-19
 
