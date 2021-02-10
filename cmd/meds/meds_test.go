@@ -26,14 +26,14 @@ import (
 	"bytes"
 	"encoding/json"
 	"errors"
+	"fmt"
 	"io/ioutil"
 	"net/http"
 	"net/http/httptest"
+	"stash.us.cray.com/HMS/hms-certs/pkg/hms_certs"
 	"strings"
 	"testing"
 	"time"
-
-	"stash.us.cray.com/HMS/hms-certs/pkg/hms_certs"
 )
 
 func NetEndpointEquals(a NetEndpoint, b NetEndpoint) bool {
@@ -42,12 +42,6 @@ func NetEndpointEquals(a NetEndpoint, b NetEndpoint) bool {
 		return false
 	} else if a.mac != b.mac {
 		print("MACs not equal")
-		return false
-	} else if a.ip6l != b.ip6l {
-		print("ip6l not equal")
-		return false
-	} else if a.ip6g != b.ip6g {
-		print("ip6g not equal")
 		return false
 	} else if a.hwtype != b.hwtype {
 		print("hwtypess not equal")
@@ -88,47 +82,17 @@ func Test_GenerateMACcC(t *testing.T) {
 	}
 }
 
-func Test_GenerateEUI64(t *testing.T) {
-	ret := GenerateEUI64("02:00:07:05:33:10")
-	ec := "0000:07ff:fe05:3310"
-	if ret != ec {
-		t.Errorf("Generated EUI64 did not match expectation:\nExpectation:\n%v\nGot:\n%v\n", ec, ret)
-	}
-}
-
-func Test_GenerateG6(t *testing.T) {
-	ret := GenerateG6("fd66:0:0:0", "02:00:07:05:33:10", "TEST_NAME")
-	ec := "fd66::7ff:fe05:3310"
-	if ret != ec {
-		t.Errorf("Generated G6 did not match expectation:\nExpectation:\n%v\nGot:\n%v\n", ec, ret)
-	}
-}
-
-func Test_GenerateL6(t *testing.T) {
-	ret := GenerateL6("02:00:07:05:33:10")
-	ec := "fe80::7ff:fe05:3310"
-	if ret != ec {
-		t.Errorf("Generated L6 did not match expectation:\nExpectation:\n%v\nGot:\n%v\n", ec, ret)
-	}
-}
-
 func Test_GenerateEnvironmentalControllerEndpoints(t *testing.T) {
-	ret := GenerateEnvironmentalControllerEndpoints("fd66:0:0:0", 3)
+	ret := GenerateEnvironmentalControllerEndpoints(3)
 
 	ec1 := NetEndpoint{
 		name:   "x3e0",
 		mac:    "",
-		ipv4:   "",
-		ip6g:   "fd66::a0:3:0",
-		ip6l:   "fe80::a0:3:0",
 		hwtype: TYPE_ENV_CONTROLLER,
 	}
 	ec2 := NetEndpoint{
 		name:   "x3e1",
 		mac:    "",
-		ipv4:   "",
-		ip6g:   "fd66::a1:3:0",
-		ip6l:   "fe80::a1:3:0",
 		hwtype: TYPE_ENV_CONTROLLER,
 	}
 
@@ -141,15 +105,11 @@ func Test_GenerateEnvironmentalControllerEndpoints(t *testing.T) {
 }
 
 func Test_GenerateNodeCardEndpoints(t *testing.T) {
-	ip4base := "10.0.0.1/22"
-	ret := GenerateNodeCardEndpoints("fd66:0:0:0", &ip4base, "02", 7, 5, 3)
+	ret := GenerateNodeCardEndpoints("02", 7, 5, 3)
 
 	nc2 := NetEndpoint{
 		name:   "x7c5s3b1",
 		mac:    "02:00:07:05:33:10",
-		ipv4:   "10.0.0.134",
-		ip6g:   "fd66::7ff:fe05:3310",
-		ip6l:   "fe80::7ff:fe05:3310",
 		hwtype: TYPE_NODE_CARD,
 	}
 
@@ -159,15 +119,11 @@ func Test_GenerateNodeCardEndpoints(t *testing.T) {
 }
 
 func Test_GenerateSwitchCardEndpoints(t *testing.T) {
-	ip4base := "10.0.0.1/22"
-	ret := GenerateSwitchCardEndpoints("fd66:0:0:0", &ip4base, "02", 7, 5)
+	ret := GenerateSwitchCardEndpoints("02", 7, 5)
 
 	sc1 := NetEndpoint{
 		name:   "x7c5r0b0",
 		mac:    "02:00:07:05:60:00",
-		ipv4:   "10.0.0.143",
-		ip6g:   "fd66::7ff:fe05:6000",
-		ip6l:   "fe80::7ff:fe05:6000",
 		hwtype: TYPE_SWITCH_CARD,
 	}
 
@@ -181,15 +137,11 @@ func Test_GenerateSwitchCardEndpoints(t *testing.T) {
 }
 
 func Test_GenerateChassisEndpoints(t *testing.T) {
-	ip4base := "10.0.0.1/22"
-	ret := GenerateChassisEndpoints("fd66:0:0:0", &ip4base, "02", 7)
+	ret := GenerateChassisEndpoints("02", 7)
 
 	cha1 := NetEndpoint{
 		name:   "x7c0b0",
 		mac:    "02:00:07:00:00:00",
-		ipv4:   "10.0.0.1",
-		ip6g:   "fd66::7ff:fe00:0",
-		ip6l:   "fe80::7ff:fe00:0",
 		hwtype: TYPE_CHASSIS,
 	}
 
@@ -292,12 +244,10 @@ func Test_watchForHardware_notPresentToPresent(t *testing.T) {
 	node := NetEndpoint{
 		name:        "testNode",
 		mac:         "001cedc0ffee",
-		ip6g:        "fd66::",
-		ip6l:        "fe80::",
 		hwtype:      TYPE_CHASSIS,
 		HSMPresence: PRESENCE_NOT_PRESENT,
 	}
-	configure_queryNet(PRESENCE_PRESENT, &(node.ipv4), nil)
+	configure_queryNet(PRESENCE_PRESENT, &(node.name), nil)
 	configure_notifyHSMPresent(nil)
 	configure_notifyHSMNotPresent(nil)
 
@@ -344,8 +294,6 @@ func Test_watchForHardware_presentToNotPresent(t *testing.T) {
 	node := NetEndpoint{
 		name:        "testNode",
 		mac:         "001cedc0ffee",
-		ip6g:        "fd66::",
-		ip6l:        "fe80::",
 		hwtype:      TYPE_CHASSIS,
 		HSMPresence: PRESENCE_PRESENT,
 	}
@@ -397,13 +345,10 @@ func Test_watchForHardware_noChange_0(t *testing.T) {
 	node := NetEndpoint{
 		name:        "testNode",
 		mac:         "001cedc0ffee",
-		ipv4:        "10.0.0.1",
-		ip6g:        "fd66::",
-		ip6l:        "fe80::",
 		hwtype:      TYPE_CHASSIS,
 		HSMPresence: PRESENCE_PRESENT,
 	}
-	configure_queryNet(PRESENCE_PRESENT, &(node.ipv4), nil)
+	configure_queryNet(PRESENCE_PRESENT, &(node.name), nil)
 	configure_notifyHSMPresent(nil)
 	configure_notifyHSMNotPresent(nil)
 
@@ -445,8 +390,6 @@ func Test_watchForHardware_noChange_1(t *testing.T) {
 	node := NetEndpoint{
 		name:        "testNode",
 		mac:         "001cedc0ffee",
-		ip6g:        "fd66::",
-		ip6l:        "fe80::",
 		hwtype:      TYPE_CHASSIS,
 		HSMPresence: PRESENCE_NOT_PRESENT,
 	}
@@ -497,9 +440,6 @@ func Test_watchForHardware_netQuery_FailureRecovery(t *testing.T) {
 	node := NetEndpoint{
 		name:        "testNode",
 		mac:         "001cedc0ffee",
-		ipv4:        "10.0.0.1",
-		ip6g:        "fd66::",
-		ip6l:        "fe80::",
 		hwtype:      TYPE_CHASSIS,
 		HSMPresence: PRESENCE_NOT_PRESENT,
 	}
@@ -552,8 +492,6 @@ func Test_notifyHSMXnamePresent(t *testing.T) {
 		NetEndpoint{
 			name:   "x7c5s3b1",
 			mac:    "02:00:07:05:33:10",
-			ip6g:   "fd66::7ff:fe05:3310",
-			ip6l:   "fe80::7ff:fe05:3310",
 			hwtype: TYPE_NODE_CARD,
 		},
 		false,
@@ -569,8 +507,6 @@ func Test_notifyHSMXnamePresent(t *testing.T) {
 		NetEndpoint{
 			name:   "x7c5s3b1",
 			mac:    "02:00:07:05:33:10",
-			ip6g:   "fd66::7ff:fe05:3310",
-			ip6l:   "fe80::7ff:fe05:3310",
 			hwtype: TYPE_NODE_CARD,
 		},
 		true,
@@ -591,8 +527,6 @@ func Test_notifyHSMXnamePresent(t *testing.T) {
 		NetEndpoint{
 			name:   "x7c5s3b1",
 			mac:    "02:00:07:05:33:10",
-			ip6g:   "fd66::7ff:fe05:3310",
-			ip6l:   "fe80::7ff:fe05:3310",
 			hwtype: TYPE_NODE_CARD,
 		},
 		false,
@@ -613,8 +547,6 @@ func Test_notifyHSMXnamePresent(t *testing.T) {
 		NetEndpoint{
 			name:   "x7c5s3b1",
 			mac:    "02:00:07:05:33:10",
-			ip6g:   "fd66::7ff:fe05:3310",
-			ip6l:   "fe80::7ff:fe05:3310",
 			hwtype: TYPE_NODE_CARD,
 		},
 		true,
@@ -635,8 +567,6 @@ func Test_notifyHSMXnamePresent(t *testing.T) {
 		NetEndpoint{
 			name:   "x7c5s3b1",
 			mac:    "02:00:07:05:33:10",
-			ip6g:   "fd66::7ff:fe05:3310",
-			ip6l:   "fe80::7ff:fe05:3310",
 			hwtype: TYPE_NODE_CARD,
 		},
 		true,
@@ -796,12 +726,11 @@ func Test_queryNetworkStatus(t *testing.T) {
 	strs := strings.Split(testServer.URL, "//")
 	address := strs[1]
 
+	fmt.Printf("Server address is: %s", address)
+
 	endpoint := NetEndpoint{
 		name:   address,
 		mac:    "02:00:07:05:33:10",
-		ipv4:   address,
-		ip6g:   address,
-		ip6l:   address,
 		hwtype: TYPE_NODE_CARD,
 	}
 

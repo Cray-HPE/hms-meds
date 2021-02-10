@@ -154,7 +154,6 @@ func getCabInfo(endpoints *[]*NetEndpoint, rackInfo RackInfo) error {
 
 	for _, cab := range hwList {
 		var cb sls_common.ComptypeCabinet
-		var rackIP *string
 		var macPre string
 		//Get ExtraProperties
 		ba, baerr := json.Marshal(cab.ExtraPropertiesRaw)
@@ -182,12 +181,6 @@ func getCabInfo(endpoints *[]*NetEndpoint, rackInfo RackInfo) error {
 			continue
 		}
 
-		if hmnNetwork.CIDR != "" {
-			rackIP = &hmnNetwork.CIDR
-		} else {
-			rackIP = nil
-		}
-
 		macPre = hmnNetwork.IPv6Prefix
 		if hmnNetwork.IPv6Prefix == "" {
 			macPre = rackInfo.macprefix
@@ -198,13 +191,9 @@ func getCabInfo(endpoints *[]*NetEndpoint, rackInfo RackInfo) error {
 				cab.Xname, rerr)
 			continue
 		}
-		*endpoints = append(*endpoints, GenerateEnvironmentalControllerEndpoints(hmnNetwork.IPv6Prefix, rackNum)...)
-		*endpoints = append(*endpoints, GenerateChassisEndpoints(hmnNetwork.IPv6Prefix, rackIP, macPre, rackNum)...)
+		*endpoints = append(*endpoints, GenerateEnvironmentalControllerEndpoints(rackNum)...)
+		*endpoints = append(*endpoints, GenerateChassisEndpoints(macPre, rackNum)...)
 
-		// This can be used to print out node addresses
-		if *printNodes == true {
-			printHostsFormat(*endpoints)
-		}
 	}
 
 	log.Printf("INFO: %d endpoints calculated for %d cabinets.\n",

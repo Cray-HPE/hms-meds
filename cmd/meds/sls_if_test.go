@@ -38,10 +38,10 @@ var cabSideLoad = []string{`{"Parent":"","Xname":"x1000","Type":"comptype_cabine
 
 // Expected net endpoints from MEDS' endpoint calculations
 
-var expEP = []NetEndpoint{{name: "x1000c0b0", mac: "02:03:E8:00:00:00", ipv4: "10.0.2.100", ip6g: "fd66::3:e8ff:fe00:0", ip6l: "fe80::3:e8ff:fe00:0", hwtype: 3},
-	{name: "x1001c0b0", mac: "02:03:E9:00:00:00", ipv4: "10.10.2.100", ip6g: "fd66::3:e9ff:fe00:0", ip6l: "fe80::3:e9ff:fe00:0", hwtype: 3},
-	{name: "x1002c0b0", mac: "02:03:EA:00:00:00", ipv4: "10.20.2.100", ip6g: "fd66::3:eaff:fe00:0", ip6l: "fe80::3:eaff:fe00:0", hwtype: 3},
-	{name: "x1003c0b0", mac: "02:03:EB:00:00:00", ipv4: "10.30.2.100", ip6g: "fd66::3:ebff:fe00:0", ip6l: "fe80::3:ebff:fe00:0", hwtype: 3},
+var expEP = []NetEndpoint{{name: "x1000c0b0", mac: "02:03:E8:00:00:00", hwtype: 3},
+	{name: "x1001c0b0", mac: "02:03:E9:00:00:00", hwtype: 3},
+	{name: "x1002c0b0", mac: "02:03:EA:00:00:00", hwtype: 3},
+	{name: "x1003c0b0", mac: "02:03:EB:00:00:00", hwtype: 3},
 }
 
 var glbHttpStatus int
