@@ -11,6 +11,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - MEDS no longer expects specific IP addresses for nodes and instead looks them up using DNS.
 
+## [1.13.1] - 2021-02-09
+
+### Changed
+
+- Added User-Agent headers to outbound HTTP requests.
+
 ## [1.13.0] - 2021-02-05
 
 ### Changed
