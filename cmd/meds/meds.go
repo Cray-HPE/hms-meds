@@ -33,7 +33,6 @@ import (
 	"io/ioutil"
 	"log"
 	"math/rand"
-	"net"
 	"net/http"
 	"os"
 	"strconv"
@@ -53,8 +52,6 @@ import (
 
 	bmc_nwprotocol "stash.us.cray.com/HMS/hms-bmc-networkprotocol/pkg"
 	"stash.us.cray.com/HMS/hms-certs/pkg/hms_certs"
-
-	"github.com/hashicorp/go-retryablehttp"
 )
 
 // A general understanding of the hardware in a Mountain rack is neccessary
@@ -96,9 +93,6 @@ type HSMNotificationArray struct {
 type NetEndpoint struct {
 	name        string
 	mac         string
-	ipv4        string
-	ip6g        string
-	ip6l        string
 	hwtype      int
 	HSMPresence HSMEndpointPresence
 	HSMPresLock sync.Mutex
@@ -233,22 +227,6 @@ func (r *RackIPList) Set(val string) error {
 	return nil
 }
 
-// See https://stackoverflow.com/questions/31191313/how-to-get-the-next-ip-address
-func IP4Plus(ip net.IP, sn *net.IPNet, increment uint) net.IP {
-	i := ip.To4()
-	v := uint(i[0])<<24 + uint(i[1])<<16 + uint(i[2])<<8 + uint(i[3])
-	v += increment
-	v3 := byte(v & 0xFF)
-	v2 := byte((v >> 8) & 0xFF)
-	v1 := byte((v >> 16) & 0xFF)
-	v0 := byte((v >> 24) & 0xFF)
-	nextIp := net.IPv4(v0, v1, v2, v3)
-	if sn.Contains(nextIp) != true {
-		panic("you blew out your IPv4 subnet! Pick a bigger mask length\n")
-	}
-	return nextIp
-}
-
 func GenerateMAC(mp string, rack int, chassis int, slt int, idx int) string {
 	return fmt.Sprintf("%s:%02X:%02X:%02X:%02X:%02X", mp,
 		(rack>>8)&0xFF, rack&0xFF, chassis&0xFF, slt&0xFF, (idx<<4)&0xFF)
@@ -267,45 +245,6 @@ func GenerateMACcC(mp string, rack int, chassis int) string {
 	return GenerateMAC(mp, rack, chassis, 0, 0)
 }
 
-// EUI64 encode a MAC address. The answer does not include the net prefix.
-func GenerateEUI64(mac string) string {
-	p := strings.Split(mac, ":")
-	x, _ := strconv.ParseInt(p[0], 16, 32)
-	x = x ^ 0x02
-
-	return fmt.Sprintf("%02X%s:%sff:fe%s:%s%s", x, p[1], p[2], p[3], p[4], p[5])
-}
-
-func GenerateG6(prefix string, mac string, xname string) string {
-	ip := net.ParseIP(fmt.Sprintf("%s:%s", prefix, GenerateEUI64(mac)))
-	if prefix == "" {
-		log.Printf("Not generating IPv6 global address for %s; no prefix supplied.", xname)
-		return ""
-	}
-	if ip == nil {
-		panic("unable to parse IP")
-	}
-	return fmt.Sprintf("%s", ip)
-}
-
-func GenerateL6(mac string) string {
-	ip := net.ParseIP(fmt.Sprintf("fe80::%s", GenerateEUI64(mac)))
-	if ip == nil {
-		panic("unable to parse IP")
-	}
-	return fmt.Sprintf("%s", ip)
-}
-
-func printHostsFormat(lst []*NetEndpoint) {
-
-	for i := range lst {
-		fmt.Printf("%s  %s  %s\n", lst[i].ip6g, lst[i].name, lst[i].name)
-		if lst[i].ipv4 != "" {
-			fmt.Printf("%s  %s  %s\n", lst[i].ipv4, lst[i].name, lst[i].name)
-		}
-	}
-}
-
 // GenerateEnvironmentalControllerEndpoints generates the Environmental
 //  Controller (eC) entries for a given rack.
 // Parameters:
@@ -314,62 +253,28 @@ func printHostsFormat(lst []*NetEndpoint) {
 // Returns:
 // - []NetEndpoint: a slice of NetEndpoints representing the eCs available
 //   in this rack
-func GenerateEnvironmentalControllerEndpoints(ip6prefix string, rack int) []*NetEndpoint {
+func GenerateEnvironmentalControllerEndpoints(rack int) []*NetEndpoint {
 	// eC is a special snowflake with respect to address assignment.
 	ret := make([]*NetEndpoint, 0)
 
 	for i := 0; i < MTN_eC_COUNT; i++ {
 		ec := new(NetEndpoint)
 		ec.name = fmt.Sprintf("x%de%d", rack, i)
-		ec.ip6g = fmt.Sprintf("%s::a%d:%x:0", ip6prefix, i, rack)
-		ec.ip6l = fmt.Sprintf("fe80::a%d:%x:0", i, rack)
 		ec.hwtype = TYPE_ENV_CONTROLLER
 		ec.HSMPresence = PRESENCE_NOT_PRESENT
-		// This just makes sure the IPv6 syntax is correct and printed
-		// in conventional form with leading zero trimmed.
-		ip := net.ParseIP(ec.ip6g)
-		if ip == nil {
-			panic("unable to parse IP")
-		}
-		ec.ip6g = fmt.Sprintf("%s", ip)
 		ret = append(ret, ec)
 	}
 	return ret
 }
 
 // GenerateNodeCardEndpoints builds the Node Card (nC) entries for a specific slot.
-func GenerateNodeCardEndpoints(ip6prefix string, ip4base *string, macprefix string, rack int, chassis int, slot int) []*NetEndpoint {
+func GenerateNodeCardEndpoints(macprefix string, rack int, chassis int, slot int) []*NetEndpoint {
 	ret := make([]*NetEndpoint, 0)
-
-	var useipv4 bool
-	var ip4start net.IP
-	var ip4net *net.IPNet
-	var err error
-	if ip4base != nil {
-		useipv4 = true
-		ip4start, ip4net, err = net.ParseCIDR(*ip4base)
-		if err != nil {
-			panic("Couldn't parse IPv4 range " + *ip4base + "!")
-		}
-	} else {
-		useipv4 = false
-	}
 
 	for nc := 0; nc < MTN_nC_PER_SLOT; nc++ {
 		ep := new(NetEndpoint)
 		ep.name = fmt.Sprintf("x%dc%ds%db%d", rack, chassis, slot, nc)
 		ep.mac = GenerateMACnC(macprefix, rack, chassis, slot, nc)
-		// 1 to not overlap with the chassis
-		// 25 * chassis to be in the right chassis
-		// 2 * slot to ge tot the right slot
-		// then add the card number
-		if useipv4 {
-
-			ep.ipv4 = IP4Plus(ip4start, ip4net,
-				1+25*uint(chassis)+2*uint(slot)+uint(nc)).String()
-		}
-		ep.ip6g = GenerateG6(ip6prefix, ep.mac, ep.name)
-		ep.ip6l = GenerateL6(ep.mac)
 		ep.hwtype = TYPE_NODE_CARD
 		ep.HSMPresence = PRESENCE_NOT_PRESENT
 		ret = append(ret, ep)
@@ -377,38 +282,14 @@ func GenerateNodeCardEndpoints(ip6prefix string, ip4base *string, macprefix stri
 	return ret
 }
 
-func GenerateSwitchCardEndpoints(ip6prefix string, ip4base *string, macprefix string, rack int, chassis int) []*NetEndpoint {
+func GenerateSwitchCardEndpoints(macprefix string, rack int, chassis int) []*NetEndpoint {
 	endpoints := make([]*NetEndpoint, 0)
-
-	var useipv4 bool
-	var ip4start net.IP
-	var ip4net *net.IPNet
-	var err error
-	if ip4base != nil {
-		useipv4 = true
-		ip4start, ip4net, err = net.ParseCIDR(*ip4base)
-		if err != nil {
-			panic("Couldn't parse IPv4 range " + *ip4base + "!")
-		}
-	} else {
-		useipv4 = false
-	}
 
 	for card := 0; card < MTN_SWITCH_COUNT; card++ {
 
 		ep := new(NetEndpoint)
 		ep.name = fmt.Sprintf("x%dc%dr%db0", rack, chassis, card)
 		ep.mac = GenerateMACsC(macprefix, rack, chassis, card)
-		if useipv4 {
-			// 1 to not overlap with the chassis
-			// 25 * chassis to be in the right chassis
-			// 16 to not overlap with nodecards
-			// then add the card number
-			ep.ipv4 = IP4Plus(ip4start, ip4net,
-				1+16+25*uint(chassis)+uint(card)).String()
-		}
-		ep.ip6g = GenerateG6(ip6prefix, ep.mac, ep.name)
-		ep.ip6l = GenerateL6(ep.mac)
 		ep.hwtype = TYPE_SWITCH_CARD
 		ep.HSMPresence = PRESENCE_NOT_PRESENT
 		endpoints = append(endpoints, ep)
@@ -416,45 +297,26 @@ func GenerateSwitchCardEndpoints(ip6prefix string, ip4base *string, macprefix st
 		// (This presents the slice to be appended as a list of
 		// variadic arguments to the append function)
 		endpoints = append(endpoints, GenerateNodeCardEndpoints(
-			ip6prefix, ip4base, macprefix, rack, chassis, card)...)
+			macprefix, rack, chassis, card)...)
 	}
 
 	return endpoints
 }
 
 //
-func GenerateChassisEndpoints(ip6prefix string, ip4base *string, macprefix string, rack int) []*NetEndpoint {
+func GenerateChassisEndpoints(macprefix string, rack int) []*NetEndpoint {
 	endpoints := make([]*NetEndpoint, 0)
-
-	var useipv4 bool
-	var ip4start net.IP
-	var ip4net *net.IPNet
-	var err error
-	if ip4base != nil {
-		useipv4 = true
-		ip4start, ip4net, err = net.ParseCIDR(*ip4base)
-		if err != nil {
-			panic("Couldn't parse IPv4 range " + *ip4base + "!")
-		}
-	} else {
-		useipv4 = false
-	}
 
 	for chassis := 0; chassis < MTN_CHASSIS_COUNT; chassis++ {
 		cc := new(NetEndpoint)
 		cc.name = fmt.Sprintf("x%dc%db0", rack, chassis)
 		cc.mac = GenerateMACcC(macprefix, rack, chassis)
-		if useipv4 {
-			cc.ipv4 = IP4Plus(ip4start, ip4net, 25*uint(chassis)).String()
-		}
-		cc.ip6g = GenerateG6(ip6prefix, cc.mac, cc.name)
-		cc.ip6l = GenerateL6(cc.mac)
 		cc.hwtype = TYPE_CHASSIS
 		cc.HSMPresence = PRESENCE_NOT_PRESENT
 		endpoints = append(endpoints, cc)
 
 		endpoints = append(endpoints, GenerateSwitchCardEndpoints(
-			ip6prefix, ip4base, macprefix, rack, chassis)...)
+			macprefix, rack, chassis)...)
 	}
 
 	return endpoints
@@ -479,7 +341,7 @@ func patchXName(xname string, enabled bool) *error {
 
 	req, err := http.NewRequest(http.MethodPatch, hsm+"/Inventory/RedfishEndpoints/"+xname, bytes.NewReader(rawPayload))
 	req.Header.Add("Content-Type", "application/json")
-	base.SetHTTPUserAgent(req,serviceName)
+	base.SetHTTPUserAgent(req, serviceName)
 	resp, err := client.Do(req)
 	if err != nil {
 		log.Printf("WARNING: Unable to patch %s: %v", xname, err)
@@ -538,8 +400,21 @@ func notifyXnamePresent(node NetEndpoint, address string) *error {
 		tmpBMCCreds.Oem.SSHAdmin = nil
 		tmpBMCCreds.Oem.SSHConsole = nil
 	}
+
+	rfNWProtoAddr := address
+	if strings.HasSuffix(rfNWProtoAddr, "c0b0") ||
+		strings.HasSuffix(rfNWProtoAddr, "c1b0") ||
+		strings.HasSuffix(rfNWProtoAddr, "c2b0") ||
+		strings.HasSuffix(rfNWProtoAddr, "c3b0") ||
+		strings.HasSuffix(rfNWProtoAddr, "c4b0") ||
+		strings.HasSuffix(rfNWProtoAddr, "c5b0") ||
+		strings.HasSuffix(rfNWProtoAddr, "c6b0") ||
+		strings.HasSuffix(rfNWProtoAddr, "c7b0") {
+		rfNWProtoAddr = strings.TrimSuffix(rfNWProtoAddr, "b0")
+	}
+
 	rfClientLock.RLock()
-	nstError := bmc_nwprotocol.SetXNameNWPInfo(tmpBMCCreds, address, creds.Username, creds.Password)
+	nstError := bmc_nwprotocol.SetXNameNWPInfo(tmpBMCCreds, rfNWProtoAddr, creds.Username, creds.Password)
 	rfClientLock.RUnlock()
 
 	perNodeCred := compcreds.CompCredentials{
@@ -596,15 +471,15 @@ func notifyHSMXnamePresent(node NetEndpoint, address string) *error {
 
 	log.Printf("DEBUG: POST to %s/Inventory/RedfishEndpoints with %s", hsm, string(rawPayload))
 
-	url := hsm+"/Inventory/RedfishEndpoints"
-	req,qerr := http.NewRequest(http.MethodPost,url,bytes.NewReader(rawPayload))
+	url := hsm + "/Inventory/RedfishEndpoints"
+	req, qerr := http.NewRequest(http.MethodPost, url, bytes.NewReader(rawPayload))
 	if qerr != nil {
 		log.Printf("WARNING: Unable to create HTTP request for %s: %v",
-			node.name,qerr)
+			node.name, qerr)
 		return &qerr
 	}
-	req.Header.Add("Content-Type","application/json")
-	base.SetHTTPUserAgent(req,serviceName)
+	req.Header.Add("Content-Type", "application/json")
+	base.SetHTTPUserAgent(req, serviceName)
 	resp, err := client.Do(req)
 	if err != nil {
 		log.Printf("WARNING: Unable to send information for %s: %v", node.name, err)
@@ -649,7 +524,7 @@ func queryHSMState() error {
 	log.Printf("DEBUG: GET from %s/Inventory/RedfishEndpoints", hsm)
 
 	url := hsm + "/Inventory/RedfishEndpoints"
-	req,qerr := http.NewRequest(http.MethodGet,url,nil)
+	req, qerr := http.NewRequest(http.MethodGet, url, nil)
 	if qerr != nil {
 		log.Printf("WARNING: Unable to create HTTP request for HSM query: %v",
 			qerr)
@@ -739,44 +614,34 @@ func queryNetworkStatusViaAddress(address string) (HSMEndpointPresence, *error) 
 
 func queryNetworkStatus(ne NetEndpoint) (HSMEndpointPresence, *string, *error) {
 	var res HSMEndpointPresence
-	var err6g, err6l, err4, errn *error
+	var errn *error
 
-	if ne.name != "" {
-		res, errn = queryNetworkStatusViaAddress(ne.name)
-		if res == PRESENCE_PRESENT {
-			return PRESENCE_PRESENT, &(ne.name), nil
-		}
+	if ne.name == "" {
+		err := fmt.Errorf("endpoint name cannot be empty!")
+		return PRESENCE_NOT_PRESENT, nil, &err
 	}
 
-	// IPv6 global
-	res, err6g = queryNetworkStatusViaAddress("[" + ne.ip6g + "]")
+	// This is pretty ugly, but for "reasons" it's been requested that from a networking point of view cabinet
+	// controllers not end with `b0` at the end of their name. However, HSM expects this to be there. So, to keep
+	// this simple just strip bhe b0 from here and that will be the end of it.
+	xname := ne.name
+	if strings.HasSuffix(xname, "c0b0") ||
+		strings.HasSuffix(xname, "c1b0") ||
+		strings.HasSuffix(xname, "c2b0") ||
+		strings.HasSuffix(xname, "c3b0") ||
+		strings.HasSuffix(xname, "c4b0") ||
+		strings.HasSuffix(xname, "c5b0") ||
+		strings.HasSuffix(xname, "c6b0") ||
+		strings.HasSuffix(xname, "c7b0") {
+		xname = strings.TrimSuffix(xname, "b0")
+	}
+
+	res, errn = queryNetworkStatusViaAddress(xname)
 	if res == PRESENCE_PRESENT {
-		return PRESENCE_PRESENT, &(ne.ip6g), nil
+		return PRESENCE_PRESENT, &(ne.name), nil
 	}
 
-	// IPv6 local
-	res, err6l = queryNetworkStatusViaAddress("[" + ne.ip6l + "]")
-	if res == PRESENCE_PRESENT {
-		return PRESENCE_PRESENT, &(ne.ip6l), nil
-	}
-
-	// IPv4
-	if ne.ipv4 != "" {
-		res, err4 = queryNetworkStatusViaAddress(ne.ipv4)
-		if res == PRESENCE_PRESENT {
-			return PRESENCE_PRESENT, &(ne.ipv4), nil
-		}
-	}
-
-	emsg := fmt.Sprintf("Not found. Tried %s (%v), %s (%v)", ne.ip6g, *err6g,
-		ne.ip6l, *err6l)
-	if ne.ipv4 != "" {
-		emsg += fmt.Sprintf(", %s (%v)", ne.ipv4, *err4)
-	}
-	if ne.name != "" {
-		emsg += fmt.Sprintf(", %s (%v)", ne.name, *errn)
-	}
-	rerr := fmt.Errorf(emsg)
+	rerr := fmt.Errorf("Not found. Tried %s: %s", ne.name, *errn)
 	return PRESENCE_NOT_PRESENT, nil, &rerr
 }
 
@@ -988,7 +853,6 @@ func getEnvVars() {
 
 func init_cabinet(cab GenericHardware) error {
 	endpoints := make([]*NetEndpoint, 0)
-	var rackIP string
 
 	rackNum, rerr := strconv.Atoi(cab.Xname[1:])
 	if rerr != nil {
@@ -1021,15 +885,6 @@ func init_cabinet(cab GenericHardware) error {
 		return err
 	}
 
-	if hmnNetwork.CIDR != "" {
-		rackIP = hmnNetwork.CIDR
-	}
-
-	ipv6prefix := ""
-	if hmnNetwork.IPv6Prefix != "" {
-		ipv6prefix = hmnNetwork.IPv6Prefix
-	}
-
 	macPrefix := ""
 	if hmnNetwork.MACPrefix != "" {
 		macPrefix = hmnNetwork.MACPrefix
@@ -1038,8 +893,8 @@ func init_cabinet(cab GenericHardware) error {
 		macPrefix = MAC_PREFIX
 	}
 
-	endpoints = append(endpoints, GenerateEnvironmentalControllerEndpoints(ipv6prefix, rackNum)...)
-	endpoints = append(endpoints, GenerateChassisEndpoints(ipv6prefix, &rackIP, macPrefix, rackNum)...)
+	endpoints = append(endpoints, GenerateEnvironmentalControllerEndpoints(rackNum)...)
+	endpoints = append(endpoints, GenerateChassisEndpoints(macPrefix, rackNum)...)
 
 	for _, v := range endpoints {
 		macWithoutColons := strings.ReplaceAll(v.mac, ":", "")
@@ -1062,23 +917,10 @@ func init_cabinet(cab GenericHardware) error {
 		// Preload HSM EthernetInterfaces with the endpoints.
 		ethernetInterface := sm.CompEthInterface{
 			MACAddr: macWithoutColons,
-			IPAddr:  v.ipv4,
 			CompID:  xname,
 		}
 
-		// TODO: CASMHMS-3617 - this hack should be removed. Delete records regardless before attempting to add.
-		deleteURL := fmt.Sprintf("%s/Inventory/EthernetInterfaces/%s", dhcpdnsClient.HSMURL, macWithoutColons)
-		request, requestErr := retryablehttp.NewRequest("DELETE", deleteURL, nil)
-		if requestErr != nil {
-			log.Printf("Failed to construct request: %s", requestErr)
-		}
-		base.SetHTTPUserAgent(request.Request,serviceName)
-		_, doErr := dhcpdnsClient.HTTPClient.Do(request)
-		if doErr != nil {
-			fmt.Printf("Failed to execute PATCH request: %s", doErr)
-		}
-
-		// Add the new ethernet interface.
+		// Add the new ethernet interface. Patches instead if it's already present
 		addErr := dhcpdnsClient.AddNewEthernetInterface(ethernetInterface, true)
 
 		if addErr != nil {
@@ -1190,12 +1032,12 @@ func main() {
 
 	getEnvVars()
 
-	serviceName,err = base.GetServiceInstanceName()
-	if (err != nil) {
+	serviceName, err = base.GetServiceInstanceName()
+	if err != nil {
 		log.Printf("Can't get service instance (hostname)!  Setting to 'MEDS'")
 		serviceName = "MEDS"
 	}
-	log.Printf("Service Instance Name: '%s'",serviceName)
+	log.Printf("Service Instance Name: '%s'", serviceName)
 
 	log.Printf("Connecting to secure store (Vault)...")
 	// Start a connection to Vault
