@@ -33,6 +33,7 @@ import (
 	"io/ioutil"
 	"log"
 	"math/rand"
+	"net"
 	"net/http"
 	"os"
 	"strconv"
@@ -162,6 +163,7 @@ var clientTimeout = 5
 // The HSM Credentials store
 var hcs *compcreds.CompCredStore
 var syslogTarg, ntpTarg string
+var syslogTargUseIP, ntpTargUseIP bool
 var smnTimeoutSecs int = 10
 var redfishNPSuffix string
 var debugLevel int = 0
@@ -787,9 +789,17 @@ func getEnvVars() {
 	if envstr != "" {
 		ntpTarg = envstr
 	}
+	envstr = os.Getenv("MEDS_NTP_TARG_USE_IP")
+	if envstr != "" {
+		ntpTargUseIP = true
+	}
 	envstr = os.Getenv("MEDS_SYSLOG_TARG")
 	if envstr != "" {
 		syslogTarg = envstr
+	}
+	envstr = os.Getenv("MEDS_SYSLOG_TARG_USE_IP")
+	if envstr != "" {
+		syslogTargUseIP = true
 	}
 	envstr = os.Getenv("MEDS_NP_RF_URL")
 	if envstr != "" {
@@ -1099,6 +1109,29 @@ func main() {
 	var nwp bmc_nwprotocol.NWPData
 	nwp.SyslogSpec = syslogTarg
 	nwp.NTPSpec = ntpTarg
+
+	//Check if we are to use IP addresses, and if so, convert them here.
+	if (syslogTargUseIP) {
+		ip,iperr := net.LookupIP(syslogTarg)
+		if (iperr != nil) {
+			log.Printf("ERROR looking up syslog server IP addr: %v",iperr)
+			log.Printf("Using hostname anyway.")
+		} else {
+			syslogTarg = ip[0].String()
+		}
+	}
+	if (ntpTargUseIP) {
+		ip,iperr := net.LookupIP(ntpTarg)
+		if (iperr != nil) {
+			log.Printf("ERROR looking up NTP IP addr: %v",iperr)
+			log.Printf("Using hostname anyway.")
+		} else {
+			ntpTarg = ip[0].String()
+		}
+	}
+	log.Printf("Using syslog server: '%s'",syslogTarg)
+	log.Printf("Using NTP server: '%s'",syslogTarg)
+
 	rfNWPStatic, err = bmc_nwprotocol.InitInstance(nwp, redfishNPSuffix, serviceName)
 	if err != nil {
 		log.Println("ERROR setting up NW protocol handling:", err)
