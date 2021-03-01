@@ -10,6 +10,8 @@
 # Version of the kubectl pod to use when upgrading/downgrading charts
 dockerKubectlTag: &dockerKubectlTag 0.2.0-20200421212755_170bb37
 hms_ca_uri: ""
+ntpserver_host_use_ip: ""
+syslogserver_host_use_ip: "y"
 
 cray-service:
   type: "Deployment"
@@ -33,12 +35,25 @@ cray-service:
         - name: VAULT_SKIP_VERIFY
           value: "true"
         - name: MEDS_SYSLOG_TARG
-          value: "rsyslog-aggregator.hmnlb:514"
+          valueFrom:
+            configMapKeyRef:
+              name: meds-nwproto-info
+              key: SYSLOG_HOST
+        - name: MEDS_SYSLOG_TARG_USE_IP
+          valueFrom:
+            configMapKeyRef:
+              name: meds-nwproto-info
+              key: SYSLOG_HOST_USE_IP
         - name: MEDS_NTP_TARG
           valueFrom:
             configMapKeyRef:
               name: meds-nwproto-info
               key: NTP_HOST
+        - name: MEDS_NTP_TARG_USE_IP
+          valueFrom:
+            configMapKeyRef:
+              name: meds-nwproto-info
+              key: NTP_HOST_USE_IP
         - name: MEDS_CA_URI
           valueFrom:
             configMapKeyRef:
