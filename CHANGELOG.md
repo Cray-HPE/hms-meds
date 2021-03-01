@@ -9,7 +9,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Changed
 
-- MEDS now has options for syslog and NTP server hostnames, settable in customizations.yaml.
+- MEDS now has options for syslog and NTP server hostnames,  settable in customizations.yaml.
 
 ## [1.14.0] - 2021-2-09
 
