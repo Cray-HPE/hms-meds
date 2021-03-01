@@ -6,8 +6,8 @@ metadata:
 data:
   NTP_HOST: "{{ .Values.ntpserver_host }}"
   NTP_HOST_USE_IP: "{{ .Values.ntpserver_host_use_ip }}"
-  SYSLOG_SERVER_HOST: "{{ .Values.syslogserver_host }}"
-  SYSLOG_SERVER_HOST_USE_IP: "{{ .Values.syslogserver_host_use_ip }}"
+  SYSLOG_HOST: "{{ .Values.syslogserver_host }}"
+  SYSLOG_HOST_USE_IP: "{{ .Values.syslogserver_host_use_ip }}"
 
 ---
 apiVersion: v1
