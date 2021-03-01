@@ -8,8 +8,7 @@
 #   pullPolicy: "" (default = "IfNotPresent")
 
 # Version of the kubectl pod to use when upgrading/downgrading charts
-### ZZZZ dockerKubectlTag: &dockerKubectlTag 0.2.0-20200421212755_170bb37
-dockerKubectlTag: &dockerKubectlTag 0.2.0
+dockerKubectlTag: &dockerKubectlTag 0.2.0-20200421212755_170bb37
 hms_ca_uri: ""
 ntpserver_host_use_ip: ""
 syslogserver_host_use_ip: "y"
