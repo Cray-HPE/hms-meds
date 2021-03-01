@@ -1112,7 +1112,8 @@ func main() {
 
 	//Check if we are to use IP addresses, and if so, convert them here.
 	if (syslogTargUseIP) {
-		ip,iperr := net.LookupIP(syslogTarg)
+		toks := strings.Split(syslogTarg,":")
+		ip,iperr := net.LookupIP(toks[0])
 		if (iperr != nil) {
 			log.Printf("ERROR looking up syslog server IP addr: %v",iperr)
 			log.Printf("Using hostname anyway.")
@@ -1121,7 +1122,8 @@ func main() {
 		}
 	}
 	if (ntpTargUseIP) {
-		ip,iperr := net.LookupIP(ntpTarg)
+		toks := strings.Split(syslogTarg,":")
+		ip,iperr := net.LookupIP(toks[0])
 		if (iperr != nil) {
 			log.Printf("ERROR looking up NTP IP addr: %v",iperr)
 			log.Printf("Using hostname anyway.")
