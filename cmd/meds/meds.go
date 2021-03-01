@@ -1132,7 +1132,7 @@ func main() {
 		}
 	}
 	log.Printf("Using syslog server: '%s'",syslogTarg)
-	log.Printf("Using NTP server: '%s'",syslogTarg)
+	log.Printf("Using NTP server: '%s'",ntpTarg)
 
 	rfNWPStatic, err = bmc_nwprotocol.InitInstance(nwp, redfishNPSuffix, serviceName)
 	if err != nil {
