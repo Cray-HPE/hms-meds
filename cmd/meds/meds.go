@@ -403,20 +403,8 @@ func notifyXnamePresent(node NetEndpoint, address string) *error {
 		tmpBMCCreds.Oem.SSHConsole = nil
 	}
 
-	rfNWProtoAddr := address
-	if strings.HasSuffix(rfNWProtoAddr, "c0b0") ||
-		strings.HasSuffix(rfNWProtoAddr, "c1b0") ||
-		strings.HasSuffix(rfNWProtoAddr, "c2b0") ||
-		strings.HasSuffix(rfNWProtoAddr, "c3b0") ||
-		strings.HasSuffix(rfNWProtoAddr, "c4b0") ||
-		strings.HasSuffix(rfNWProtoAddr, "c5b0") ||
-		strings.HasSuffix(rfNWProtoAddr, "c6b0") ||
-		strings.HasSuffix(rfNWProtoAddr, "c7b0") {
-		rfNWProtoAddr = strings.TrimSuffix(rfNWProtoAddr, "b0")
-	}
-
 	rfClientLock.RLock()
-	nstError := bmc_nwprotocol.SetXNameNWPInfo(tmpBMCCreds, rfNWProtoAddr, creds.Username, creds.Password)
+	nstError := bmc_nwprotocol.SetXNameNWPInfo(tmpBMCCreds, address, creds.Username, creds.Password)
 	rfClientLock.RUnlock()
 
 	perNodeCred := compcreds.CompCredentials{
@@ -443,22 +431,10 @@ func notifyXnamePresent(node NetEndpoint, address string) *error {
 }
 
 func notifyHSMXnamePresent(node NetEndpoint, address string) *error {
-	fqdn := node.name
-	if strings.HasSuffix(node.name, "c0b0") ||
-		strings.HasSuffix(node.name, "c1b0") ||
-		strings.HasSuffix(node.name, "c2b0") ||
-		strings.HasSuffix(node.name, "c3b0") ||
-		strings.HasSuffix(node.name, "c4b0") ||
-		strings.HasSuffix(node.name, "c5b0") ||
-		strings.HasSuffix(node.name, "c6b0") ||
-		strings.HasSuffix(node.name, "c7b0") {
-		fqdn = strings.TrimSuffix(fqdn, "b0")
-	}
-
 	// No longer include User and Password (set to blank) to signal HSM to pull from Vault
 	payload := HSMNotification{
 		ID:                 node.name,
-		FQDN:               fqdn,
+		FQDN:               node.name,
 		User:               "", // blank to pull from Vault
 		Password:           "", // blank to pull from Vault
 		MACAddr:            node.mac,
@@ -623,22 +599,7 @@ func queryNetworkStatus(ne NetEndpoint) (HSMEndpointPresence, *string, *error) {
 		return PRESENCE_NOT_PRESENT, nil, &err
 	}
 
-	// This is pretty ugly, but for "reasons" it's been requested that from a networking point of view cabinet
-	// controllers not end with `b0` at the end of their name. However, HSM expects this to be there. So, to keep
-	// this simple just strip bhe b0 from here and that will be the end of it.
-	xname := ne.name
-	if strings.HasSuffix(xname, "c0b0") ||
-		strings.HasSuffix(xname, "c1b0") ||
-		strings.HasSuffix(xname, "c2b0") ||
-		strings.HasSuffix(xname, "c3b0") ||
-		strings.HasSuffix(xname, "c4b0") ||
-		strings.HasSuffix(xname, "c5b0") ||
-		strings.HasSuffix(xname, "c6b0") ||
-		strings.HasSuffix(xname, "c7b0") {
-		xname = strings.TrimSuffix(xname, "b0")
-	}
-
-	res, errn = queryNetworkStatusViaAddress(xname)
+	res, errn = queryNetworkStatusViaAddress(ne.name)
 	if res == PRESENCE_PRESENT {
 		return PRESENCE_PRESENT, &(ne.name), nil
 	}
@@ -909,25 +870,10 @@ func init_cabinet(cab GenericHardware) error {
 	for _, v := range endpoints {
 		macWithoutColons := strings.ReplaceAll(v.mac, ":", "")
 
-		// This is pretty ugly, but for "reasons" it's been requested that from a networking point of view cabinet
-		// controllers not end with `b0` at the end of their name. However, HSM expects this to be there. So, to keep
-		// this simple just strip bhe b0 from here and that will be the end of it.
-		xname := v.name
-		if strings.HasSuffix(v.name, "c0b0") ||
-			strings.HasSuffix(v.name, "c1b0") ||
-			strings.HasSuffix(v.name, "c2b0") ||
-			strings.HasSuffix(v.name, "c3b0") ||
-			strings.HasSuffix(v.name, "c4b0") ||
-			strings.HasSuffix(v.name, "c5b0") ||
-			strings.HasSuffix(v.name, "c6b0") ||
-			strings.HasSuffix(v.name, "c7b0") {
-			xname = strings.TrimSuffix(xname, "b0")
-		}
-
 		// Preload HSM EthernetInterfaces with the endpoints.
 		ethernetInterface := sm.CompEthInterface{
 			MACAddr: macWithoutColons,
-			CompID:  xname,
+			CompID:  v.name,
 		}
 
 		// Add the new ethernet interface. Patches instead if it's already present
