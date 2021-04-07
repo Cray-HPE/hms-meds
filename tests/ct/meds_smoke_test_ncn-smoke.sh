@@ -2,7 +2,7 @@
 #
 #  MIT License
 #
-#  (C) Copyright [2019-2021] Hewlett Packard Enterprise Development LP
+#  (C) Copyright [2020-2021] Hewlett Packard Enterprise Development LP
 #
 #  Permission is hereby granted, free of charge, to any person obtaining a
 #  copy of this software and associated documentation files (the "Software"),
@@ -20,7 +20,8 @@
 #  THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR
 #  OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE,
 #  ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR
-#  OTHER DEALINGS IN THE SOFTWARE.#
+#  OTHER DEALINGS IN THE SOFTWARE.
+#
 ###############################################################
 #
 #     CASM Test - Cray Inc.
@@ -35,7 +36,7 @@
 #
 #     DATE STARTED      : 06/23/2020
 #
-#     LAST MODIFIED     : 09/23/2020
+#     LAST MODIFIED     : 03/29/2021
 #
 #     SYNOPSIS
 #       This is a smoke test for HMS MEDS that verifies that the
@@ -66,6 +67,7 @@
 #       -------------------------------------------------------
 #       schooler   06/23/2020   initial implementation
 #       schooler   09/23/2020   use latest hms_smoke_test_lib
+#       schooler   03/29/2021   add check_job_status test
 #
 #     DEPENDENCIES
 #       - hms_smoke_test_lib_ncn-resources_remote-resources.sh which is
@@ -77,8 +79,9 @@
 #
 ###############################################################
 
-# HMS test metrics test cases: 1
+# HMS test metrics test cases: 2
 # 1. Check cray-meds pod status
+# 2. Check cray-meds job status
 
 # initialize test variables
 TEST_RUN_TIMESTAMP=$(date +"%Y%m%dT%H%M%S")
@@ -139,6 +142,13 @@ function check_pod_status()
     return $?
 }
 
+# check_job_status
+function check_job_status()
+{
+    run_check_job_status "cray-meds"
+    return $?
+}
+
 trap ">&2 echo \"recieved kill signal, exiting with status of '1'...\" ; \
     cleanup ; \
     exit 1" SIGHUP SIGINT SIGTERM
@@ -163,6 +173,14 @@ echo "Running meds_smoke_test..."
 
 # run initial pod status test
 check_pod_status
+if [[ $? -ne 0 ]] ; then
+    echo "FAIL: meds_smoke_test ran with failures"
+    cleanup
+    exit 1
+fi
+
+# run initial job status test
+check_job_status
 if [[ $? -ne 0 ]] ; then
     echo "FAIL: meds_smoke_test ran with failures"
     cleanup
