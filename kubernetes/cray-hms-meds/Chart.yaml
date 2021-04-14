@@ -2,4 +2,4 @@ apiVersion: v1
 description: "Kubernetes resources for cray-hms-meds"
 name: "cray-hms-meds"
 home: "HMS/hms-meds"
-version: 1.14.3
+version: 1.14.4
