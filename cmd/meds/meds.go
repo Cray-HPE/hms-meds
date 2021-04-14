@@ -41,7 +41,7 @@ import (
 	"sync"
 	"time"
 
-	"stash.us.cray.com/HMS/hms-base"
+	base "stash.us.cray.com/HMS/hms-base"
 	dns_dhcp "stash.us.cray.com/HMS/hms-dns-dhcp/pkg"
 	sls_common "stash.us.cray.com/HMS/hms-sls/pkg/sls-common"
 	"stash.us.cray.com/HMS/hms-smd/pkg/sm"
@@ -363,20 +363,45 @@ func patchXName(xname string, enabled bool) *error {
 }
 
 func notifyXnamePresent(node NetEndpoint, address string) *error {
-	creds, err := credStorage.FindGlobalCredentials()
-	if err != nil || len(creds.Username) == 0 {
-		if len(defUser) != 0 {
-			log.Printf("WARNING: Unable to retrieve MEDS global credentials (err: %s) or retreived credentials are "+
-				"empty, using defaults", err)
-			creds = model.MedsCredentials{
-				Username: defUser,
-				Password: defPass,
+	perNodeCred, err := hcs.GetCompCred(node.name)
+	if err != nil {
+		log.Printf("WARNING: Unable to retrieve key %s from vault: %s", node.name, err)
+		return &err
+	}
+
+	// If we get nothing back from Vault then we need to push something in.
+	if perNodeCred.Username == "" || perNodeCred.Password == "" {
+		// Grab the global credentails
+		globalCreds, err := credStorage.FindGlobalCredentials()
+		if err != nil || len(globalCreds.Username) == 0 {
+			if len(defUser) != 0 {
+				log.Printf("WARNING: Unable to retrieve MEDS global credentials (err: %s) or retreived credentials are "+
+					"empty, using defaults", err)
+					globalCreds = model.MedsCredentials{
+					Username: defUser,
+					Password: defPass,
+				}
+			} else {
+				err = fmt.Errorf("Unable to retrieve MEDS global credentials (err: %s) or retreived credentials are "+
+					"empty. No defaults are set, so refusing to continue adding Xname", err)
+				log.Printf("WARNING: %s", err)
+				return &err
 			}
-		} else {
-			err = fmt.Errorf("Unable to retrieve MEDS global credentials (err: %s) or retreived credentials are "+
-				"empty. No defaults are set, so refusing to continue adding Xname", err)
-			log.Printf("WARNING: %s", err)
-			return &err
+		}
+	
+		// Push in the default creds into vault
+		perNodeCred.Xname = node.name
+		perNodeCred.Username = globalCreds.Username
+		perNodeCred.Password = globalCreds.Password
+
+		log.Printf("INFO: No creds exist for %s in vault, setting it to the MEDS global defaults", node.name)
+
+		err = hcs.StoreCompCred(perNodeCred)
+		if err != nil {
+			// If we fail to store credentials in vault, we'll lose the
+			// credentials and the component endpoints associated with
+			// them will still be successfully in the database.
+			log.Printf("Failed to store credentials for %s in Vault - %s", node.name, err)
 		}
 	}
 
@@ -404,22 +429,8 @@ func notifyXnamePresent(node NetEndpoint, address string) *error {
 	}
 
 	rfClientLock.RLock()
-	nstError := bmc_nwprotocol.SetXNameNWPInfo(tmpBMCCreds, address, creds.Username, creds.Password)
+	nstError := bmc_nwprotocol.SetXNameNWPInfo(tmpBMCCreds, address, perNodeCred.Username, perNodeCred.Password)
 	rfClientLock.RUnlock()
-
-	perNodeCred := compcreds.CompCredentials{
-		Xname:    node.name,
-		URL:      "",
-		Username: creds.Username,
-		Password: creds.Password,
-	}
-	err = hcs.StoreCompCred(perNodeCred)
-	if err != nil {
-		// If we fail to store credentials in vault, we'll lose the
-		// credentials and the component endpoints associated with
-		// them will still be successfully in the database.
-		log.Printf("Failed to store credentials for %s in Vault - %s", node.name, err)
-	}
 
 	hsmError := notifyHSMXnamePresent(node, address)
 
