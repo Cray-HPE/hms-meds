@@ -23,6 +23,7 @@
 package main
 
 import (
+	"github.com/hashicorp/go-retryablehttp"
 	"net/http"
 	"net/http/httptest"
 	"testing"
@@ -82,10 +83,12 @@ func TestGetCabInfo(t *testing.T) {
 
 	//Create test http server, create test client, assign to global client var
 	glbHttpStatus = http.StatusOK
+	retryClient := retryablehttp.NewClient()
+
 	svr := httptest.NewServer(http.HandlerFunc(doHWSearch))
 	sls = svr.URL
-	cp := svr.Client()
-	rfClient = &hms_certs.HTTPClientPair{SecureClient: cp, InsecureClient: cp,}
+
+	rfClient = &hms_certs.HTTPClientPair{SecureClient: retryClient, InsecureClient: retryClient,}
 
 	err := getCabInfo(&endpointsNew, rackInfo)
 	if err != nil {
