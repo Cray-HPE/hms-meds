@@ -26,6 +26,7 @@ import (
 	"bytes"
 	"encoding/json"
 	"fmt"
+	"io/ioutil"
 	"log"
 	"net"
 	"net/http"
@@ -303,7 +304,10 @@ func SetXNameNWPInfo(nwProtoInfo RedfishNWProtocol, targAddress, RFUsername, RFP
 		return rerr
 	}
 
-	defer rsp.Body.Close()
+	if (rsp.Body != nil) {
+		_,_ = ioutil.ReadAll(rsp.Body)
+		defer rsp.Body.Close()
+	}
 
 	if (rsp.StatusCode != http.StatusOK) && (rsp.StatusCode != http.StatusNoContent) {
 		rerr := fmt.Errorf("ERROR sending NTP/syslog info to '%s', status code %d",
