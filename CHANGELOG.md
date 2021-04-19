@@ -5,10 +5,14 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.14.5] - 2021-04-14
+
+### Changed
+- CASMHMS-4715 - Modified MEDS to only push the global default BMC credentials into vault when the BMC credentials do not exist in vault.
+
 ## [1.14.4] - 2021-04-14
 
 ### Changed
-
 - CASMHMS-4660 - Fixed HTTP response body leaks.
 
 ## [1.14.3] - 2021-03-31
