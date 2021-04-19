@@ -65,6 +65,8 @@ func getSLSCabInfo() ([]GenericHardware, error) {
 	var jdata []GenericHardware
 	var mcabs []GenericHardware
 	var hcabs []GenericHardware
+	var body []byte
+	var berr error
 
 	//Search:  /search/hardware?type=comptype_cabinet&class=Mountain
 
@@ -74,18 +76,22 @@ func getSLSCabInfo() ([]GenericHardware, error) {
 		log.Printf("ERROR in GET of hardware search: %v\n", err)
 		return nil, err
 	}
+
+	if (rsp.Body != nil) {
+		body, berr = ioutil.ReadAll(rsp.Body)
+		defer rsp.Body.Close()
+	}
+
 	if rsp.StatusCode != http.StatusOK {
 		emsg := fmt.Sprintf("Bad error code from hardware SLS /search GET: %d/%s\n",
 			rsp.StatusCode, http.StatusText(rsp.StatusCode))
 		return nil, fmt.Errorf(emsg)
 	}
 
-	body, berr := ioutil.ReadAll(rsp.Body)
 	if berr != nil {
 		log.Printf("ERROR reading SLS /search response body (Mountain): %v\n", berr)
 		return nil, berr
 	}
-	defer rsp.Body.Close()
 
 	//Process the returned data
 
@@ -103,18 +109,22 @@ func getSLSCabInfo() ([]GenericHardware, error) {
 		log.Printf("ERROR in GET of hardware search: %v\n", err)
 		return nil, err
 	}
+
+	if (rsp.Body != nil) {
+		body, berr = ioutil.ReadAll(rsp.Body)
+		defer rsp.Body.Close()
+	}
+
 	if rsp.StatusCode != http.StatusOK {
 		emsg := fmt.Sprintf("Bad error code from hardware SLS /search GET: %d/%s\n",
 			rsp.StatusCode, http.StatusText(rsp.StatusCode))
 		return nil, fmt.Errorf(emsg)
 	}
 
-	body, berr = ioutil.ReadAll(rsp.Body)
 	if berr != nil {
 		log.Printf("ERROR reading SLS /search response body (Hill): %v\n", berr)
 		return nil, berr
 	}
-	defer rsp.Body.Close()
 
 	//Process the returned data
 

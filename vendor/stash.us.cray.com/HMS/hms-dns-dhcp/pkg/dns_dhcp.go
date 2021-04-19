@@ -93,16 +93,17 @@ func (helper *DNSDHCPHelper) GetUnknownComponents() (unknownComponents []sm.Comp
         return
     }
 
+    jsonBytes, err := ioutil.ReadAll(response.Body)
+    defer response.Body.Close()
+
     if response.StatusCode != http.StatusOK {
         err = fmt.Errorf("unexpected status code from HSM: %d", response.StatusCode)
         return
     }
 
-    jsonBytes, err := ioutil.ReadAll(response.Body)
     if err != nil {
         return
     }
-    defer response.Body.Close()
 
     err = json.Unmarshal(jsonBytes, &unknownComponents)
 
@@ -117,16 +118,17 @@ func (helper *DNSDHCPHelper) GetAllEthernetInterfaces() (unknownComponents []sm.
         return
     }
 
+    jsonBytes, err := ioutil.ReadAll(response.Body)
+    defer response.Body.Close()
+
     if response.StatusCode != http.StatusOK {
         err = fmt.Errorf("unexpected status code from HSM: %d", response.StatusCode)
         return
     }
 
-    jsonBytes, err := ioutil.ReadAll(response.Body)
     if err != nil {
         return
     }
-    defer response.Body.Close()
 
     err = json.Unmarshal(jsonBytes, &unknownComponents)
 
@@ -154,6 +156,11 @@ func (helper *DNSDHCPHelper) AddNewEthernetInterface(newInterface sm.CompEthInte
     if doErr != nil {
         err = fmt.Errorf("failed to execute POST request: %w", doErr)
         return
+    }
+
+    if (response.Body != nil) {
+        _,_ = ioutil.ReadAll(response.Body)
+        defer response.Body.Close()
     }
 
     if response.StatusCode == http.StatusConflict {
@@ -190,6 +197,10 @@ func (helper *DNSDHCPHelper) PatchEthernetInterface(theInterface sm.CompEthInter
     if doErr != nil {
         err = fmt.Errorf("failed to execute PATCH request: %w", doErr)
         return
+    }
+    if (response.Body != nil) {
+        _,_ = ioutil.ReadAll(response.Body)
+        defer response.Body.Close()
     }
 
     if response.StatusCode != http.StatusOK {

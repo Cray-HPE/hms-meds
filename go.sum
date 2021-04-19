@@ -773,12 +773,18 @@ stash.us.cray.com/HMS/hms-base v1.12.0 h1:LsEi7z1fnv9qOuli2+ThA8TF3yPqNINOrBVu/9
 stash.us.cray.com/HMS/hms-base v1.12.0/go.mod h1:2bT2ZeXBgXsrIsAtw0P6ILlTNilgOzzpJ/1NV545Tl0=
 stash.us.cray.com/HMS/hms-bmc-networkprotocol v1.4.0 h1:SOU/oqkJ04Oqz1duSQP79hyndYsWEuQhB81SxNnKr7M=
 stash.us.cray.com/HMS/hms-bmc-networkprotocol v1.4.0/go.mod h1:bKx8C8Ns0zK2QJz6/T/0JJ+MlVpUW3DgSdOf9Q05VVk=
+stash.us.cray.com/HMS/hms-bmc-networkprotocol v1.4.2 h1:OZEUwMaLBSCyktfX7qVRIB9lhiUjwG5Vr/rFIpBR4zs=
+stash.us.cray.com/HMS/hms-bmc-networkprotocol v1.4.2/go.mod h1:bKx8C8Ns0zK2QJz6/T/0JJ+MlVpUW3DgSdOf9Q05VVk=
 stash.us.cray.com/HMS/hms-certs v1.2.0 h1:sntICwYa5W04CeXBkoHyk1K6P1TGqO1s8Y+DNXw8+Sk=
 stash.us.cray.com/HMS/hms-certs v1.2.0/go.mod h1:G8+mHi2izwVRF6WkxobnRAnAgcE79CIgvmtJU4HkIcI=
+stash.us.cray.com/HMS/hms-certs v1.2.2 h1:lh/dPgaoDNqWyQZgxz/towl9UfDr/SfX2BU48/syfWQ=
+stash.us.cray.com/HMS/hms-certs v1.2.2/go.mod h1:G8+mHi2izwVRF6WkxobnRAnAgcE79CIgvmtJU4HkIcI=
 stash.us.cray.com/HMS/hms-compcredentials v1.10.0 h1:I0z3cW1FJ92TMbHq7BKFX7NXnu1MFFGgZkKTLw4sih0=
 stash.us.cray.com/HMS/hms-compcredentials v1.10.0/go.mod h1:G7HccBFy+wJkxdxSgVRmGm0MzG3KBFNtkx9NW41jMlA=
 stash.us.cray.com/HMS/hms-dns-dhcp v1.4.1 h1:PjXq5Npue2cShyWuYga9+X2zzx9EVJ4qjLVjV/6Tsjg=
 stash.us.cray.com/HMS/hms-dns-dhcp v1.4.1/go.mod h1:7nu5+ffbfa04kBm3YcF9ChkWbbTTaQRP4Q3m93sH7Q4=
+stash.us.cray.com/HMS/hms-dns-dhcp v1.4.3 h1:WQr5gpFgWORjIfzF8ZIUpNYpyE4AsyyngICtZ+vJk6M=
+stash.us.cray.com/HMS/hms-dns-dhcp v1.4.3/go.mod h1:7nu5+ffbfa04kBm3YcF9ChkWbbTTaQRP4Q3m93sH7Q4=
 stash.us.cray.com/HMS/hms-go-http-lib v1.4.0/go.mod h1:eJFHFY3OmoLhTTauAaaUtKGl0+4XdpIRTXokvNVRFJU=
 stash.us.cray.com/HMS/hms-msgbus v1.9.0/go.mod h1:1e76godR4v0zXFnn+jYlFUujDGbeXN3ciploERU2Puk=
 stash.us.cray.com/HMS/hms-s3 v1.8.0/go.mod h1:MFPhPEgOL+FEPZ0/AJNtWIsHJKgvxga4QJPbC0rYFBs=
@@ -789,3 +795,5 @@ stash.us.cray.com/HMS/hms-sls v1.8.1 h1:rHRYXP/7DrCm9DFZZpvH6V8hMG1agb493/YMvi4C
 stash.us.cray.com/HMS/hms-sls v1.8.1/go.mod h1:O03DDrP15nhx4COD/fOvk1Dz/e3ZXHaUP586EGUpp3Q=
 stash.us.cray.com/HMS/hms-smd v1.28.0 h1:O+5CfLX5iMzRXE6BJofV7pfocFOigWh6P46KF75355U=
 stash.us.cray.com/HMS/hms-smd v1.28.0/go.mod h1:KGYFO8eclZBvgdVP+6o7ohRpKTSNwW5fRxH8PD7VzWQ=
+stash.us.cray.com/HMS/hms-smd v1.28.7 h1:JyeaY4NiSDzlko+AscFl6dtQpepQjuzT83KAJyH6Fns=
+stash.us.cray.com/HMS/hms-smd v1.28.7/go.mod h1:KGYFO8eclZBvgdVP+6o7ohRpKTSNwW5fRxH8PD7VzWQ=
