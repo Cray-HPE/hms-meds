@@ -321,6 +321,7 @@ func GenerateChassisEndpoints(macprefix string, rack int) []*NetEndpoint {
 }
 
 func patchXName(xname string, enabled bool) *error {
+	var strbody []byte
 	payload := HSMNotification{
 		ID:      xname,
 		Enabled: &enabled,
@@ -345,13 +346,16 @@ func patchXName(xname string, enabled bool) *error {
 		return &err
 	}
 
+	if resp.Body != nil {
+		strbody, _ = ioutil.ReadAll(resp.Body)
+		resp.Body.Close()
+	}
+
 	if resp.StatusCode == 200 {
 		log.Printf("INFO: Successfully patched %s", xname)
 	} else {
-		strbody, _ := ioutil.ReadAll(resp.Body)
 		log.Printf("WARNING: An error occurred patching %s: %s %v", xname, resp.Status, string(strbody))
 		rerr := fmt.Errorf("Unable to patch information for %s to HSM: %d\n%s", xname, resp.StatusCode, string(strbody))
-		resp.Body.Close()
 		return &rerr
 	}
 	return nil
@@ -449,6 +453,8 @@ func notifyXnamePresent(node NetEndpoint, address string) *error {
 }
 
 func notifyHSMXnamePresent(node NetEndpoint, address string) *error {
+	var strbody []byte
+
 	fqdn := node.name
 	if strings.HasSuffix(node.name, "c0b0") ||
 		strings.HasSuffix(node.name, "c1b0") ||
@@ -485,16 +491,19 @@ func notifyHSMXnamePresent(node NetEndpoint, address string) *error {
 		return &err
 	}
 
+	if resp.Body != nil {
+		strbody, _ = ioutil.ReadAll(resp.Body)
+		resp.Body.Close()
+	}
+
 	if resp.StatusCode == 201 {
 		log.Printf("INFO: Successfully created %s", node.name)
 	} else if resp.StatusCode == 409 {
 		log.Printf("INFO: %s alredy present; patching instead", node.name)
 		return patchXName(node.name, true)
 	} else {
-		strbody, _ := ioutil.ReadAll(resp.Body)
 		log.Printf("WARNING: An error occurred uploading %s: %s %v", node.name, resp.Status, string(strbody))
 		rerr := errors.New("Unable to upload information for " + node.name + " to HSM: " + string(resp.StatusCode) + "\n" + string(strbody))
-		resp.Body.Close()
 		return &rerr
 	}
 	log.Printf("INFO: Successfully added %s to HSM", node.name)
@@ -528,10 +537,13 @@ func queryHSMState() error {
 		return err
 	}
 
-	if resp.Body != nil {
-		defer resp.Body.Close()
+	if resp.Body == nil {
+		emsg := fmt.Errorf("No response body from querying HSM for RedfishEndpoints.")
+		log.Printf("WARNING: %v",emsg)
+		return emsg
 	}
 
+	defer resp.Body.Close()
 	bodyBytes, err := ioutil.ReadAll(resp.Body)
 	if err != nil {
 		log.Printf("WARNING: Unable to read HTTP body while querying HSM for RedfishEndpoints: %v", err)
@@ -574,9 +586,8 @@ func queryHSMState() error {
 	}
 
 	// else ...
-	strbody, _ := ioutil.ReadAll(resp.Body)
-	log.Printf("WARNING: Error occurred looking up RedfishEndpoints in HSM (code %d):\n%s", resp.StatusCode, string(strbody))
-	rerr := errors.New("Unable to retrieve status from HSM: " + string(resp.StatusCode) + "\n" + string(strbody))
+	log.Printf("WARNING: Error occurred looking up RedfishEndpoints in HSM (code %d):\n%s", resp.StatusCode, string(bodyBytes))
+	rerr := errors.New("Unable to retrieve status from HSM: " + string(resp.StatusCode) + "\n" + string(bodyBytes))
 	return rerr
 }
 
@@ -591,14 +602,17 @@ func queryNetworkStatusViaAddress(address string) (HSMEndpointPresence, *error) 
 	}
 
 	// Ensure we clean up any stray connection
-	defer resp.Body.Close()
+	var strbody []byte
+	if (resp.Body != nil) {
+		defer resp.Body.Close()
+		strbody, _ = ioutil.ReadAll(resp.Body)
+	}
 
 	if resp.StatusCode == 200 {
 		return PRESENCE_PRESENT, nil
 	}
 
 	// else ...
-	strbody, _ := ioutil.ReadAll(resp.Body)
 	emsg := fmt.Errorf("Bad return status: (%d): %v",
 		resp.StatusCode, string(strbody))
 	return PRESENCE_NOT_PRESENT, &emsg
