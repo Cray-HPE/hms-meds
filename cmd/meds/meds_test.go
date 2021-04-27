@@ -32,11 +32,12 @@ import (
 	"io/ioutil"
 	"net/http"
 	"net/http/httptest"
-	"stash.us.cray.com/HMS/hms-base"
-	"stash.us.cray.com/HMS/hms-certs/pkg/hms_certs"
 	"strings"
 	"testing"
 	"time"
+
+	base "stash.us.cray.com/HMS/hms-base"
+	"stash.us.cray.com/HMS/hms-certs/pkg/hms_certs"
 )
 
 func NetEndpointEquals(a NetEndpoint, b NetEndpoint) bool {
@@ -282,6 +283,11 @@ func Test_watchForHardware_notPresentToPresent(t *testing.T) {
 	if queryNet_count != 2 {
 		t.Errorf("Wrong number of calls to queryNet.  Expected 2, got %d", queryNet_count)
 	}
+
+	// Verify the NetEndpoint has the correct HSMPresence state
+	if node.HSMPresence != PRESENCE_PRESENT {
+		t.Errorf("Unexpected HSM Presence state: %d", node.HSMPresence)
+	}
 }
 
 func Test_watchForHardware_presentToNotPresent(t *testing.T) {
@@ -333,6 +339,12 @@ func Test_watchForHardware_presentToNotPresent(t *testing.T) {
 	if queryNet_count != 2 {
 		t.Errorf("Wrong numbber of calls to queryNet.  Expected 2, got %d", queryNet_count)
 	}
+
+	// Verify the NetEndpoint has the correct HSMPresence state
+	// Yes, we really expect the node to be PRESENT in HSM when BMC is not reachable
+	if node.HSMPresence != PRESENCE_PRESENT {
+		t.Errorf("Unexpected HSM Presence state: %d", node.HSMPresence)
+	}
 }
 
 func Test_watchForHardware_noChange_0(t *testing.T) {
@@ -377,6 +389,11 @@ func Test_watchForHardware_noChange_0(t *testing.T) {
 
 	if queryNet_count != 2 {
 		t.Errorf("Wrong numbber of calls to queryNet.  Expected 2, got %d", queryNet_count)
+	}
+
+	// Verify the NetEndpoint has the correct HSMPresence state
+	if node.HSMPresence != PRESENCE_PRESENT {
+		t.Errorf("Unexpected HSM Presence state: %d", node.HSMPresence)
 	}
 }
 
@@ -424,6 +441,11 @@ func Test_watchForHardware_noChange_1(t *testing.T) {
 	if queryNet_count != 2 {
 		t.Errorf("Wrong numbber of calls to queryNet.  Expected 2, got %d", queryNet_count)
 	}
+
+	// Verify the NetEndpoint has the correct HSMPresence state
+	if node.HSMPresence != PRESENCE_NOT_PRESENT {
+		t.Errorf("Unexpected HSM Presence state: %d", node.HSMPresence)
+	}
 }
 
 // This test verifies that no matter what netQuery returns,
@@ -468,6 +490,11 @@ func Test_watchForHardware_netQuery_FailureRecovery(t *testing.T) {
 	if len(notifyHSMNotPresentCalls) != 0 {
 		t.Errorf("Wrong number of calls to mock_notifyHSMNotPresent.  Expected 0, got %d",
 			len(notifyHSMNotPresentCalls))
+	}
+
+	// Verify the NetEndpoint has the correct HSMPresence state
+	if node.HSMPresence != PRESENCE_NOT_PRESENT {
+		t.Errorf("Unexpected HSM Presence state: %d", node.HSMPresence)
 	}
 }
 

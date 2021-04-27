@@ -55,7 +55,7 @@ import (
 	"stash.us.cray.com/HMS/hms-certs/pkg/hms_certs"
 )
 
-// A general understanding of the hardware in a Mountain rack is neccessary
+// A general understanding of the hardware in a Mountain rack is necessary
 // to fully understand and appreciate the way items in this are generated.
 //
 // At the top level, each cabinet has 2 Environmental controllers (eC) and
@@ -380,20 +380,20 @@ func notifyXnamePresent(node NetEndpoint, address string) *error {
 		globalCreds, err := credStorage.FindGlobalCredentials()
 		if err != nil || len(globalCreds.Username) == 0 {
 			if len(defUser) != 0 {
-				log.Printf("WARNING: Unable to retrieve MEDS global credentials (err: %s) or retreived credentials are "+
+				log.Printf("WARNING: Unable to retrieve MEDS global credentials (err: %s) or retrieved credentials are "+
 					"empty, using defaults", err)
-					globalCreds = model.MedsCredentials{
+				globalCreds = model.MedsCredentials{
 					Username: defUser,
 					Password: defPass,
 				}
 			} else {
-				err = fmt.Errorf("Unable to retrieve MEDS global credentials (err: %s) or retreived credentials are "+
+				err = fmt.Errorf("Unable to retrieve MEDS global credentials (err: %s) or retrieved credentials are "+
 					"empty. No defaults are set, so refusing to continue adding Xname", err)
 				log.Printf("WARNING: %s", err)
 				return &err
 			}
 		}
-	
+
 		// Push in the default creds into vault
 		perNodeCred.Xname = node.name
 		perNodeCred.Username = globalCreds.Username
@@ -412,7 +412,7 @@ func notifyXnamePresent(node NetEndpoint, address string) *error {
 
 	bmcCreds, err := credStorage.FindBMCSSHCredentials(node.name)
 	if err != nil || len(bmcCreds.Username) == 0 {
-		log.Printf("WARNING: Unable to retrieve MEDS SSH credentials (err: %s) or retreived credentials are "+
+		log.Printf("WARNING: Unable to retrieve MEDS SSH credentials (err: %s) or retrieved credentials are "+
 			"empty, using defaults", err)
 		bmcCreds = model.MedsSSHCredentials{
 			Username:      defUser,
@@ -502,12 +502,8 @@ func notifyHSMXnamePresent(node NetEndpoint, address string) *error {
 }
 
 func notifyHSMXnameNotPresent(node NetEndpoint) *error {
-	//log.Printf("DEBUG: Would remove %s via DELETE; disabled for Surly2", node.name)
-	//return nil
-	//log.Printf("DEBUG: DELETE to %s/Inventory/RedfishEndpoints/%s", hsm, node.name)
-
 	log.Printf("DEBUG: Would remove %s, but MEDS no longer marks redfishEndpoints as disabled. This message is purely for your information; MEDS is operating as expected.", node.name)
-	//return patchXName(node.name, false)
+
 	return nil
 }
 
@@ -537,7 +533,7 @@ func queryHSMState() error {
 
 	if resp.Body == nil {
 		emsg := fmt.Errorf("No response body from querying HSM for RedfishEndpoints.")
-		log.Printf("WARNING: %v",emsg)
+		log.Printf("WARNING: %v", emsg)
 		return emsg
 	}
 
@@ -562,17 +558,21 @@ func queryHSMState() error {
 		for _, ep := range endpoints {
 			rfEP, ok := rfEPMap[ep.name]
 			if !ok {
+				// Redfish Endpoint was in the HSM inventory, but no longer present. ie Deleted
 				if ep.HSMPresence != PRESENCE_NOT_PRESENT {
 					log.Printf("DEBUG: %s is now not present in HSM", ep.name)
 				}
 				ep.HSMPresence = PRESENCE_NOT_PRESENT
 			} else if rfEP.Enabled != nil && *(rfEP.Enabled) != true {
+				// Redfish endpoint is present in HSM inventory, but has been manually marked disabled
+				// MEDS treats this as if the ENDPOINT is not present/
 				// present and set false
 				if ep.HSMPresence != PRESENCE_NOT_PRESENT {
 					log.Printf("DEBUG: %s is now not present in HSM", ep.name)
 				}
 				ep.HSMPresence = PRESENCE_NOT_PRESENT
 			} else {
+				// Redfish endpoint is present within HSM inventory and enabled
 				// present and set true OR flag not present
 				if ep.HSMPresence != PRESENCE_PRESENT {
 					log.Printf("DEBUG: %s is now present in HSM", ep.name)
@@ -602,7 +602,7 @@ func queryNetworkStatusViaAddress(address string) (HSMEndpointPresence, *error) 
 	// Ensure we clean up any stray connection
 
 	var strbody []byte
-	if (resp.Body != nil) {
+	if resp.Body != nil {
 		defer resp.Body.Close()
 		strbody, _ = ioutil.ReadAll(resp.Body)
 	}
@@ -671,6 +671,7 @@ func watchForHardware(
 					netPresence = ne.HSMPresence // ensure no state change on FIRST failure (but do one on second)
 				}
 				if err != nil {
+					log.Printf("ERROR: Net query failed on %s with error: %v", ne.name, *err)
 					prevErr = fmt.Sprintf("%v", *err)
 				} else {
 					prevErr = ""
@@ -690,8 +691,7 @@ func watchForHardware(
 					if err != nil {
 						log.Printf("WARNING: Failed to notify HSM that %s is NOT present: %v", ne.name, *err)
 					} else {
-						log.Printf("INFO: Marked %s not present in HSM.", ne.name)
-						ne.HSMPresence = PRESENCE_NOT_PRESENT
+						log.Printf("INFO: Lost network contact with %s", ne.name)
 					}
 				}
 			}()
@@ -913,7 +913,7 @@ func init_cabinet(cab GenericHardware) error {
 			// If the add to HSM fails don't add the endpoint to any lists and instead skip over it so we process it again.
 			continue
 		} else {
-			log.Printf("Added new etihernet interface to HSM: %+v", v)
+			log.Printf("Added new ethernet interface to HSM: %+v", v)
 		}
 
 		// Create a channel we can use to kill this later
@@ -1084,28 +1084,28 @@ func main() {
 	nwp.NTPSpec = ntpTarg
 
 	//Check if we are to use IP addresses, and if so, convert them here.
-	if (syslogTargUseIP) {
-		toks := strings.Split(syslogTarg,":")
-		ip,iperr := net.LookupIP(toks[0])
-		if (iperr != nil) {
-			log.Printf("ERROR looking up syslog server IP addr: %v",iperr)
+	if syslogTargUseIP {
+		toks := strings.Split(syslogTarg, ":")
+		ip, iperr := net.LookupIP(toks[0])
+		if iperr != nil {
+			log.Printf("ERROR looking up syslog server IP addr: %v", iperr)
 			log.Printf("Using hostname anyway.")
 		} else {
 			syslogTarg = ip[0].String()
 		}
 	}
-	if (ntpTargUseIP) {
-		toks := strings.Split(syslogTarg,":")
-		ip,iperr := net.LookupIP(toks[0])
-		if (iperr != nil) {
-			log.Printf("ERROR looking up NTP IP addr: %v",iperr)
+	if ntpTargUseIP {
+		toks := strings.Split(syslogTarg, ":")
+		ip, iperr := net.LookupIP(toks[0])
+		if iperr != nil {
+			log.Printf("ERROR looking up NTP IP addr: %v", iperr)
 			log.Printf("Using hostname anyway.")
 		} else {
 			ntpTarg = ip[0].String()
 		}
 	}
-	log.Printf("Using syslog server: '%s'",syslogTarg)
-	log.Printf("Using NTP server: '%s'",ntpTarg)
+	log.Printf("Using syslog server: '%s'", syslogTarg)
+	log.Printf("Using NTP server: '%s'", ntpTarg)
 
 	rfNWPStatic, err = bmc_nwprotocol.InitInstance(nwp, redfishNPSuffix, serviceName)
 	if err != nil {
