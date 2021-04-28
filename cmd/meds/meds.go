@@ -155,6 +155,7 @@ var defSSHKey string
 var hms_ca_uri string
 var logInsecFailover = true
 var clientTimeout = 5
+var maxInitialHSMSyncAttempts int
 
 // The HSM Credentials store
 var hcs *compcreds.CompCredStore
@@ -187,6 +188,10 @@ var activeCabinets map[string][]*NetEndpoint = make(map[string][]*NetEndpoint)
 
 // A full list of endpoints with no cabinet reference
 var activeEndpoints map[string]*NetEndpoint = make(map[string]*NetEndpoint)
+
+// A full list of redfish endpoints known in HSM
+var hsmRedfishEndpointsCache map[string]HSMNotification
+var hsmRedfishEndpointsCacheLock sync.Mutex
 
 // Lock for modifying the above two structures
 var activeEndpointsLock sync.Mutex
@@ -516,38 +521,6 @@ func notifyHSMXnameNotPresent(node NetEndpoint) *error {
 	return nil
 }
 
-func queryHSMRFEndpointPresence(xname string) (HSMEndpointPresence, error) {
-	resp, err := client.Get(hsm + "/Inventory/RedfishEndpoints/" + xname)
-	if err != nil {
-		log.Printf("WARNING: Unable to get RedfishEndpoint %s from HSM: %v", xname, err)
-	}
-
-	if resp.Body == nil {
-		emsg := fmt.Errorf("No response body from querying HSM for RedfishEndpoint: %s", xname)
-		log.Printf("WARNING: %v", emsg)
-		return PRESENCE_NOT_PRESENT, emsg
-	}
-
-	defer resp.Body.Close()
-	bodyBytes, err := ioutil.ReadAll(resp.Body)
-	if err != nil {
-		log.Printf("WARNING: Unable to read HTTP body while querying HSM for RedfishEndpoint %s: %v", xname, err)
-		return PRESENCE_NOT_PRESENT, err
-	}
-
-	if resp.StatusCode == 200 {
-		// The Redfish Endpoint is known to HSM
-		return PRESENCE_PRESENT, nil
-	} else if resp.StatusCode == 404 {
-		// The Redfish Endpoint is not known to HSM
-		return PRESENCE_NOT_PRESENT, nil
-	}
-
-	log.Printf("WARNING: Error occurred looking up RedfishEndpoint %s in HSM (code %d):\n%s", xname, resp.StatusCode, string(bodyBytes))
-	rerr := fmt.Errorf("Unable to retrieve status from HSM: %d \n %s", resp.StatusCode, string(bodyBytes))
-	return PRESENCE_NOT_PRESENT, rerr
-}
-
 func queryHSMState() error {
 	endpoints := activeEndpoints
 	// Lock the presence field for all endpoints so other
@@ -614,6 +587,12 @@ func queryHSMState() error {
 				ep.HSMPresence = PRESENCE_PRESENT
 			}
 		}
+
+		// Update HSM Redfish endpoint cache
+		hsmRedfishEndpointsCacheLock.Lock()
+		hsmRedfishEndpointsCache = rfEPMap
+		hsmRedfishEndpointsCacheLock.Unlock()
+
 		return nil
 	}
 
@@ -981,21 +960,16 @@ func init_cabinet(cab GenericHardware) error {
 		// Create a channel we can use to kill this later
 		v.QuitChannel = make(chan struct{})
 
+		// Determine if this redfish endpoint is known in state manager
+		hsmRedfishEndpointsCacheLock.Lock()
+		if _, known := hsmRedfishEndpointsCache[v.name]; known {
+			v.HSMPresence = PRESENCE_PRESENT
+		}
+		hsmRedfishEndpointsCacheLock.Unlock()
+
 		// Now add endpoints to activeCabinets and
 		activeCabinets[cab.Xname] = append(activeCabinets[cab.Xname], v)
 		activeEndpoints[v.name] = v
-
-		// Query HSM for RF endpoint state
-		hsmPresense, err := queryHSMRFEndpointPresence(v.name)
-		if err != nil {
-			log.Printf("WARNING: Unable to get RedfishEndpoint %s from HSM: %v", v.name, err)
-		}
-		if hsmPresense == PRESENCE_PRESENT {
-			log.Printf("DEBUG: %s is initially present in HSM", v.name)
-		} else {
-			log.Printf("DEBUG: %s is NOT initially present in HSM", v.name)
-		}
-		v.HSMPresence = hsmPresense
 
 		// Start hardware polling thread
 		go watchForHardware(v, v.QuitChannel, queryNetworkStatus, notifyXnamePresent,
@@ -1085,6 +1059,8 @@ func main() {
 		"URL path for network options Redfish endpoint")
 	flag.StringVar(&credentialsVault, "credentialsVaultPrefix", model.CredentialsKeyPrefix,
 		"Vault prefix for storing MEDS credentials")
+	flag.IntVar(&maxInitialHSMSyncAttempts, "max-initial-hsm-sync-attempts", 30,
+		"Number of attempts to perform an initial sync with HSM")
 	flag.Parse()
 
 	getEnvVars()
@@ -1182,6 +1158,23 @@ func main() {
 
 	/* Start up watch for HSM changes early, so we can loop over data */
 	HSMPollquitc := make(chan struct{})
+
+	// Perform an initial sync with HSM before starting, so we now the state of the redfish endpoints
+	// This will help prevent MEDS from flooding HSM with discoveries when it starts up
+	for attempt := 1; attempt <= maxInitialHSMSyncAttempts; attempt++ {
+		err := queryHSMState()
+		if err != nil {
+			log.Printf("Initial sync with HSM failed. attempt %d of %d", attempt, maxInitialHSMSyncAttempts)
+			time.Sleep(time.Second)
+		} else {
+			log.Printf("Successfully performed initial sync with HSM")
+			break
+		}
+
+		if attempt >= maxInitialHSMSyncAttempts {
+			log.Fatal("Unable to perform initial sync with HSM after reaching max attempts")
+		}
+	}
 
 	// TODO I'll have to rewrite how this is handled, I think.  Or at least move the function into the thread
 	go watchForHSMChanges(HSMPollquitc)
