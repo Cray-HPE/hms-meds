@@ -155,6 +155,7 @@ var defSSHKey string
 var hms_ca_uri string
 var logInsecFailover = true
 var clientTimeout = 5
+var maxInitialHSMSyncAttempts int
 
 // The HSM Credentials store
 var hcs *compcreds.CompCredStore
@@ -1042,6 +1043,8 @@ func main() {
 		"URL path for network options Redfish endpoint")
 	flag.StringVar(&credentialsVault, "credentialsVaultPrefix", model.CredentialsKeyPrefix,
 		"Vault prefix for storing MEDS credentials")
+	flag.IntVar(&maxInitialHSMSyncAttempts, "max-initial-hsm-sync-attempts", 10,
+		"Number of attempts to perform an initial sync with HSM")
 	flag.Parse()
 
 	getEnvVars()
@@ -1139,6 +1142,19 @@ func main() {
 
 	/* Start up watch for HSM changes early, so we can loop over data */
 	HSMPollquitc := make(chan struct{})
+
+	// Perform an initial sync with HSM before starting, so we now the state of the redfish endpoints
+	// This will help prevent MEDS from flooding HSM with discoveries when it starts up
+	for attempt := 1; attempt <= maxInitialHSMSyncAttempts; attempt++ {
+		err := queryHSMState()
+		if err != nil {
+			log.Printf("Initial sync with HSM failed. attempt %d of %d", attempt, maxInitialHSMSyncAttempts)
+		}
+
+		if attempt >= maxInitialHSMSyncAttempts {
+			log.Fatal("Unable to perform initial sync with HSM after reaching max attempts")
+		}
+	}
 
 	// TODO I'll have to rewrite how this is handled, I think.  Or at least move the function into the thread
 	go watchForHSMChanges(HSMPollquitc)
