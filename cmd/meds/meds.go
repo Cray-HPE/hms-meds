@@ -919,6 +919,8 @@ func init_cabinet(cab GenericHardware) error {
 	for _, v := range endpoints {
 		normalizedMAC := strings.ToLower(strings.ReplaceAll(v.mac, ":", ""))
 
+		// Check to see if the generated endpoint has a MAC address associated with it.
+		// Currently MEDS does generate a MAC addresses fro CEC's. Ex: x5000e0, x5000e1
 		if normalizedMAC == "" {
 			log.Printf("WARN: Endpoint has no MAC address: %s", v.name)
 			continue
