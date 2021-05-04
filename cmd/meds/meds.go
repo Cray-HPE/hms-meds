@@ -904,28 +904,74 @@ func init_cabinet(cab GenericHardware) error {
 	endpoints = append(endpoints, GenerateEnvironmentalControllerEndpoints(rackNum)...)
 	endpoints = append(endpoints, GenerateChassisEndpoints(macPrefix, rackNum)...)
 
+	// Determine what ethernet interfaces need to be get added or updated.
+	hsmEthernetInterfaces, err := dhcpdnsClient.GetAllEthernetInterfaces()
+	if err != nil {
+		log.Println("Failed to get ethernet interfaces from HSM, not processing further: ", err)
+		return err
+	}
+	hsmEthernetInterfacesMap := map[string]sm.CompEthInterface{}
+	for _, ei := range hsmEthernetInterfaces {
+		hsmEthernetInterfacesMap[ei.ID] = ei
+	}
+
+	// Generate MAC addresses for hardware in this cabinet
 	for _, v := range endpoints {
-		macWithoutColons := strings.ReplaceAll(v.mac, ":", "")
+		normalizedMAC := strings.ToLower(strings.ReplaceAll(v.mac, ":", ""))
+
+		// Check to see if the generated endpoint has a MAC address associated with it.
+		// Currently MEDS does generate a MAC addresses fro CEC's. Ex: x5000e0, x5000e1
+		if normalizedMAC == "" {
+			log.Printf("WARN: Endpoint has no MAC address: %s", v.name)
+			continue
+		}
 
 		// Preload HSM EthernetInterfaces with the endpoints.
 		ethernetInterface := sm.CompEthInterface{
-			MACAddr: macWithoutColons,
+			MACAddr: normalizedMAC,
 			CompID:  v.name,
 		}
 
-		// Add the new ethernet interface. Patches instead if it's already present
-		addErr := dhcpdnsClient.AddNewEthernetInterface(ethernetInterface, true)
+		// POST/PATCH ethernet interfaces into HSM
+		if hsmEI, ok := hsmEthernetInterfacesMap[ethernetInterface.MACAddr]; ok && hsmEI.CompID == ethernetInterface.CompID {
+			// The MAC address is currently in HSM with the same component ID
+			log.Printf("INFO: Ethernet interface for MAC %s and CompID %s already present in HSM", ethernetInterface.MACAddr, ethernetInterface.CompID)
+		} else if ok && hsmEI.CompID != ethernetInterface.CompID {
+			// The MAC address is currently in HSM with a different component ID
+			log.Printf("INFO: Patching ethernet interface with MAC %s. HSM has CompID %s want %s.", ethernetInterface.MACAddr, hsmEI.CompID, ethernetInterface.CompID)
+			patchErr := dhcpdnsClient.PatchEthernetInterface(ethernetInterface)
 
-		if addErr != nil {
-			log.Println("Failed to add new ethernet interface to HSM, not processing further: ", addErr)
-			log.Printf("Interface: %+v", ethernetInterface)
+			if patchErr != nil {
+				log.Println("ERROR: Failed to patch ethernet interface to HSM, not processing further: ", patchErr)
+				log.Printf("Interface: %+v", ethernetInterface)
 
-			// If the add to HSM fails don't add the endpoint to any lists and instead skip over it so we process it again.
-			continue
+				// If the add to HSM fails don't add the endpoint to any lists and instead skip over it so we process it again.
+				// The main loop will try to re-initialize the cabinet
+				return patchErr
+			}
+
+			log.Printf("INFO: Patched new ethernet interface to HSM: %+v", ethernetInterface.CompID)
 		} else {
-			log.Printf("Added new ethernet interface to HSM: %+v", v)
-		}
+			// Add the new ethernet interface. Patches instead if it's already present just in case
+			addErr := dhcpdnsClient.AddNewEthernetInterface(ethernetInterface, true)
 
+			if addErr != nil {
+				log.Println("Failed to add new ethernet interface to HSM, not processing further: ", addErr)
+				log.Printf("Interface: %+v", ethernetInterface)
+
+				// If the add to HSM fails don't add the endpoint to any lists and instead skip over it so we process it again.
+				// The main loop will try to re-initialize the cabinet
+				return addErr
+			}
+
+			log.Printf("INFO: Added new ethernet interface to HSM: %+v", ethernetInterface.CompID)
+		}
+	}
+
+	log.Printf("INFO: Finished adding EthernetInterfaces to HSM for cabinet %s", cab.Xname)
+
+	// Start watching for hardware
+	for _, v := range endpoints {
 		// Create a channel we can use to kill this later
 		v.QuitChannel = make(chan struct{})
 

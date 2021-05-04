@@ -1,85 +1,69 @@
 ---
 version: '3.7'
+
 #THIS environment sets up all of MEDS
-#  All dependencies -> HSM (vault), RTS (red fish sims) are all setup and active.
+#  All dependencies -> HSM (vault), RTS (Redfish sims) are all setup and active.
 #  The ports are exposed to the local system.
 networks:
-  rts:
-services:
-  etcd:
-    image: dtr.dev.cray.com/coreos/etcd:v3.4.7
-    environment:
-      - ALLOW_NONE_AUTHENTICATION=yes
-      - ETCD_ADVERTISE_CLIENT_URLS=http://etcd:2379
-      - ETCD_LISTEN_CLIENT_URLS=http://0.0.0.0:2379
-    ports:
-      - 2379:2379
-      - 2380:2380
-    networks:
-      - rts
-  meds-init:
-    build:
-      context: .
-      dockerfile: Dockerfile.compose
-    command: ["vault_loader"]
-    environment:
-      - HSM_URL=http://cray-smd:27779/hsm/v1
-      - MEDS_OPTS=""
-      - CRAY_VAULT_AUTH_PATH=auth/token/create
-      - CRAY_VAULT_ROLE_FILE=configs/namespace
-      - CRAY_VAULT_JWT_FILE=configs/token
-      - VAULT_ADDR=http://vault:8200
-      - VAULT_TOKEN=hms
-      - VAULT_KEYPATH=hms-creds
-      - VAULT_SKIP_VERIFY=true
-      - MEDS_NTP_TARG=""
-      - MEDS_SYSLOG_TARG=""
-      - MEDS_NP_RF_URL="/redfish/v1/Managers/BMC/NetworkProtocol"
-      - MEDS_ROOT_SSH_KEY=""
-    networks:
-      - rts
   meds:
-    build:
-      context: .
-      dockerfile: Dockerfile.compose
-    #image: dtr.dev.cray.com/spresser/cray-meds:latest
+
+services:
+  #
+  # Vault
+  # 
+  vault:
+    hostname: vault
+    image: dtr.dev.cray.com/library/vault:1.4.0
     environment:
-      - HSM_URL=http://cray-smd:27779/hsm/v1
-      - "MEDS_OPTS=-sls http://cray-sls:8376/v1"
-      - CRAY_VAULT_AUTH_PATH=auth/token/create
-      - CRAY_VAULT_ROLE_FILE=configs/namespace
-      - CRAY_VAULT_JWT_FILE=configs/token
+      - VAULT_DEV_ROOT_TOKEN_ID=hms
+      - VAULT_DEV_LISTEN_ADDRESS=0.0.0.0:8200
+      - VAULT_ADDR=http://127.0.0.1:8200
+    ports:
+      - "8200:8200"
+    cap_add:
+      - IPC_LOCK
+    networks:
+      - meds
+  vault-kv-enabler:
+    image: dtr.dev.cray.com/hms/vault-kv-enabler:1.4.0
+    environment:
       - VAULT_ADDR=http://vault:8200
       - VAULT_TOKEN=hms
-      - VAULT_KEYPATH=hms-creds
-      - VAULT_SKIP_VERIFY=true
-      - MEDS_NTP_TARG=""
-      - MEDS_SYSLOG_TARG=""
-      - MEDS_NP_RF_URL=/redfish/v1/Managers/BMC/NetworkProtocol
-      - MEDS_ROOT_SSH_KEY=""
-    networks:
-      - rts
+      - KV_STORES=hms-creds,reds-creds,secret
     depends_on:
-      - sls-init
-      - cray-sls-preload
       - vault
-  sls-init:
+    networks:
+      - meds
+
+  #
+  # SLS
+  #
+  cray-sls-postgres:
+    hostname: sls-postgres
+    image: dtr.dev.cray.com/library/postgres:11-alpine
+    environment:
+      - POSTGRES_USER=slsuser
+      - POSTGRES_DB=sls
+      - POSTGRES_HOST_AUTH_METHOD=trust
+    ports:
+      - "54321:5432"
+    networks:
+      - meds
+  cray-sls-init:
     image: dtr.dev.cray.com/cray/cray-sls
     command: ["sls-init"]
     environment:
-      - POSTGRES_HOST=postgres
-      - POSTGRES_PORT=5432
+      - POSTGRES_HOST=sls-postgres
       - DBOPTS=sslmode=disable
       - DBUSER=slsuser
     depends_on:
-      - hmsds-postgres
+      - cray-sls-postgres
     networks:
-      - rts
+      - meds
   cray-sls:
     image: dtr.dev.cray.com/cray/cray-sls
     environment:
-      - POSTGRES_HOST=postgres
-      - POSTGRES_PORT=5432
+      - POSTGRES_HOST=cray-sls-postgres
       - DBOPTS=sslmode=disable
       - DBUSER=slsuser
       - CRAY_VAULT_AUTH_PATH=auth/token/create
@@ -91,11 +75,12 @@ services:
     ports:
       - "8376:8376"
     depends_on:
-      - hmsds-postgres
-      - sls-init
+      - cray-sls-postgres
+      - cray-sls-init
       - vault
     networks:
-      - rts
+      - meds
+
   cray-sls-preload:
     image: dtr.dev.cray.com/cray/cray-sls
     command: >
@@ -103,7 +88,7 @@ services:
       curl  -d '{\"Xname\":\"x1000\",\"Type\":\"comptype_cabinet\",\"Class\":\"Mountain\",\"TypeString\":\"Cabinet\",\"ExtraProperties\":{\"Networks\":{\"cn\":{
         \"HMN\":{\"CIDR\":\"10.104.0.1/22\",\"Gateway\":\"10.104.3.254\",\"VLan\":3001},
         \"NMN\":{\"CIDR\":\"10.100.0.1/22\",\"Gateway\":\"10.100.3.254\",\"VLan\":2001}},
-        \"ncn\":{}}}}' http://localhost:8376/v1/hardware"
+        \"ncn\":{}}}}' http://cray-sls:8376/v1/hardware"
     environment:
       - POSTGRES_HOST=postgres
       - POSTGRES_PORT=5432
@@ -118,71 +103,12 @@ services:
     depends_on:
       - cray-sls
     networks:
-      - rts
-  postgres:
-    hostname: postgres
-    image: dtr.dev.cray.com/library/postgres:11-alpine
-    environment:
-      - POSTGRES_USER=slsuser
-      - POSTGRES_DB=sls
-      - POSTGRES_HOST_AUTH_METHOD=trust
-    ports:
-      - "5433:5432"
-    networks:
-      - rts
-  s3:
-    image: dtr.dev.cray.com/minio/minio
-    hostname: s3
-    environment:
-      MINIO_ACCESS_KEY: s3-access-key
-      MINIO_SECRET_KEY: s3-secret-key
-    command: server /data
-    ports:
-      - "9000:9000"
-    networks:
-      - rts
-  s3-init:
-    image: dtr.dev.cray.com/minio/mc
-    hostname: s3-init
-    environment:
-      - MC_HOST_S3=http://s3-access-key:s3-secret-key@s3:9000
-    command: mb S3/fw-update
-    depends_on:
-      - s3
-    networks:
-      - rts
-  vault:
-    hostname: vault
-    image: dtr.dev.cray.com/library/vault:1.4.2
-    environment:
-      - VAULT_DEV_ROOT_TOKEN_ID=hms
-      - VAULT_DEV_LISTEN_ADDRESS=0.0.0.0:8200
-      - VAULT_LOG_LEVEL=trace
-      - VAULT_ADDR=http://127.0.0.1:8200
-    ports:
-      - "8200:8200"
-    cap_add:
-      - IPC_LOCK
-    networks:
-      - rts
-  vault-kv-enabler:
-    image: dtr.dev.cray.com/hms/vault-kv-enabler:1.4.0
-    environment:
-      - VAULT_ADDR=http://vault:8200
-      - VAULT_TOKEN=hms
-      - KV_STORES=hms-creds,reds-creds,secret
-    depends_on:
-      - vault
-    networks:
-      - rts
-  redis:
-    image: dtr.dev.cray.com/library/redis:5.0-alpine
-    hostname: hms-redfish-redis
-    ports:
-      - "6379:6379"
-    networks:
-      - rts
-  hmsds-postgres:
+      - meds
+
+  #
+  # HSM
+  #
+  cray-smd-postgres:
     hostname: hmsds-postgres
     image: dtr.dev.cray.com/library/postgres:11-alpine
     environment:
@@ -190,22 +116,24 @@ services:
       - POSTGRES_USER=hmsdsuser
       - POSTGRES_DB=hmsds
     ports:
-      - "5432:5432"
+      - "54322:5432"
     networks:
-      - rts
+      - meds
   cray-smd-init:
-    image: dtr.dev.cray.com/cray/cray-smd-init
+    image: dtr.dev.cray.com/cray/cray-smd
     environment:
-      - POSTGRES_HOST=hmsds-postgres
-      - POSTGRES_PORT=5432
+      - SMD_DBHOST=cray-smd-postgres
+      - SMD_DBPORT=5432
     depends_on:
-      - hmsds-postgres
+      - cray-smd-postgres
     networks:
-      - rts
+      - meds
+    command: /entrypoint.sh smd-init
   cray-smd:
     image: dtr.dev.cray.com/cray/cray-smd
     environment:
-      - POSTGRES_HOST=hmsds-postgres
+      - POSTGRES_HOST=cray-smd-postgres
+      - SMD_DBHOST=cray-smd-postgres
       - POSTGRES_PORT=5432
       - RF_MSG_HOST=kafka:9092:cray-dmtf-resource-event
       - CRAY_VAULT_AUTH_PATH=auth/token/create
@@ -223,63 +151,80 @@ services:
     ports:
       - "27779:27779"
     networks:
-      - rts
-  zookeeper:
-    image: dtr.dev.cray.com/confluentinc/cp-zookeeper:5.4.0
-    hostname: zookeeper
-    ports:
-      - "2181:2181"
-    environment:
-      ZOOKEEPER_CLIENT_PORT: 2181
-      ZOOKEEPER_TICK_TIME: 2000
-    networks:
-      - rts
-  kafka:
-    image: dtr.dev.cray.com/confluentinc/cp-kafka:5.4.0
-    hostname: kafka
-    depends_on:
-      - zookeeper
-    ports:
-      - "9092:9092"
-    environment:
-      KAFKA_BROKER_ID: 1
-      KAFKA_ZOOKEEPER_CONNECT: 'zookeeper:2181'
-      KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: PLAINTEXT:PLAINTEXT,PLAINTEXT_HOST:PLAINTEXT
-      KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://kafka:9092
-      KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
-      KAFKA_GROUP_INITIAL_REBALANCE_DELAY_MS: 0
-    networks:
-      - rts
-  cray-hms-hmcollector:
-    image: dtr.dev.cray.com/cray/hms-hmcollector
-    environment:
-      - LOG_LEVEL=TRACE
-      - SM_URL=http://cray-smd:27779
-      - POLLING_ENABLED=false
-      - RF_SUBSCRIBE_ENABLED=false
-      - REST_PORT=80
-      - VAULT_TOKEN=hms
-      - CRAY_VAULT_JWT_FILE=configs/token
-      - CRAY_VAULT_ROLE_FILE=configs/namespace
-      - CRAY_VAULT_AUTH_PATH=auth/token/create
-      - VAULT_ADDR=http://vault:8200
-    volumes:
-      - ./configs/kafka_brokers.json:/configs/kafka_brokers.json
-      - ./configs/namespace:/configs/namespace
-      - ./configs/token:/configs/token
-    networks:
-      - rts
-  dummy-endpoint:
+      - meds
+
+  #
+  # RTS
+  #
+
+  #
+  # MEDS
+  #
+  meds-init:
     build:
       context: .
-      dockerfile: Dockerfile.dummy-endpoint
-    hostname: x1000c1s1b0
+    command: ["vault_loader"]
     environment:
-      - SCHEMA_VERSION=2019.1
-      - LOG_LEVEL=TRACE
-    ports:
-      - "443:443"
+      - HSM_URL=http://cray-smd:27779/hsm/v1
+      - MEDS_OPTS=""
+      - CRAY_VAULT_AUTH_PATH=auth/token/create
+      - CRAY_VAULT_ROLE_FILE=configs/namespace
+      - CRAY_VAULT_JWT_FILE=configs/token
+      - VAULT_ADDR=http://vault:8200
+      - VAULT_TOKEN=hms
+      - VAULT_KEYPATH=hms-creds
+      - VAULT_SKIP_VERIFY=true
+      - MEDS_NTP_TARG=""
+      - MEDS_SYSLOG_TARG=""
+      - MEDS_NP_RF_URL="/redfish/v1/Managers/BMC/NetworkProtocol"
+      - MEDS_ROOT_SSH_KEY=""
     networks:
-      rts:
-        aliases:
-          - x1000c1s1b0
+      - meds
+  meds:
+    build:
+      context: .
+    environment:
+      - HSM_URL=http://cray-smd:27779/hsm/v1
+      - "MEDS_OPTS=-sls http://cray-sls:8376/v1"
+      - CRAY_VAULT_AUTH_PATH=auth/token/create
+      - CRAY_VAULT_ROLE_FILE=configs/namespace
+      - CRAY_VAULT_JWT_FILE=configs/token
+      - VAULT_ADDR=http://vault:8200
+      - VAULT_TOKEN=hms
+      - VAULT_KEYPATH=hms-creds
+      - VAULT_SKIP_VERIFY=true
+
+      - MEDS_SYSLOG_TARG=localhost:514
+      # - MEDS_SYSLOG_TARG_USE_IP=
+      - MEDS_NTP_TARG=localhost:123
+      # - MEDS_NTP_TARG_USE_IP=
+      - MEDS_CA_URI=
+
+      # - MEDS_NTP_TARG="time-hmn:123"
+      # - MEDS_SYSLOG_TARG="rsyslog-aggregator.hmnlb:514"
+      # - MEDS_NP_RF_URL=/redfish/v1/Managers/BMC/NetworkProtocol
+      # - MEDS_ROOT_SSH_KEY=""
+    volumes: 
+      - ./configs:/configs
+    networks:
+      - meds
+    depends_on:
+      - cray-sls-init
+      - cray-sls
+      - cray-sls-preload
+      - vault
+
+  # dummy-endpoint:
+  #   build:
+  #     context: .
+  #     dockerfile: Dockerfile.dummy-endpoint
+  #   hostname: x1000c1s1b0
+  #   environment:
+  #     - SCHEMA_VERSION=2019.1
+  #     - LOG_LEVEL=TRACE
+  #   ports:
+  #     - "443:443"
+  #   networks:
+  #     meds:
+  #       aliases:
+  #         - x1000c1s1b0
