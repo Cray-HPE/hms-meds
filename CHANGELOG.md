@@ -5,6 +5,11 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.14.9] - 2021-07-01
+
+### Changed
+- CASMHMS-4928 - When MEDS initializes a cabinet it will verify that Redfish Endpoints for ChassisBMCs have the correct FQDN and Hostname set. If the FQDN and Hostname do not have a `b0` suffix MEDS will update the RedfishEndpoint in HSM to have it.    
+
 ## [1.14.8] - 2021-05-04
 
 ### Changed
