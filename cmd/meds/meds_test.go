@@ -33,6 +33,7 @@ import (
 	"net/http"
 	"net/http/httptest"
 	"strings"
+	"sync"
 	"testing"
 	"time"
 
@@ -808,6 +809,301 @@ func Test_queryNetworkStatus(t *testing.T) {
 				if test.expectedReqURI != requestURI {
 					t.Errorf("Test %v (%s) Failed: Expected request URI is '%v'; Received '%v'", i, test.description, test.expectedReqURI, requestURI)
 				}
+			}
+		} else if err == nil {
+			t.Errorf("Test %v (%s) Failed: Expected an error", i, test.description)
+		}
+	}
+}
+
+func Test_verifyCabinetRedfishEndpoints(t *testing.T) {
+	type HTTPResponse struct {
+		respCode        int
+		respBody        string
+		expectedReqBody []byte
+	}
+
+	tests := []struct {
+		description           string
+		responses             map[string]HTTPResponse
+		netEndpoints          []*NetEndpoint
+		redfishEndpointsCache map[string]HSMNotification
+		expectErr             bool
+	}{{
+		description: "Nothing to change",
+		responses:   map[string]HTTPResponse{},
+		netEndpoints: []*NetEndpoint{{
+			name:   "x9000c1b0",
+			mac:    "02:23:28:01:00:00",
+			hwtype: TYPE_CHASSIS,
+		}, {
+			name:   "x9000c1r1b0",
+			mac:    "02:23:28:01:61:00",
+			hwtype: TYPE_SWITCH_CARD,
+		}, {
+			name:   "x9000c3s0b0",
+			mac:    "02:23:28:03:30:00",
+			hwtype: TYPE_NODE_CARD,
+		}},
+		redfishEndpointsCache: map[string]HSMNotification{
+			"x9000c1b0": {
+				ID:                 "x9000c1b0",
+				FQDN:               "x9000c1b0",
+				Hostname:           "x9000c1b0",
+				User:               "root",
+				MACAddr:            "02:23:28:01:00:00",
+				RediscoverOnUpdate: true,
+			},
+			"x9000c1r1b0": {
+				ID:                 "x9000c1r1b0",
+				FQDN:               "x9000c1r1b0",
+				Hostname:           "x9000c1r1b0",
+				User:               "root",
+				MACAddr:            "02:23:28:01:61:00",
+				RediscoverOnUpdate: true,
+			},
+			"x9000c3s0b0": {
+				ID:                 "x9000c3s0b0",
+				FQDN:               "x9000c3s0b0",
+				Hostname:           "x9000c3s0b0",
+				User:               "root",
+				MACAddr:            "02:23:28:03:30:00",
+				RediscoverOnUpdate: true,
+			}},
+		expectErr: false,
+	}, {
+		description: "Chassis BMC with old FQDN",
+		responses: map[string]HTTPResponse{
+			"/Inventory/RedfishEndpoints/x9000c1b0": {
+				respCode:        200,
+				respBody:        `{"ID":"x1000c6b0","Type":"ChassisBMC","Hostname":"x1000c6b0","Domain":"","FQDN":"x1000c6b0","Enabled":true,"User":"","Password":"","RediscoverOnUpdate":true,"DiscoveryInfo":{"LastDiscoveryAttempt":"2021-06-30T23:33:46.847154Z","LastDiscoveryStatus":"HTTPsGetFailed"}}`,
+				expectedReqBody: json.RawMessage(`{"ID":"x9000c1b0","FQDN":"x9000c1b0","Hostname":"x9000c1b0"}`),
+			},
+		},
+		netEndpoints: []*NetEndpoint{{
+			name:   "x9000c1b0",
+			mac:    "02:23:28:01:00:00",
+			hwtype: TYPE_CHASSIS,
+		}, {
+			name:   "x9000c1r1b0",
+			mac:    "02:23:28:01:61:00",
+			hwtype: TYPE_SWITCH_CARD,
+		}, {
+			name:   "x9000c3s0b0",
+			mac:    "02:23:28:03:30:00",
+			hwtype: TYPE_NODE_CARD,
+		}},
+		redfishEndpointsCache: map[string]HSMNotification{
+			"x9000c1b0": {
+				ID:                 "x9000c1b0",
+				FQDN:               "x9000c1",
+				Hostname:           "x9000c1",
+				User:               "root",
+				MACAddr:            "02:23:28:01:00:00",
+				RediscoverOnUpdate: true,
+			},
+			"x9000c1r1b0": {
+				ID:                 "x9000c1r1b0",
+				FQDN:               "x9000c1r1b0",
+				Hostname:           "x9000c1r1b0",
+				User:               "root",
+				MACAddr:            "02:23:28:01:61:00",
+				RediscoverOnUpdate: true,
+			},
+			"x9000c3s0b0": {
+				ID:                 "x9000c3s0b0",
+				FQDN:               "x9000c3s0b0",
+				Hostname:           "x9000c3s0b0",
+				User:               "root",
+				MACAddr:            "02:23:28:03:30:00",
+				RediscoverOnUpdate: true,
+			}},
+		expectErr: false,
+	}, {
+		description: "Mix of old and new Chassis BMC FQDN",
+		responses: map[string]HTTPResponse{
+			"/Inventory/RedfishEndpoints/x9000c1b0": {
+				respCode:        200,
+				respBody:        `{"ID":"x1000c6b0","Type":"ChassisBMC","Hostname":"x1000c6b0","Domain":"","FQDN":"x1000c6b0","Enabled":true,"User":"","Password":"","RediscoverOnUpdate":true,"DiscoveryInfo":{"LastDiscoveryAttempt":"2021-06-30T23:33:46.847154Z","LastDiscoveryStatus":"HTTPsGetFailed"}}`,
+				expectedReqBody: json.RawMessage(`{"ID":"x9000c1b0","FQDN":"x9000c1b0","Hostname":"x9000c1b0"}`),
+			},
+		},
+		netEndpoints: []*NetEndpoint{{
+			name:   "x9000c1b0",
+			mac:    "02:23:28:01:00:00",
+			hwtype: TYPE_CHASSIS,
+		}, {
+			name:   "x9000c3b0",
+			mac:    "02:23:28:03:00:00",
+			hwtype: TYPE_CHASSIS,
+		}, {
+			name:   "x9000c1r1b0",
+			mac:    "02:23:28:01:61:00",
+			hwtype: TYPE_SWITCH_CARD,
+		}, {
+			name:   "x9000c3s0b0",
+			mac:    "02:23:28:03:30:00",
+			hwtype: TYPE_NODE_CARD,
+		}},
+		redfishEndpointsCache: map[string]HSMNotification{
+			"x9000c1b0": {
+				ID:                 "x9000c1b0",
+				FQDN:               "x9000c1",
+				Hostname:           "x9000c1",
+				User:               "root",
+				MACAddr:            "02:23:28:01:00:00",
+				RediscoverOnUpdate: true,
+			},
+			"x9000c3b0": {
+				ID:                 "x9000c3b0",
+				FQDN:               "x9000c3b0",
+				Hostname:           "x9000c3b0",
+				User:               "root",
+				MACAddr:            "02:23:28:03:00:00",
+				RediscoverOnUpdate: true,
+			},
+			"x9000c1r1b0": {
+				ID:                 "x9000c1r1b0",
+				FQDN:               "x9000c1r1b0",
+				Hostname:           "x9000c1r1b0",
+				User:               "root",
+				MACAddr:            "02:23:28:01:61:00",
+				RediscoverOnUpdate: true,
+			},
+			"x9000c3s0b0": {
+				ID:                 "x9000c3s0b0",
+				FQDN:               "x9000c3s0b0",
+				Hostname:           "x9000c3s0b0",
+				User:               "root",
+				MACAddr:            "02:23:28:03:30:00",
+				RediscoverOnUpdate: true,
+			}},
+		expectErr: false,
+	}, {
+		description: "HSM is unavialable",
+		responses: map[string]HTTPResponse{
+			"/Inventory/RedfishEndpoints/x9000c1b0": {
+				respCode:        500,
+				respBody:        ``,
+				expectedReqBody: json.RawMessage(`{"ID":"x9000c1b0","FQDN":"x9000c1b0","Hostname":"x9000c1b0"}`),
+			},
+		},
+		netEndpoints: []*NetEndpoint{{
+			name:   "x9000c1b0",
+			mac:    "02:23:28:01:00:00",
+			hwtype: TYPE_CHASSIS,
+		}, {
+			name:   "x9000c3b0",
+			mac:    "02:23:28:03:00:00",
+			hwtype: TYPE_CHASSIS,
+		}, {
+			name:   "x9000c1r1b0",
+			mac:    "02:23:28:01:61:00",
+			hwtype: TYPE_SWITCH_CARD,
+		}, {
+			name:   "x9000c3s0b0",
+			mac:    "02:23:28:03:30:00",
+			hwtype: TYPE_NODE_CARD,
+		}},
+		redfishEndpointsCache: map[string]HSMNotification{
+			"x9000c1b0": {
+				ID:                 "x9000c1b0",
+				FQDN:               "x9000c1",
+				Hostname:           "x9000c1",
+				User:               "root",
+				MACAddr:            "02:23:28:01:00:00",
+				RediscoverOnUpdate: true,
+			},
+			"x9000c3b0": {
+				ID:                 "x9000c3b0",
+				FQDN:               "x9000c3b0",
+				Hostname:           "x9000c3b0",
+				User:               "root",
+				MACAddr:            "02:23:28:03:00:00",
+				RediscoverOnUpdate: true,
+			},
+			"x9000c1r1b0": {
+				ID:                 "x9000c1r1b0",
+				FQDN:               "x9000c1r1b0",
+				Hostname:           "x9000c1r1b0",
+				User:               "root",
+				MACAddr:            "02:23:28:01:61:00",
+				RediscoverOnUpdate: true,
+			},
+			"x9000c3s0b0": {
+				ID:                 "x9000c3s0b0",
+				FQDN:               "x9000c3s0b0",
+				Hostname:           "x9000c3s0b0",
+				User:               "root",
+				MACAddr:            "02:23:28:03:30:00",
+				RediscoverOnUpdate: true,
+			}},
+		expectErr: true,
+	}, {
+		description: "No redfish endpoints present in HSM",
+		responses:   map[string]HTTPResponse{},
+		netEndpoints: []*NetEndpoint{{
+			name:   "x9000c1b0",
+			mac:    "02:23:28:01:00:00",
+			hwtype: TYPE_CHASSIS,
+		}, {
+			name:   "x9000c3b0",
+			mac:    "02:23:28:03:00:00",
+			hwtype: TYPE_CHASSIS,
+		}, {
+			name:   "x9000c1r1b0",
+			mac:    "02:23:28:01:61:00",
+			hwtype: TYPE_SWITCH_CARD,
+		}, {
+			name:   "x9000c3s0b0",
+			mac:    "02:23:28:03:30:00",
+			hwtype: TYPE_NODE_CARD,
+		}},
+		redfishEndpointsCache: map[string]HSMNotification{},
+		expectErr:             false,
+	}}
+
+	serviceName = "MEDS_TEST"
+	defUser = "root"
+	defPass = "********"
+	client, _ = hms_certs.CreateHTTPClientPair("", clientTimeout)
+	setupRFHTTPStuff()
+
+	for i, test := range tests {
+		testServer := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+			requestPath := r.URL.Path
+			requestBody, _ := ioutil.ReadAll(r.Body)
+
+			httpr, ok := test.responses[requestPath]
+			if ok {
+				// Check for User-Agent headers
+				if !userAgentHeaderPresent(r) {
+					t.Errorf("Test %v had no User-Agent header.", i)
+				}
+
+				// Check the request is the one we expected
+				if bytes.Compare(httpr.expectedReqBody, requestBody) != 0 {
+					t.Errorf("Test %v (%s) Failed: Expected request body is '%v'; Received '%v'", i, test.description, string(httpr.expectedReqBody), string(requestBody))
+				}
+
+				w.WriteHeader(httpr.respCode)
+				w.Write(json.RawMessage(httpr.respBody))
+			} else {
+				w.WriteHeader(500)
+				w.Write([]byte("Couldn't find HTTPResponse to give for URL " + requestPath))
+			}
+		}))
+		defer testServer.Close()
+		hsm = testServer.URL
+
+		// Setup global variables
+		hsmRedfishEndpointsCacheLock = sync.Mutex{}
+		hsmRedfishEndpointsCache = test.redfishEndpointsCache
+
+		err := (verifyCabinetRedfishEndpoints(test.netEndpoints))
+		if !test.expectErr {
+			if err != nil {
+				t.Errorf("Test %v (%s) Failed: Received unexpected error - %v", i, test.description, err)
 			}
 		} else if err == nil {
 			t.Errorf("Test %v (%s) Failed: Expected an error", i, test.description)

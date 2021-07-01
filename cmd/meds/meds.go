@@ -79,6 +79,7 @@ const MAC_PREFIX = "02"
 type HSMNotification struct {
 	ID                 string `json:"ID"`
 	FQDN               string `json:"FQDN,omitempty"`
+	Hostname           string `json:"Hostname,omitempty"`
 	IPAddress          string `json:"IPAddress,omitempty"`
 	User               string `json:"User,omitempty"`
 	Password           string `json:"Password,omitempty"`
@@ -203,8 +204,8 @@ var activeEndpointsLock sync.Mutex
 // Implements the flag.Value String() method
 func (r *RackList) String() string {
 	var rackText string
-	for i := range *r {
-		rackText += ", " + string((*r)[i])
+	for _, rackNumber := range *r {
+		rackText += ", " + fmt.Sprintf("%d", rackNumber)
 	}
 	return rackText
 }
@@ -329,7 +330,7 @@ func GenerateChassisEndpoints(macprefix string, rack int) []*NetEndpoint {
 	return endpoints
 }
 
-func patchXName(xname string, enabled bool) *error {
+func patchXNameEnabled(xname string, enabled bool) *error {
 	var strbody []byte
 
 	payload := HSMNotification{
@@ -368,6 +369,47 @@ func patchXName(xname string, enabled bool) *error {
 		log.Printf("WARNING: An error occurred patching %s: %s %v", xname, resp.Status, string(strbody))
 		rerr := fmt.Errorf("Unable to patch information for %s to HSM: %d\n%s", xname, resp.StatusCode, string(strbody))
 		return &rerr
+	}
+	return nil
+}
+
+func patchXnameFQDN(xname, fqdn, hostname string) error {
+	var strbody []byte
+
+	payload := HSMNotification{
+		ID:       xname,
+		FQDN:     fqdn,
+		Hostname: hostname,
+	}
+
+	rawPayload, err := json.Marshal(payload)
+	if err != nil {
+		log.Printf("WARNING: Could not encode JSON for %s: %v (%v) with FQDN (%s) and Hostname (%s)", xname, err, payload, fqdn, hostname)
+		return err
+	}
+
+	log.Printf("DEBUG: PATCH to %s/Inventory/RedfishEndpoints/%s", hsm, xname)
+
+	req, err := http.NewRequest(http.MethodPatch, hsm+"/Inventory/RedfishEndpoints/"+xname, bytes.NewReader(rawPayload))
+	req.Header.Add("Content-Type", "application/json")
+	base.SetHTTPUserAgent(req, serviceName)
+	resp, err := client.Do(req)
+	if err != nil {
+		log.Printf("WARNING: Unable to patch %s: %v", xname, err)
+		return err
+	}
+
+	if resp.Body != nil {
+		strbody, _ = ioutil.ReadAll(resp.Body)
+		resp.Body.Close()
+	}
+
+	if resp.StatusCode == 200 {
+		log.Printf("INFO: Successfully patched %s", xname)
+	} else {
+		log.Printf("WARNING: An error occurred patching %s: %s %v", xname, resp.Status, string(strbody))
+		rerr := fmt.Errorf("Unable to patch information for %s to HSM: %d\n%s", xname, resp.StatusCode, string(strbody))
+		return rerr
 	}
 	return nil
 }
@@ -496,10 +538,10 @@ func notifyHSMXnamePresent(node NetEndpoint, address string) *error {
 		log.Printf("INFO: Successfully created %s", node.name)
 	} else if resp.StatusCode == 409 {
 		log.Printf("INFO: %s alredy present; patching instead", node.name)
-		return patchXName(node.name, true)
+		return patchXNameEnabled(node.name, true)
 	} else {
 		log.Printf("WARNING: An error occurred uploading %s: %s %v", node.name, resp.Status, string(strbody))
-		rerr := errors.New("Unable to upload information for " + node.name + " to HSM: " + string(resp.StatusCode) + "\n" + string(strbody))
+		rerr := errors.New("Unable to upload information for " + node.name + " to HSM: " + fmt.Sprint(resp.StatusCode) + "\n" + string(strbody))
 		return &rerr
 	}
 	log.Printf("INFO: Successfully added %s to HSM", node.name)
@@ -596,7 +638,7 @@ func queryHSMState() error {
 
 	// else ...
 	log.Printf("WARNING: Error occurred looking up RedfishEndpoints in HSM (code %d):\n%s", resp.StatusCode, string(bodyBytes))
-	rerr := errors.New("Unable to retrieve status from HSM: " + string(resp.StatusCode) + "\n" + string(bodyBytes))
+	rerr := errors.New("Unable to retrieve status from HSM: " + fmt.Sprint(resp.StatusCode) + "\n" + string(bodyBytes))
 	return rerr
 }
 
@@ -970,6 +1012,9 @@ func init_cabinet(cab GenericHardware) error {
 
 	log.Printf("INFO: Finished adding EthernetInterfaces to HSM for cabinet %s", cab.Xname)
 
+	// Verify that the FQDN/Hostname for RedfishEndpoints in HSM are what we expect
+	verifyCabinetRedfishEndpoints(endpoints)
+
 	// Start watching for hardware
 	for _, v := range endpoints {
 		// Create a channel we can use to kill this later
@@ -989,6 +1034,45 @@ func init_cabinet(cab GenericHardware) error {
 		// Start hardware polling thread
 		go watchForHardware(v, v.QuitChannel, queryNetworkStatus, notifyXnamePresent,
 			notifyHSMXnameNotPresent)
+	}
+
+	return nil
+}
+
+func verifyCabinetRedfishEndpoints(endpoints []*NetEndpoint) error {
+	// Verify that the FQDN/Hostname for RedfishEndpoints in HSM are what we expect
+	for _, v := range endpoints {
+		// Determine if this redfish endpoint is known in state manager and if it has the correct FQDN
+		hsmRedfishEndpointsCacheLock.Lock()
+		updateRFEndpoint := false
+		var fqdn, hostname string
+		if rfEP, known := hsmRedfishEndpointsCache[v.name]; known {
+
+			// Verify that ChassisBMC's have the correct FQDN/hostname values set
+			// TODO For authoritative DNS the following check should be changed to handle the FQDN of the system.
+			if base.GetHMSType(rfEP.ID) == base.ChassisBMC && rfEP.ID != rfEP.FQDN {
+				fqdn = rfEP.ID
+				hostname = rfEP.ID
+				log.Printf("Found ChassisBMC RedfishEndpoint with ID (%s) and FQDN (%s) PATCHING HSM to use FQDN (%s) and Hostname (%s)\n",
+					v.name, rfEP.FQDN, fqdn, hostname)
+
+				updateRFEndpoint = true
+				rfEP.FQDN = fqdn
+			}
+		}
+		hsmRedfishEndpointsCacheLock.Unlock()
+
+		// Update the redfish endpoint if applicable
+		if updateRFEndpoint {
+			err := patchXnameFQDN(v.name, fqdn, hostname)
+			if err != nil {
+				log.Printf("Failed to update RedfishEndpoint (%s) in HSM with new FQDN/Hostname, not processing further: %v\n", v.name, err)
+
+				// If the add to HSM fails don't add the endpoint to any lists and instead skip over it so we process it again.
+				// The main loop will try to re-initialize the cabinet
+				return err
+			}
+		}
 	}
 
 	return nil
