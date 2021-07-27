@@ -28,7 +28,7 @@ import (
 	"fmt"
 	"path"
 
-	sstorage "stash.us.cray.com/HMS/hms-securestorage"
+	sstorage "github.com/Cray-HPE/hms-securestorage"
 )
 
 // CredentialsKeyPrefix is the base of the Vault key for credentials

@@ -23,5 +23,5 @@ FROM cray/meds-base
 
 # Run test coverage...
 RUN set -ex && \
-    go test -cover -v stash.us.cray.com/HMS/hms-meds/cmd/meds && \
-    go test -cover -v stash.us.cray.com/HMS/hms-meds/internal/model
+    go test -cover -v github.com/Cray-HPE/hms-meds/cmd/meds && \
+    go test -cover -v github.com/Cray-HPE/hms-meds/internal/model

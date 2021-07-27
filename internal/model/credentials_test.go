@@ -28,7 +28,7 @@ import (
 	"reflect"
 	"testing"
 
-	mtest "stash.us.cray.com/HMS/hms-meds/internal/testing"
+	mtest "github.com/Cray-HPE/hms-meds/internal/testing"
 )
 
 func TestMedsCredStore_FindGlobalCredentials(t *testing.T) {
