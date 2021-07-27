@@ -30,8 +30,8 @@ import (
 	"os"
 	"time"
 
-	"stash.us.cray.com/HMS/hms-meds/internal/model"
-	securestorage "stash.us.cray.com/HMS/hms-securestorage"
+	"github.com/Cray-HPE/hms-meds/internal/model"
+	securestorage "github.com/Cray-HPE/hms-securestorage"
 )
 
 func main() {

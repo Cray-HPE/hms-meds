@@ -33,9 +33,9 @@ FROM build-base AS base
 RUN go env -w GO111MODULE=auto
 
 # Copy all the necessary files to the image.
-COPY cmd $GOPATH/src/stash.us.cray.com/HMS/hms-meds/cmd
-COPY internal $GOPATH/src/stash.us.cray.com/HMS/hms-meds/internal
-COPY vendor $GOPATH/src/stash.us.cray.com/HMS/hms-meds/vendor
+COPY cmd $GOPATH/src/github.com/Cray-HPE/hms-meds/cmd
+COPY internal $GOPATH/src/github.com/Cray-HPE/hms-meds/internal
+COPY vendor $GOPATH/src/github.com/Cray-HPE/hms-meds/vendor
 
 
 ### Build Stage ###
@@ -43,8 +43,8 @@ FROM base AS builder
 
 # Now build
 RUN set -ex \
-    && go build -i -o /usr/local/bin/meds stash.us.cray.com/HMS/hms-meds/cmd/meds \
-    && go build -i -o /usr/local/bin/vault_loader stash.us.cray.com/HMS/hms-meds/cmd/vault_loader
+    && go build -i -o /usr/local/bin/meds github.com/Cray-HPE/hms-meds/cmd/meds \
+    && go build -i -o /usr/local/bin/vault_loader github.com/Cray-HPE/hms-meds/cmd/vault_loader
 
 
 ### Final Stage ###
