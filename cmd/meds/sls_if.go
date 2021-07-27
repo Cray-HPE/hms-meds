@@ -32,9 +32,9 @@ import (
 	"net/http"
 	"strconv"
 
-	sls_common "stash.us.cray.com/HMS/hms-sls/pkg/sls-common"
+	sls_common "github.com/Cray-HPE/hms-sls/pkg/sls-common"
 
-	base "stash.us.cray.com/HMS/hms-base"
+	base "github.com/Cray-HPE/hms-base"
 )
 
 // Generic Hardware data.  NOTE: this is currently replicated.
