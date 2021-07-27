@@ -23,5 +23,5 @@ FROM cray/meds-base
 
 # Run unit tests...
 RUN set -ex && \
-    go test -v stash.us.cray.com/HMS/hms-meds/cmd/meds && \
-    go test -v stash.us.cray.com/HMS/hms-meds/internal/model
+    go test -v github.com/Cray-HPE/hms-meds/cmd/meds && \
+    go test -v github.com/Cray-HPE/hms-meds/internal/model
