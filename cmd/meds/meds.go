@@ -41,18 +41,18 @@ import (
 	"sync"
 	"time"
 
-	base "stash.us.cray.com/HMS/hms-base"
-	dns_dhcp "stash.us.cray.com/HMS/hms-dns-dhcp/pkg"
-	sls_common "stash.us.cray.com/HMS/hms-sls/pkg/sls-common"
-	"stash.us.cray.com/HMS/hms-smd/pkg/sm"
+	base "github.com/Cray-HPE/hms-base"
+	dns_dhcp "github.com/Cray-HPE/hms-dns-dhcp/pkg"
+	sls_common "github.com/Cray-HPE/hms-sls/pkg/sls-common"
+	"github.com/Cray-HPE/hms-smd/pkg/sm"
 
-	"stash.us.cray.com/HMS/hms-meds/internal/model"
+	"github.com/Cray-HPE/hms-meds/internal/model"
 
-	compcreds "stash.us.cray.com/HMS/hms-compcredentials"
-	sstorage "stash.us.cray.com/HMS/hms-securestorage"
+	compcreds "github.com/Cray-HPE/hms-compcredentials"
+	sstorage "github.com/Cray-HPE/hms-securestorage"
 
-	bmc_nwprotocol "stash.us.cray.com/HMS/hms-bmc-networkprotocol/pkg"
-	"stash.us.cray.com/HMS/hms-certs/pkg/hms_certs"
+	bmc_nwprotocol "github.com/Cray-HPE/hms-bmc-networkprotocol/pkg"
+	"github.com/Cray-HPE/hms-certs/pkg/hms_certs"
 )
 
 // A general understanding of the hardware in a Mountain rack is necessary

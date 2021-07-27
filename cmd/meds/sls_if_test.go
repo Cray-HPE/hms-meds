@@ -29,7 +29,7 @@ import (
 	"net/http"
 	"net/http/httptest"
 	"testing"
-	"stash.us.cray.com/HMS/hms-certs/pkg/hms_certs"
+	"github.com/Cray-HPE/hms-certs/pkg/hms_certs"
 )
 
 // Fake payload of sls/v1/hardware/search
