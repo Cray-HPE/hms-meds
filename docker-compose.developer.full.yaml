@@ -25,7 +25,7 @@ services:
     networks:
       - meds
   vault-kv-enabler:
-    image: arti.dev.cray.com/csm-docker-master-local/vault-kv-enabler:1.11.3
+    image: artifactory.algol60.net/csm-docker/stable/vault-kv-enabler:1.12.5
     environment:
       - VAULT_ADDR=http://vault:8200
       - VAULT_TOKEN=hms
@@ -50,7 +50,7 @@ services:
     networks:
       - meds
   cray-sls-init:
-    image: arti.dev.cray.com/csm-docker-master-local/cray-sls:latest
+    image: artifactory.algol60.net/csm-docker/stable/cray-sls:1.9.4
     command: ["sls-init"]
     environment:
       - POSTGRES_HOST=sls-postgres
@@ -61,7 +61,7 @@ services:
     networks:
       - meds
   cray-sls:
-    image: arti.dev.cray.com/csm-docker-master-local/cray-sls:latest
+    image: artifactory.algol60.net/csm-docker/stable/cray-sls:1.9.4
     environment:
       - POSTGRES_HOST=cray-sls-postgres
       - DBOPTS=sslmode=disable
@@ -82,7 +82,7 @@ services:
       - meds
 
   cray-sls-preload:
-    image: arti.dev.cray.com/csm-docker-master-local/cray-sls:latest
+    image: artifactory.algol60.net/csm-docker/stable/cray-sls:1.9.4
     command: >
       sh -c "sleep 5 &&
       curl  -d '{\"Xname\":\"x1000\",\"Type\":\"comptype_cabinet\",\"Class\":\"Mountain\",\"TypeString\":\"Cabinet\",\"ExtraProperties\":{\"Networks\":{\"cn\":{
@@ -120,7 +120,7 @@ services:
     networks:
       - meds
   cray-smd-init:
-    image: arti.dev.cray.com/csm-docker-master-local/cray-smd:latest
+    image: artifactory.algol60.net/csm-docker/stable/cray-smd:1.29.10
     environment:
       - SMD_DBHOST=cray-smd-postgres
       - SMD_DBPORT=5432
@@ -130,7 +130,7 @@ services:
       - meds
     command: /entrypoint.sh smd-init
   cray-smd:
-    image: arti.dev.cray.com/csm-docker-master-local/cray-smd:latest
+    image: artifactory.algol60.net/csm-docker/stable/cray-smd:1.29.10
     environment:
       - POSTGRES_HOST=cray-smd-postgres
       - SMD_DBHOST=cray-smd-postgres
