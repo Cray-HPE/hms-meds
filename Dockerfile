@@ -25,7 +25,7 @@
 FROM arti.dev.cray.com/baseos-docker-master-local/golang:1.16-alpine3.13 AS build-base
 
 RUN set -ex \
-    && apk update \
+    && apk -U upgrade \
     && apk add build-base
 
 FROM build-base AS base
@@ -67,7 +67,7 @@ ENV MEDS_ROOT_SSH_KEY=""
 
 # Include curl in the final image.
 RUN set -ex \
-    && apk update \
+    && apk -U upgrade \
     && apk add --no-cache curl
 
 # Copy built binaries from above build step.
