@@ -30,7 +30,7 @@ COPY tests/dummy-endpoint .
 
 # install dependencies
 RUN set -ex \
-    && apk update \
+    && apk -U upgrade \
     && apk add \
         build-base \
         python3 \
