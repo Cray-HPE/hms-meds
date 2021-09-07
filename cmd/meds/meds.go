@@ -1192,6 +1192,55 @@ func main() {
 	log.Printf("INFO: Setting up non-TLS-validated HTTP client for in-service use.")
 	client, _ = hms_certs.CreateHTTPClientPair("", clientTimeout)
 
+	//Fix up syslog/NTP IP/hostnames
+
+	var nwp bmc_nwprotocol.NWPData
+
+	//Check if we are to use IP addresses, and if so, convert them here.
+	if syslogTargUseIP {
+		toks := strings.Split(syslogTarg, ":")
+		ip, iperr := net.LookupIP(toks[0])
+		if iperr != nil {
+			log.Printf("ERROR looking up syslog server IP addr: %v", iperr)
+			log.Printf("Using hostname anyway.")
+		} else {
+			syslogTarg = ip[0].String()
+			if (len(toks) > 1) {
+				syslogTarg = syslogTarg + ":" + toks[1]
+			} else {
+				log.Printf("INFO: No port specified in syslog target, using 123.")
+				syslogTarg = syslogTarg + ":123"
+			}
+		}
+	}
+	if ntpTargUseIP {
+		toks := strings.Split(ntpTarg, ":")
+		ip, iperr := net.LookupIP(toks[0])
+		if iperr != nil {
+			log.Printf("ERROR looking up NTP IP addr: %v", iperr)
+			log.Printf("Using hostname anyway.")
+		} else {
+			ntpTarg = ip[0].String()
+			if (len(toks) > 1) {
+				ntpTarg = ntpTarg + ":" + toks[1]
+			} else {
+				log.Printf("INFO: No port specified in NTP target, using 514.")
+				ntpTarg = ntpTarg + ":514"
+			}
+		}
+	}
+
+	nwp.SyslogSpec = syslogTarg
+	nwp.NTPSpec = ntpTarg
+	log.Printf("Using syslog server: '%s'", syslogTarg)
+	log.Printf("Using NTP server: '%s'", ntpTarg)
+
+	rfNWPStatic, err = bmc_nwprotocol.InitInstance(nwp, redfishNPSuffix, serviceName)
+	if err != nil {
+		log.Println("ERROR setting up NW protocol handling:", err)
+		//TODO: should we exit??
+	}
+
 	//Set up RF HTTP transport.  Re-try for Vault, fail over on too many retries.
 
 	ok := false
@@ -1226,40 +1275,6 @@ func main() {
 		}
 	} else {
 		log.Printf("WARNING: No CA bundle URI specified, not watching for CA changes.")
-	}
-
-	var nwp bmc_nwprotocol.NWPData
-	nwp.SyslogSpec = syslogTarg
-	nwp.NTPSpec = ntpTarg
-
-	//Check if we are to use IP addresses, and if so, convert them here.
-	if syslogTargUseIP {
-		toks := strings.Split(syslogTarg, ":")
-		ip, iperr := net.LookupIP(toks[0])
-		if iperr != nil {
-			log.Printf("ERROR looking up syslog server IP addr: %v", iperr)
-			log.Printf("Using hostname anyway.")
-		} else {
-			syslogTarg = ip[0].String()
-		}
-	}
-	if ntpTargUseIP {
-		toks := strings.Split(syslogTarg, ":")
-		ip, iperr := net.LookupIP(toks[0])
-		if iperr != nil {
-			log.Printf("ERROR looking up NTP IP addr: %v", iperr)
-			log.Printf("Using hostname anyway.")
-		} else {
-			ntpTarg = ip[0].String()
-		}
-	}
-	log.Printf("Using syslog server: '%s'", syslogTarg)
-	log.Printf("Using NTP server: '%s'", ntpTarg)
-
-	rfNWPStatic, err = bmc_nwprotocol.InitInstance(nwp, redfishNPSuffix, serviceName)
-	if err != nil {
-		log.Println("ERROR setting up NW protocol handling:", err)
-		//TODO: should we exit??
 	}
 
 	/* Start up watch for HSM changes early, so we can loop over data */
