@@ -9,7 +9,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Changed
 
-- Fixed bug in syslog/NTP use of IP addrs.
+- Fixed bug in syslog/NTP use of IP addresses.
 
 ## [1.15.6] - 2021-08-30
 
