@@ -28,6 +28,8 @@ RUN set -ex \
     && apk -U upgrade \
     && apk add build-base
 
+
+### Build Stage ###
 FROM build-base AS base
 
 RUN go env -w GO111MODULE=auto
@@ -38,7 +40,7 @@ COPY internal $GOPATH/src/github.com/Cray-HPE/hms-meds/internal
 COPY vendor $GOPATH/src/github.com/Cray-HPE/hms-meds/vendor
 
 
-### Build Stage ###
+### Builder Stage ###
 FROM base AS builder
 
 # Now build
@@ -73,6 +75,9 @@ RUN set -ex \
 # Copy built binaries from above build step.
 COPY --from=builder /usr/local/bin/meds /usr/local/bin
 COPY --from=builder /usr/local/bin/vault_loader /usr/local/bin
+
+# nobody 65534:65534
+USER 65534:65534
 
 # Set up the command to start the service, the run the init script.
 CMD meds -hsm ${HSM_URL} ${MEDS_OPTS}
