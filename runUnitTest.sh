@@ -27,8 +27,13 @@
 # Fail on error and print executions
 set -ex
 
-# Build the build base image (if it's not already)
-docker build -t cray/meds-base --target base .
+GITSHA=$(git rev-parse HEAD)
+TIMESTAMP=$(date +"%Y-%m-%dT%H-%M-%SZ")
+IMAGE="cray/hms-meds-coverage"
+# image names must be lower case
+UNIQUE_TAG=$(echo ${IMAGE}_${GITSHA}_${TIMESTAMP} | tr '[:upper:]' '[:lower:]')
+# export NO_CACHE=--no-cache # this will cause docker build to run with no cache; off by default for local builds, enabled in jenkinsfile
 
-# Run the tests.
-docker build -t cray/meds-unit-testing -f Dockerfile.testing --no-cache .
+DOCKER_BUILDKIT=0 docker build $NO_CACHE -t $UNIQUE_TAG -f Dockerfile.testing .
+docker image rm $UNIQUE_TAG --force
+

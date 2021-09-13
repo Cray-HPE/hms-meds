@@ -27,10 +27,10 @@ CHART_NAME ?= cray-hms-meds
 CHART_VERSION ?= $(shell cat .version)
 
 
-all: image chart unittest coverage
+all: image chart unittest
 
 image:
-	docker build --pull ${DOCKER_ARGS} --tag '${NAME}:${VERSION}' .
+	docker build ${NO_CACHE} --pull ${DOCKER_ARGS} --tag '${NAME}:${VERSION}' .
 
 chart:
 	helm repo add cray-algol60 https://artifactory.algol60.net/artifactory/csm-helm-charts
@@ -39,7 +39,4 @@ chart:
 
 unittest:
 	./runUnitTest.sh
-
-coverage:
-	./runCoverage.sh
 
