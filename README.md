@@ -66,3 +66,9 @@ This will set up an environment with one dummy endpoint, named `x1000c1s1b0`.  I
 `curl  -d '{"Xname":"x1000","Type":"comptype_cabinet","Class":"Mountain","TypeString":"Cabinet","ExtraProperties":{"Networks":{"cn":{"HMN":{"CIDR":"172.26.0.1/22","Gateway":"172.26.0.254","VLan":3001},"NMN":{"CIDR":"10.100.0.1/22","Gateway":"10.100.3.254","VLan":2001}},"ncn":{}}}}' http://cray-sls:8376/v1/hardware`
 
 Note that on the mac, docker containers do not resolve, so use `localhost` as the hostname to contact.
+
+### MEDS CT Testing
+
+This repository builds and publishes hms-meds-ct-test RPMs along with the service itself containing tests that verify MEDS on the
+NCNs of live Shasta systems. The tests require the hms-ct-test-base RPM to also be installed on the NCNs in order to execute.
+The version of the test RPM installed on the NCNs should always match the version of MEDS deployed on the system.
