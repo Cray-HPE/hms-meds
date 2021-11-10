@@ -7,8 +7,13 @@
 #   tag: "" (default = "latest")
 #   pullPolicy: "" (default = "IfNotPresent")
 
+image:
+  repository: artifactory.algol60.net/csm-docker/stable/cray-meds
+  pullPolicy: IfNotPresent
+
 # Version of the kubectl pod to use when upgrading/downgrading charts
-dockerKubectlTag: &dockerKubectlTag 0.2.0
+dockerKubectlTag: &dockerKubectlTag 1.19.15
+dockerKubectlRepository: artifactory.algol60.net/csm-docker/stable/docker-kubectl
 hms_ca_uri: ""
 ntpserver_host_use_ip: ""
 syslogserver_host_use_ip: "y"
@@ -22,7 +27,8 @@ cray-service:
     cray-meds:
       name: "cray-meds"
       image:
-        repository: "cray/cray-meds"
+        repository: artifactory.algol60.net/csm-docker/stable/cray-meds
+        tag: 1.18.0
       env:
         - name: MEDS_OPTS
           valueFrom:
@@ -87,7 +93,7 @@ cray-service:
               name: meds-nwproto-info
               key: NTP_HOST
       image:
-        repository: "curlimages/curl"
+        repository: "artifactory.algol60.net/csm-docker/stable/docker.io/curlimages/curl"
         tag: 7.73.0
       command: ["/bin/sh", "-c"]
       args: ["NTPT=`echo ${MEDS_NTP_TARG} | sed 's/:.*$//'` ; echo $NTPT ;  until getent hosts rsyslog-aggregator.hmnlb ; do echo Waiting for rsyslog-aggregator.hmnlb to resolve in DNS ; sleep 3 ; done ; echo rsyslog-aggregator.hmnlb resolves in DNS; until getent hosts ${NTPT} ; do echo Waiting for ${NTPT} to resolve in DNS ; sleep 3 ; done ; echo ${NTPT} resolves in DNS"]

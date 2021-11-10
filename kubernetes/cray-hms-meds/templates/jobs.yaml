@@ -20,7 +20,7 @@ spec:
                 secretKeyRef:
                   name: cray-meds-credentials
                   key: vault_redfish_defaults
-          image: "{{ include "cray-hms-meds.image-prefix" .Values }}cray/cray-meds:{{ include "cray-hms-meds.imageTag" . }}"
+          image: {{ .Values.image.repository }}:{{ default .Chart.AppVersion .Values.image.tag }}
           command: ["vault_loader"]
 ---
 apiVersion: batch/v1
@@ -41,7 +41,7 @@ spec:
       serviceAccountName: "cray-meds-vault-loader"
       containers:
         - name: job-deleter
-          image: "{{ include "cray-hms-meds.image-prefix" .Values }}loftsman/docker-kubectl:{{ .Values.dockerKubectlTag }}"
+          image: {{ .Values.dockerKubectlRepository }}:{{ .Values.dockerKubectlTag }}
           command:
           - /bin/sh
           - -c

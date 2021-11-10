@@ -3,3 +3,4 @@ go/pkg
 kubernetes/.packaged/
 kubernetes/cray-hms-meds/helm
 .idea/
+*.swp
