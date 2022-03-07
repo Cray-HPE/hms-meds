@@ -3,7 +3,7 @@
 #
 # MIT License
 #
-# (C) Copyright [2019-2021] Hewlett Packard Enterprise Development LP
+# (C) Copyright [2020-2022] Hewlett Packard Enterprise Development LP
 #
 # Permission is hereby granted, free of charge, to any person obtaining a
 # copy of this software and associated documentation files (the "Software"),
@@ -23,17 +23,39 @@
 # ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR
 # OTHER DEALINGS IN THE SOFTWARE.
 #
+set -x
 
-# Fail on error and print executions
-set -ex
 
-GITSHA=$(git rev-parse HEAD)
-TIMESTAMP=$(date +"%Y-%m-%dT%H-%M-%SZ")
-IMAGE="cray/hms-meds-coverage"
-# image names must be lower case
-UNIQUE_TAG=$(echo ${IMAGE}_${GITSHA}_${TIMESTAMP} | tr '[:upper:]' '[:lower:]')
-# export NO_CACHE=--no-cache # this will cause docker build to run with no cache; off by default for local builds, enabled in jenkinsfile
+# Configure docker compose
+export COMPOSE_PROJECT_NAME=$RANDOM
+export COMPOSE_FILE=docker-compose.test.unit.yaml
 
-DOCKER_BUILDKIT=0 docker build $NO_CACHE -t $UNIQUE_TAG -f Dockerfile.testing .
-docker image rm $UNIQUE_TAG --force
+echo "COMPOSE_PROJECT_NAME: ${COMPOSE_PROJECT_NAME}"
+echo "COMPOSE_FILE: $COMPOSE_FILE"
 
+
+function cleanup() {
+  docker-compose down
+  if ! [[ $? -eq 0 ]]; then
+    echo "Failed to decompose environment!"
+    exit 1
+  fi
+  exit $1
+}
+
+
+echo "Starting containers..."
+docker-compose build
+docker-compose up --exit-code-from unit-tests unit-tests
+
+test_result=$?
+
+# Clean up
+echo "Cleaning up containers..."
+if [[ $test_result -ne 0 ]]; then
+  echo "Unit tests FAILED!"
+  cleanup 1
+fi
+
+echo "Unit tests PASSED!"
+cleanup 0

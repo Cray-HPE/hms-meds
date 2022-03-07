@@ -1,8 +1,6 @@
-#! /bin/bash
-#
 # MIT License
 #
-# (C) Copyright [2019-2021] Hewlett Packard Enterprise Development LP
+# (C) Copyright [2021-2022] Hewlett Packard Enterprise Development LP
 #
 # Permission is hereby granted, free of charge, to any person obtaining a
 # copy of this software and associated documentation files (the "Software"),
@@ -21,6 +19,33 @@
 # OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE,
 # ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR
 # OTHER DEALINGS IN THE SOFTWARE.
-#
 
-docker run $(docker build . | tee /dev/tty | tail -n 1 | awk '{print $3}')
+# Dockerfile for running bss unit tests.
+
+### build-base stage ###
+# Build base just has the packages installed we need.
+FROM artifactory.algol60.net/docker.io/library/golang:1.16-alpine AS build-base
+
+RUN set -ex \
+    && apk -U upgrade \
+    && apk add build-base
+
+### base stage ###
+# Base copies in the files we need to test/build.
+FROM build-base AS base
+
+RUN go env -w GO111MODULE=auto
+
+# Copy all the necessary files to the image.
+COPY cmd $GOPATH/src/github.com/Cray-HPE/hms-meds/cmd
+COPY internal $GOPATH/src/github.com/Cray-HPE/hms-meds/internal
+COPY vendor $GOPATH/src/github.com/Cray-HPE/hms-meds/vendor
+COPY .version $GOPATH/src/github.com/Cray-HPE/hms-meds/.version
+
+### testing stage ###
+FROM base AS testing
+
+WORKDIR /go
+
+# Run unit tests.
+CMD ["sh", "-c", "go test -cover -v github.com/Cray-HPE/hms-meds/cmd/meds;  go test -cover -v github.com/Cray-HPE/hms-meds/internal/model"]
