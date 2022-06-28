@@ -41,10 +41,11 @@ import (
 	"sync"
 	"time"
 
-	base "github.com/Cray-HPE/hms-base"
+	base "github.com/Cray-HPE/hms-base/v2"
 	dns_dhcp "github.com/Cray-HPE/hms-dns-dhcp/pkg"
 	sls_common "github.com/Cray-HPE/hms-sls/pkg/sls-common"
 	"github.com/Cray-HPE/hms-smd/pkg/sm"
+	"github.com/Cray-HPE/hms-xname/xnametypes"
 
 	"github.com/Cray-HPE/hms-meds/internal/model"
 
@@ -1050,7 +1051,7 @@ func verifyCabinetRedfishEndpoints(endpoints []*NetEndpoint) error {
 
 			// Verify that ChassisBMC's have the correct FQDN/hostname values set
 			// TODO For authoritative DNS the following check should be changed to handle the FQDN of the system.
-			if base.GetHMSType(rfEP.ID) == base.ChassisBMC && rfEP.ID != rfEP.FQDN {
+			if xnametypes.GetHMSType(rfEP.ID) == xnametypes.ChassisBMC && rfEP.ID != rfEP.FQDN {
 				fqdn = rfEP.ID
 				hostname = rfEP.ID
 				log.Printf("Found ChassisBMC RedfishEndpoint with ID (%s) and FQDN (%s) PATCHING HSM to use FQDN (%s) and Hostname (%s)\n",
@@ -1205,7 +1206,7 @@ func main() {
 			log.Printf("Using hostname anyway.")
 		} else {
 			syslogTarg = ip[0].String()
-			if (len(toks) > 1) {
+			if len(toks) > 1 {
 				syslogTarg = syslogTarg + ":" + toks[1]
 			} else {
 				log.Printf("INFO: No port specified in syslog target, using 123.")
@@ -1221,7 +1222,7 @@ func main() {
 			log.Printf("Using hostname anyway.")
 		} else {
 			ntpTarg = ip[0].String()
-			if (len(toks) > 1) {
+			if len(toks) > 1 {
 				ntpTarg = ntpTarg + ":" + toks[1]
 			} else {
 				log.Printf("INFO: No port specified in NTP target, using 514.")
