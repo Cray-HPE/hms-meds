@@ -25,11 +25,7 @@
 package main
 
 import (
-	"github.com/hashicorp/go-retryablehttp"
 	"net/http"
-	"net/http/httptest"
-	"testing"
-	"github.com/Cray-HPE/hms-certs/pkg/hms_certs"
 )
 
 // Fake payload of sls/v1/hardware/search
@@ -70,63 +66,4 @@ func doHWSearch(w http.ResponseWriter, req *http.Request) {
 	w.Header().Set("Content-Type", "application/json")
 	w.WriteHeader(glbHttpStatus)
 	w.Write([]byte(payload))
-}
-
-func TestGetCabInfo(t *testing.T) {
-	var endpointsNew = make([]*NetEndpoint, 0)
-	var endpointsOld = make([]*NetEndpoint, 0)
-	var rackInfo = RackInfo{rackList: []int{1000, 1001, 1002, 1003},
-		rackIPList: []string{"10.0.2.100/22",
-			"10.10.2.100/22",
-			"10.20.2.100/22",
-			"10.30.2.100/22"},
-		ip6prefix: "fd66:0:0:0",
-		macprefix: "02"}
-
-	//Create test http server, create test client, assign to global client var
-	glbHttpStatus = http.StatusOK
-	retryClient := retryablehttp.NewClient()
-
-	svr := httptest.NewServer(http.HandlerFunc(doHWSearch))
-	sls = svr.URL
-
-	rfClient = &hms_certs.HTTPClientPair{SecureClient: retryClient, InsecureClient: retryClient,}
-
-	err := getCabInfo(&endpointsNew, rackInfo)
-	if err != nil {
-		t.Error("ERROR getting cabinet info via SLS:", err)
-	}
-
-	for _, ep := range endpointsNew {
-		for _, xp := range expEP {
-			if xp.name == ep.name {
-				if *ep != xp {
-					t.Errorf("NEW: Endpoint mismatch,\nexp: '%v'\ngot: '%v'\n", xp, *ep)
-				}
-			}
-		}
-	}
-
-	////// ERROR CONDITIONS
-
-	t.Log("TESTING ERROR CONDITIONS")
-
-	// Bad status code from SLS
-
-	sls = svr.URL
-	glbHttpStatus = http.StatusInternalServerError
-	err = getCabInfo(&endpointsOld, rackInfo)
-	if err == nil {
-		t.Errorf("ERROR getting cabinet via SLS didn't fail, should have.\n")
-	}
-	glbHttpStatus = http.StatusOK
-
-	// No data in SLS (not an error)
-
-	hwEmpty = true
-	err = getCabInfo(&endpointsOld, rackInfo)
-	if err != nil {
-		t.Error("ERROR empty SLS failed:", err)
-	}
-	hwEmpty = false
 }

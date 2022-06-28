@@ -25,6 +25,8 @@
 package testing
 
 import (
+	"errors"
+
 	"github.com/mitchellh/mapstructure"
 )
 
@@ -53,4 +55,9 @@ func (kv KvMock) Delete(key string) error {
 }
 func (kv KvMock) LookupKeys(keyPath string) (keys []string, err error) {
 	return
+}
+
+// StoreWithData is required for hms-certs
+func (kv KvMock) StoreWithData(key string, value interface{}, output interface{}) error {
+	return errors.New("not implemented")
 }

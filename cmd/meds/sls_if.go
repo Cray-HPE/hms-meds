@@ -30,11 +30,8 @@ import (
 	"io/ioutil"
 	"log"
 	"net/http"
-	"strconv"
 
-	sls_common "github.com/Cray-HPE/hms-sls/pkg/sls-common"
-
-	base "github.com/Cray-HPE/hms-base"
+	"github.com/Cray-HPE/hms-xname/xnametypes"
 )
 
 // Generic Hardware data.  NOTE: this is currently replicated.
@@ -45,13 +42,13 @@ type HMSStringType string
 type CabinetType string
 
 type GenericHardware struct {
-	Parent             string        `json:"Parent"`
-	Children           []string      `json:"Children,omitempty"`
-	Xname              string        `json:"Xname"`
-	Type               HMSStringType `json:"Type"`
-	Class              CabinetType   `json:"Class"`
-	TypeString         base.HMSType  `json:"TypeString"`
-	ExtraPropertiesRaw interface{}   `json:"ExtraProperties,omitempty"`
+	Parent             string             `json:"Parent"`
+	Children           []string           `json:"Children,omitempty"`
+	Xname              string             `json:"Xname"`
+	Type               HMSStringType      `json:"Type"`
+	Class              CabinetType        `json:"Class"`
+	TypeString         xnametypes.HMSType `json:"TypeString"`
+	ExtraPropertiesRaw interface{}        `json:"ExtraProperties,omitempty"`
 }
 
 type GenericHardwareArray []GenericHardware
@@ -77,7 +74,7 @@ func getSLSCabInfo() ([]GenericHardware, error) {
 		return nil, err
 	}
 
-	if (rsp.Body != nil) {
+	if rsp.Body != nil {
 		body, berr = ioutil.ReadAll(rsp.Body)
 		defer rsp.Body.Close()
 	}
@@ -110,7 +107,7 @@ func getSLSCabInfo() ([]GenericHardware, error) {
 		return nil, err
 	}
 
-	if (rsp.Body != nil) {
+	if rsp.Body != nil {
 		body, berr = ioutil.ReadAll(rsp.Body)
 		defer rsp.Body.Close()
 	}
@@ -143,72 +140,4 @@ func getSLSCabInfo() ([]GenericHardware, error) {
 	}
 
 	return jdata, nil
-}
-
-// Get relevant cabinet information.  If SLS URL is present then query SLS.
-// If not, then use the older method from cmdline arguments.  If either
-// method fails, an error is returned, causing MEDS to panic.
-
-func getCabInfo(endpoints *[]*NetEndpoint, rackInfo RackInfo) error {
-	log.Printf("INFO: Gathering cabinet info from SLS.\n")
-
-	hwList, hwerr := getSLSCabInfo()
-
-	if hwerr != nil {
-		log.Printf("ERROR, can't get cabinet list from SLS: %v\n",
-			hwerr)
-		return hwerr
-	}
-	if len(hwList) == 0 {
-		log.Printf("INFO: No cabinets found in SLS.\n")
-		return nil //TODO: should this be an error?
-	}
-
-	for _, cab := range hwList {
-		var cb sls_common.ComptypeCabinet
-		var macPre string
-		//Get ExtraProperties
-		ba, baerr := json.Marshal(cab.ExtraPropertiesRaw)
-		if baerr != nil {
-			err := fmt.Errorf("INTERNAL ERROR, can't marshal cab props: %v\n",
-				baerr)
-			log.Println(err)
-			return err
-		}
-
-		baerr = json.Unmarshal(ba, &cb)
-		if baerr != nil {
-			err := fmt.Errorf("INTERNAL ERROR, can't unmarshal cab props: %v\n",
-				baerr)
-			log.Println(err)
-			return err
-		}
-
-		log.Printf("INFO: SLS Cab info for %s: '%s'\n", cab.Xname, string(ba))
-
-		// Make sure the map checks out before reaching into it to avoid panic.
-		hmnNetwork, networkExists := cb.Networks["cn"]["HMN"]
-		if !networkExists {
-			log.Printf("Cabinet doesn't have HMN network for compute nodes: %+v\n", cb)
-			continue
-		}
-
-		macPre = hmnNetwork.IPv6Prefix
-		if hmnNetwork.IPv6Prefix == "" {
-			macPre = rackInfo.macprefix
-		}
-		rackNum, rerr := strconv.Atoi(cab.Xname[1:])
-		if rerr != nil {
-			log.Printf("INTERNAL ERROR, can't convert Xname '%s' to int: %v\n",
-				cab.Xname, rerr)
-			continue
-		}
-		*endpoints = append(*endpoints, GenerateEnvironmentalControllerEndpoints(rackNum)...)
-		*endpoints = append(*endpoints, GenerateChassisEndpoints(macPre, rackNum)...)
-
-	}
-
-	log.Printf("INFO: %d endpoints calculated for %d cabinets.\n",
-		len(*endpoints), len(hwList))
-	return nil
 }
