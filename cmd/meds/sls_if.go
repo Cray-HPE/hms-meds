@@ -31,6 +31,7 @@ import (
 	"log"
 	"net/http"
 
+	sls_common "github.com/Cray-HPE/hms-sls/pkg/sls-common"
 	"github.com/Cray-HPE/hms-xname/xnametypes"
 )
 
@@ -38,30 +39,30 @@ import (
 // It may move to a common package someday, but for now we'll
 // make our own copy and data types.
 
-type HMSStringType string
-type CabinetType string
+// type HMSStringType string
+// type CabinetType string
 
-type GenericHardware struct {
-	Parent             string             `json:"Parent"`
-	Children           []string           `json:"Children,omitempty"`
-	Xname              string             `json:"Xname"`
-	Type               HMSStringType      `json:"Type"`
-	Class              CabinetType        `json:"Class"`
-	TypeString         xnametypes.HMSType `json:"TypeString"`
-	ExtraPropertiesRaw interface{}        `json:"ExtraProperties,omitempty"`
-}
+// type GenericHardware struct {
+// 	Parent             string             `json:"Parent"`
+// 	Children           []string           `json:"Children,omitempty"`
+// 	Xname              string             `json:"Xname"`
+// 	Type               HMSStringType      `json:"Type"`
+// 	Class              CabinetType        `json:"Class"`
+// 	TypeString         xnametypes.HMSType `json:"TypeString"`
+// 	ExtraPropertiesRaw interface{}        `json:"ExtraProperties,omitempty"`
+// }
 
-type GenericHardwareArray []GenericHardware
+// type GenericHardwareArray []GenericHardware
 
 // Query SLS for relevant cabinet info.  We need the cabinet XName,
 // cabinet class (mountain), MACPrefix, IPv4 CIDR, IPv6 prefix.
 // If --sls=xxxx or MEDS_SLS=xxx was not specified, then return
 // nothing, which will cause MEDS to try the older method.
 
-func getSLSCabInfo() ([]GenericHardware, error) {
-	var jdata []GenericHardware
-	var mcabs []GenericHardware
-	var hcabs []GenericHardware
+func getSLSCabInfo() ([]sls_common.GenericHardware, error) {
+	var jdata []sls_common.GenericHardware
+	var mcabs []sls_common.GenericHardware
+	var hcabs []sls_common.GenericHardware
 	var body []byte
 	var berr error
 
@@ -140,4 +141,55 @@ func getSLSCabInfo() ([]GenericHardware, error) {
 	}
 
 	return jdata, nil
+}
+
+func getSLSCabinetChassis(cabinetXname string) ([]sls_common.GenericHardware, error) {
+	if xnametypes.GetHMSType(cabinetXname) != xnametypes.Cabinet {
+		return nil, fmt.Errorf("provided xname is not a cabinet: %v", cabinetXname)
+	}
+
+	// Search:  /search/hardware?type=comptype_chassis&parent=x1000
+	var body []byte
+	var berr error
+	rsp, err := client.InsecureClient.Get(sls + fmt.Sprintf("/search/hardware?type=comptype_chassis&parent=%s", cabinetXname))
+	if err != nil {
+		log.Printf("ERROR in GET of hardware search: %v\n", err)
+		return nil, err
+	}
+
+	if rsp.Body != nil {
+		body, berr = ioutil.ReadAll(rsp.Body)
+		defer rsp.Body.Close()
+	}
+
+	if rsp.StatusCode != http.StatusOK {
+		emsg := fmt.Sprintf("Bad error code from hardware SLS /search GET: %d/%s\n",
+			rsp.StatusCode, http.StatusText(rsp.StatusCode))
+		return nil, fmt.Errorf(emsg)
+	}
+
+	if berr != nil {
+		log.Printf("ERROR reading SLS /search response body (for chassis of cabinet %v): %v\n", cabinetXname, berr)
+		return nil, berr
+	}
+
+	// Process the returned data
+	var unprocessedCabinetChassis []sls_common.GenericHardware
+	umerr := json.Unmarshal(body, &unprocessedCabinetChassis)
+	if umerr != nil {
+		log.Printf("ERROR unmarshalling SLS /search response body (for chassis of cabinet %v): %v\n", cabinetXname, umerr)
+		return nil, umerr
+	}
+
+	// Filter out any river chassis returned in the query
+	var cabinetChassis []sls_common.GenericHardware
+	for _, chassis := range unprocessedCabinetChassis {
+		if chassis.Class == sls_common.ClassRiver {
+			continue
+		}
+
+		cabinetChassis = append(cabinetChassis, chassis)
+	}
+
+	return cabinetChassis, nil
 }

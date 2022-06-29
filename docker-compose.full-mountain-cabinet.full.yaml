@@ -1,0 +1,2005 @@
+networks:
+  meds: {}
+services:
+  x1000c0:
+    environment:
+    - MOCKUPFOLDER=CMM
+    - XNAME=x1000c0
+    - AUTH_CONFIG=root:root_password:Administrator
+    - PORT=443
+    hostname: x1000c0
+    image: artifactory.algol60.net/csm-docker/stable/csm-rie:1.1.0
+    networks:
+    - meds
+  x1000c0r0b0:
+    environment:
+    - MOCKUPFOLDER=Slingshot_Switch_Blade
+    - XNAME=x1000c0r0b0
+    - AUTH_CONFIG=root:root_password:Administrator
+    - PORT=443
+    hostname: x1000c0r0b0
+    image: artifactory.algol60.net/csm-docker/stable/csm-rie:1.1.0
+    networks:
+    - meds
+  x1000c0r1b0:
+    environment:
+    - MOCKUPFOLDER=Slingshot_Switch_Blade
+    - XNAME=x1000c0r1b0
+    - AUTH_CONFIG=root:root_password:Administrator
+    - PORT=443
+    hostname: x1000c0r1b0
+    image: artifactory.algol60.net/csm-docker/stable/csm-rie:1.1.0
+    networks:
+    - meds
+  x1000c0r2b0:
+    environment:
+    - MOCKUPFOLDER=Slingshot_Switch_Blade
+    - XNAME=x1000c0r2b0
+    - AUTH_CONFIG=root:root_password:Administrator
+    - PORT=443
+    hostname: x1000c0r2b0
+    image: artifactory.algol60.net/csm-docker/stable/csm-rie:1.1.0
+    networks:
+    - meds
+  x1000c0r3b0:
+    environment:
+    - MOCKUPFOLDER=Slingshot_Switch_Blade
+    - XNAME=x1000c0r3b0
+    - AUTH_CONFIG=root:root_password:Administrator
+    - PORT=443
+    hostname: x1000c0r3b0
+    image: artifactory.algol60.net/csm-docker/stable/csm-rie:1.1.0
+    networks:
+    - meds
+  x1000c0r4b0:
+    environment:
+    - MOCKUPFOLDER=Slingshot_Switch_Blade
+    - XNAME=x1000c0r4b0
+    - AUTH_CONFIG=root:root_password:Administrator
+    - PORT=443
+    hostname: x1000c0r4b0
+    image: artifactory.algol60.net/csm-docker/stable/csm-rie:1.1.0
+    networks:
+    - meds
+  x1000c0r5b0:
+    environment:
+    - MOCKUPFOLDER=Slingshot_Switch_Blade
+    - XNAME=x1000c0r5b0
+    - AUTH_CONFIG=root:root_password:Administrator
+    - PORT=443
+    hostname: x1000c0r5b0
+    image: artifactory.algol60.net/csm-docker/stable/csm-rie:1.1.0
+    networks:
+    - meds
+  x1000c0r6b0:
+    environment:
+    - MOCKUPFOLDER=Slingshot_Switch_Blade
+    - XNAME=x1000c0r6b0
+    - AUTH_CONFIG=root:root_password:Administrator
+    - PORT=443
+    hostname: x1000c0r6b0
+    image: artifactory.algol60.net/csm-docker/stable/csm-rie:1.1.0
+    networks:
+    - meds
+  x1000c0r7b0:
+    environment:
+    - MOCKUPFOLDER=Slingshot_Switch_Blade
+    - XNAME=x1000c0r7b0
+    - AUTH_CONFIG=root:root_password:Administrator
+    - PORT=443
+    hostname: x1000c0r7b0
+    image: artifactory.algol60.net/csm-docker/stable/csm-rie:1.1.0
+    networks:
+    - meds
+  x1000c0s0b0:
+    environment:
+    - MOCKUPFOLDER=EX425
+    - XNAME=x1000c0s0b0
+    - AUTH_CONFIG=root:root_password:Administrator
+    - PORT=443
+    hostname: x1000c0s0b0
+    image: artifactory.algol60.net/csm-docker/stable/csm-rie:1.1.0
+    networks:
+    - meds
+  x1000c0s0b1:
+    environment:
+    - MOCKUPFOLDER=EX425
+    - XNAME=x1000c0s0b1
+    - AUTH_CONFIG=root:root_password:Administrator
+    - PORT=443
+    hostname: x1000c0s0b1
+    image: artifactory.algol60.net/csm-docker/stable/csm-rie:1.1.0
+    networks:
+    - meds
+  x1000c0s1b0:
+    environment:
+    - MOCKUPFOLDER=EX425
+    - XNAME=x1000c0s1b0
+    - AUTH_CONFIG=root:root_password:Administrator
+    - PORT=443
+    hostname: x1000c0s1b0
+    image: artifactory.algol60.net/csm-docker/stable/csm-rie:1.1.0
+    networks:
+    - meds
+  x1000c0s1b1:
+    environment:
+    - MOCKUPFOLDER=EX425
+    - XNAME=x1000c0s1b1
+    - AUTH_CONFIG=root:root_password:Administrator
+    - PORT=443
+    hostname: x1000c0s1b1
+    image: artifactory.algol60.net/csm-docker/stable/csm-rie:1.1.0
+    networks:
+    - meds
+  x1000c0s2b0:
+    environment:
+    - MOCKUPFOLDER=EX425
+    - XNAME=x1000c0s2b0
+    - AUTH_CONFIG=root:root_password:Administrator
+    - PORT=443
+    hostname: x1000c0s2b0
+    image: artifactory.algol60.net/csm-docker/stable/csm-rie:1.1.0
+    networks:
+    - meds
+  x1000c0s2b1:
+    environment:
+    - MOCKUPFOLDER=EX425
+    - XNAME=x1000c0s2b1
+    - AUTH_CONFIG=root:root_password:Administrator
+    - PORT=443
+    hostname: x1000c0s2b1
+    image: artifactory.algol60.net/csm-docker/stable/csm-rie:1.1.0
+    networks:
+    - meds
+  x1000c0s3b0:
+    environment:
+    - MOCKUPFOLDER=EX425
+    - XNAME=x1000c0s3b0
+    - AUTH_CONFIG=root:root_password:Administrator
+    - PORT=443
+    hostname: x1000c0s3b0
+    image: artifactory.algol60.net/csm-docker/stable/csm-rie:1.1.0
+    networks:
+    - meds
+  x1000c0s3b1:
+    environment:
+    - MOCKUPFOLDER=EX425
+    - XNAME=x1000c0s3b1
+    - AUTH_CONFIG=root:root_password:Administrator
+    - PORT=443
+    hostname: x1000c0s3b1
+    image: artifactory.algol60.net/csm-docker/stable/csm-rie:1.1.0
+    networks:
+    - meds
+  x1000c0s4b0:
+    environment:
+    - MOCKUPFOLDER=EX425
+    - XNAME=x1000c0s4b0
+    - AUTH_CONFIG=root:root_password:Administrator
+    - PORT=443
+    hostname: x1000c0s4b0
+    image: artifactory.algol60.net/csm-docker/stable/csm-rie:1.1.0
+    networks:
+    - meds
+  x1000c0s4b1:
+    environment:
+    - MOCKUPFOLDER=EX425
+    - XNAME=x1000c0s4b1
+    - AUTH_CONFIG=root:root_password:Administrator
+    - PORT=443
+    hostname: x1000c0s4b1
+    image: artifactory.algol60.net/csm-docker/stable/csm-rie:1.1.0
+    networks:
+    - meds
+  x1000c0s5b0:
+    environment:
+    - MOCKUPFOLDER=EX425
+    - XNAME=x1000c0s5b0
+    - AUTH_CONFIG=root:root_password:Administrator
+    - PORT=443
+    hostname: x1000c0s5b0
+    image: artifactory.algol60.net/csm-docker/stable/csm-rie:1.1.0
+    networks:
+    - meds
+  x1000c0s5b1:
+    environment:
+    - MOCKUPFOLDER=EX425
+    - XNAME=x1000c0s5b1
+    - AUTH_CONFIG=root:root_password:Administrator
+    - PORT=443
+    hostname: x1000c0s5b1
+    image: artifactory.algol60.net/csm-docker/stable/csm-rie:1.1.0
+    networks:
+    - meds
+  x1000c0s6b0:
+    environment:
+    - MOCKUPFOLDER=EX425
+    - XNAME=x1000c0s6b0
+    - AUTH_CONFIG=root:root_password:Administrator
+    - PORT=443
+    hostname: x1000c0s6b0
+    image: artifactory.algol60.net/csm-docker/stable/csm-rie:1.1.0
+    networks:
+    - meds
+  x1000c0s6b1:
+    environment:
+    - MOCKUPFOLDER=EX425
+    - XNAME=x1000c0s6b1
+    - AUTH_CONFIG=root:root_password:Administrator
+    - PORT=443
+    hostname: x1000c0s6b1
+    image: artifactory.algol60.net/csm-docker/stable/csm-rie:1.1.0
+    networks:
+    - meds
+  x1000c0s7b0:
+    environment:
+    - MOCKUPFOLDER=EX425
+    - XNAME=x1000c0s7b0
+    - AUTH_CONFIG=root:root_password:Administrator
+    - PORT=443
+    hostname: x1000c0s7b0
+    image: artifactory.algol60.net/csm-docker/stable/csm-rie:1.1.0
+    networks:
+    - meds
+  x1000c0s7b1:
+    environment:
+    - MOCKUPFOLDER=EX425
+    - XNAME=x1000c0s7b1
+    - AUTH_CONFIG=root:root_password:Administrator
+    - PORT=443
+    hostname: x1000c0s7b1
+    image: artifactory.algol60.net/csm-docker/stable/csm-rie:1.1.0
+    networks:
+    - meds
+  x1000c1:
+    environment:
+    - MOCKUPFOLDER=CMM
+    - XNAME=x1000c1
+    - AUTH_CONFIG=root:root_password:Administrator
+    - PORT=443
+    hostname: x1000c1
+    image: artifactory.algol60.net/csm-docker/stable/csm-rie:1.1.0
+    networks:
+    - meds
+  x1000c1r0b0:
+    environment:
+    - MOCKUPFOLDER=Slingshot_Switch_Blade
+    - XNAME=x1000c1r0b0
+    - AUTH_CONFIG=root:root_password:Administrator
+    - PORT=443
+    hostname: x1000c1r0b0
+    image: artifactory.algol60.net/csm-docker/stable/csm-rie:1.1.0
+    networks:
+    - meds
+  x1000c1r1b0:
+    environment:
+    - MOCKUPFOLDER=Slingshot_Switch_Blade
+    - XNAME=x1000c1r1b0
+    - AUTH_CONFIG=root:root_password:Administrator
+    - PORT=443
+    hostname: x1000c1r1b0
+    image: artifactory.algol60.net/csm-docker/stable/csm-rie:1.1.0
+    networks:
+    - meds
+  x1000c1r2b0:
+    environment:
+    - MOCKUPFOLDER=Slingshot_Switch_Blade
+    - XNAME=x1000c1r2b0
+    - AUTH_CONFIG=root:root_password:Administrator
+    - PORT=443
+    hostname: x1000c1r2b0
+    image: artifactory.algol60.net/csm-docker/stable/csm-rie:1.1.0
+    networks:
+    - meds
+  x1000c1r3b0:
+    environment:
+    - MOCKUPFOLDER=Slingshot_Switch_Blade
+    - XNAME=x1000c1r3b0
+    - AUTH_CONFIG=root:root_password:Administrator
+    - PORT=443
+    hostname: x1000c1r3b0
+    image: artifactory.algol60.net/csm-docker/stable/csm-rie:1.1.0
+    networks:
+    - meds
+  x1000c1r4b0:
+    environment:
+    - MOCKUPFOLDER=Slingshot_Switch_Blade
+    - XNAME=x1000c1r4b0
+    - AUTH_CONFIG=root:root_password:Administrator
+    - PORT=443
+    hostname: x1000c1r4b0
+    image: artifactory.algol60.net/csm-docker/stable/csm-rie:1.1.0
+    networks:
+    - meds
+  x1000c1r5b0:
+    environment:
+    - MOCKUPFOLDER=Slingshot_Switch_Blade
+    - XNAME=x1000c1r5b0
+    - AUTH_CONFIG=root:root_password:Administrator
+    - PORT=443
+    hostname: x1000c1r5b0
+    image: artifactory.algol60.net/csm-docker/stable/csm-rie:1.1.0
+    networks:
+    - meds
+  x1000c1r6b0:
+    environment:
+    - MOCKUPFOLDER=Slingshot_Switch_Blade
+    - XNAME=x1000c1r6b0
+    - AUTH_CONFIG=root:root_password:Administrator
+    - PORT=443
+    hostname: x1000c1r6b0
+    image: artifactory.algol60.net/csm-docker/stable/csm-rie:1.1.0
+    networks:
+    - meds
+  x1000c1r7b0:
+    environment:
+    - MOCKUPFOLDER=Slingshot_Switch_Blade
+    - XNAME=x1000c1r7b0
+    - AUTH_CONFIG=root:root_password:Administrator
+    - PORT=443
+    hostname: x1000c1r7b0
+    image: artifactory.algol60.net/csm-docker/stable/csm-rie:1.1.0
+    networks:
+    - meds
+  x1000c1s0b0:
+    environment:
+    - MOCKUPFOLDER=EX425
+    - XNAME=x1000c1s0b0
+    - AUTH_CONFIG=root:root_password:Administrator
+    - PORT=443
+    hostname: x1000c1s0b0
+    image: artifactory.algol60.net/csm-docker/stable/csm-rie:1.1.0
+    networks:
+    - meds
+  x1000c1s0b1:
+    environment:
+    - MOCKUPFOLDER=EX425
+    - XNAME=x1000c1s0b1
+    - AUTH_CONFIG=root:root_password:Administrator
+    - PORT=443
+    hostname: x1000c1s0b1
+    image: artifactory.algol60.net/csm-docker/stable/csm-rie:1.1.0
+    networks:
+    - meds
+  x1000c1s1b0:
+    environment:
+    - MOCKUPFOLDER=EX425
+    - XNAME=x1000c1s1b0
+    - AUTH_CONFIG=root:root_password:Administrator
+    - PORT=443
+    hostname: x1000c1s1b0
+    image: artifactory.algol60.net/csm-docker/stable/csm-rie:1.1.0
+    networks:
+    - meds
+  x1000c1s1b1:
+    environment:
+    - MOCKUPFOLDER=EX425
+    - XNAME=x1000c1s1b1
+    - AUTH_CONFIG=root:root_password:Administrator
+    - PORT=443
+    hostname: x1000c1s1b1
+    image: artifactory.algol60.net/csm-docker/stable/csm-rie:1.1.0
+    networks:
+    - meds
+  x1000c1s2b0:
+    environment:
+    - MOCKUPFOLDER=EX425
+    - XNAME=x1000c1s2b0
+    - AUTH_CONFIG=root:root_password:Administrator
+    - PORT=443
+    hostname: x1000c1s2b0
+    image: artifactory.algol60.net/csm-docker/stable/csm-rie:1.1.0
+    networks:
+    - meds
+  x1000c1s2b1:
+    environment:
+    - MOCKUPFOLDER=EX425
+    - XNAME=x1000c1s2b1
+    - AUTH_CONFIG=root:root_password:Administrator
+    - PORT=443
+    hostname: x1000c1s2b1
+    image: artifactory.algol60.net/csm-docker/stable/csm-rie:1.1.0
+    networks:
+    - meds
+  x1000c1s3b0:
+    environment:
+    - MOCKUPFOLDER=EX425
+    - XNAME=x1000c1s3b0
+    - AUTH_CONFIG=root:root_password:Administrator
+    - PORT=443
+    hostname: x1000c1s3b0
+    image: artifactory.algol60.net/csm-docker/stable/csm-rie:1.1.0
+    networks:
+    - meds
+  x1000c1s3b1:
+    environment:
+    - MOCKUPFOLDER=EX425
+    - XNAME=x1000c1s3b1
+    - AUTH_CONFIG=root:root_password:Administrator
+    - PORT=443
+    hostname: x1000c1s3b1
+    image: artifactory.algol60.net/csm-docker/stable/csm-rie:1.1.0
+    networks:
+    - meds
+  x1000c1s4b0:
+    environment:
+    - MOCKUPFOLDER=EX425
+    - XNAME=x1000c1s4b0
+    - AUTH_CONFIG=root:root_password:Administrator
+    - PORT=443
+    hostname: x1000c1s4b0
+    image: artifactory.algol60.net/csm-docker/stable/csm-rie:1.1.0
+    networks:
+    - meds
+  x1000c1s4b1:
+    environment:
+    - MOCKUPFOLDER=EX425
+    - XNAME=x1000c1s4b1
+    - AUTH_CONFIG=root:root_password:Administrator
+    - PORT=443
+    hostname: x1000c1s4b1
+    image: artifactory.algol60.net/csm-docker/stable/csm-rie:1.1.0
+    networks:
+    - meds
+  x1000c1s5b0:
+    environment:
+    - MOCKUPFOLDER=EX425
+    - XNAME=x1000c1s5b0
+    - AUTH_CONFIG=root:root_password:Administrator
+    - PORT=443
+    hostname: x1000c1s5b0
+    image: artifactory.algol60.net/csm-docker/stable/csm-rie:1.1.0
+    networks:
+    - meds
+  x1000c1s5b1:
+    environment:
+    - MOCKUPFOLDER=EX425
+    - XNAME=x1000c1s5b1
+    - AUTH_CONFIG=root:root_password:Administrator
+    - PORT=443
+    hostname: x1000c1s5b1
+    image: artifactory.algol60.net/csm-docker/stable/csm-rie:1.1.0
+    networks:
+    - meds
+  x1000c1s6b0:
+    environment:
+    - MOCKUPFOLDER=EX425
+    - XNAME=x1000c1s6b0
+    - AUTH_CONFIG=root:root_password:Administrator
+    - PORT=443
+    hostname: x1000c1s6b0
+    image: artifactory.algol60.net/csm-docker/stable/csm-rie:1.1.0
+    networks:
+    - meds
+  x1000c1s6b1:
+    environment:
+    - MOCKUPFOLDER=EX425
+    - XNAME=x1000c1s6b1
+    - AUTH_CONFIG=root:root_password:Administrator
+    - PORT=443
+    hostname: x1000c1s6b1
+    image: artifactory.algol60.net/csm-docker/stable/csm-rie:1.1.0
+    networks:
+    - meds
+  x1000c1s7b0:
+    environment:
+    - MOCKUPFOLDER=EX425
+    - XNAME=x1000c1s7b0
+    - AUTH_CONFIG=root:root_password:Administrator
+    - PORT=443
+    hostname: x1000c1s7b0
+    image: artifactory.algol60.net/csm-docker/stable/csm-rie:1.1.0
+    networks:
+    - meds
+  x1000c1s7b1:
+    environment:
+    - MOCKUPFOLDER=EX425
+    - XNAME=x1000c1s7b1
+    - AUTH_CONFIG=root:root_password:Administrator
+    - PORT=443
+    hostname: x1000c1s7b1
+    image: artifactory.algol60.net/csm-docker/stable/csm-rie:1.1.0
+    networks:
+    - meds
+  x1000c2:
+    environment:
+    - MOCKUPFOLDER=CMM
+    - XNAME=x1000c2
+    - AUTH_CONFIG=root:root_password:Administrator
+    - PORT=443
+    hostname: x1000c2
+    image: artifactory.algol60.net/csm-docker/stable/csm-rie:1.1.0
+    networks:
+    - meds
+  x1000c2r0b0:
+    environment:
+    - MOCKUPFOLDER=Slingshot_Switch_Blade
+    - XNAME=x1000c2r0b0
+    - AUTH_CONFIG=root:root_password:Administrator
+    - PORT=443
+    hostname: x1000c2r0b0
+    image: artifactory.algol60.net/csm-docker/stable/csm-rie:1.1.0
+    networks:
+    - meds
+  x1000c2r1b0:
+    environment:
+    - MOCKUPFOLDER=Slingshot_Switch_Blade
+    - XNAME=x1000c2r1b0
+    - AUTH_CONFIG=root:root_password:Administrator
+    - PORT=443
+    hostname: x1000c2r1b0
+    image: artifactory.algol60.net/csm-docker/stable/csm-rie:1.1.0
+    networks:
+    - meds
+  x1000c2r2b0:
+    environment:
+    - MOCKUPFOLDER=Slingshot_Switch_Blade
+    - XNAME=x1000c2r2b0
+    - AUTH_CONFIG=root:root_password:Administrator
+    - PORT=443
+    hostname: x1000c2r2b0
+    image: artifactory.algol60.net/csm-docker/stable/csm-rie:1.1.0
+    networks:
+    - meds
+  x1000c2r3b0:
+    environment:
+    - MOCKUPFOLDER=Slingshot_Switch_Blade
+    - XNAME=x1000c2r3b0
+    - AUTH_CONFIG=root:root_password:Administrator
+    - PORT=443
+    hostname: x1000c2r3b0
+    image: artifactory.algol60.net/csm-docker/stable/csm-rie:1.1.0
+    networks:
+    - meds
+  x1000c2r4b0:
+    environment:
+    - MOCKUPFOLDER=Slingshot_Switch_Blade
+    - XNAME=x1000c2r4b0
+    - AUTH_CONFIG=root:root_password:Administrator
+    - PORT=443
+    hostname: x1000c2r4b0
+    image: artifactory.algol60.net/csm-docker/stable/csm-rie:1.1.0
+    networks:
+    - meds
+  x1000c2r5b0:
+    environment:
+    - MOCKUPFOLDER=Slingshot_Switch_Blade
+    - XNAME=x1000c2r5b0
+    - AUTH_CONFIG=root:root_password:Administrator
+    - PORT=443
+    hostname: x1000c2r5b0
+    image: artifactory.algol60.net/csm-docker/stable/csm-rie:1.1.0
+    networks:
+    - meds
+  x1000c2r6b0:
+    environment:
+    - MOCKUPFOLDER=Slingshot_Switch_Blade
+    - XNAME=x1000c2r6b0
+    - AUTH_CONFIG=root:root_password:Administrator
+    - PORT=443
+    hostname: x1000c2r6b0
+    image: artifactory.algol60.net/csm-docker/stable/csm-rie:1.1.0
+    networks:
+    - meds
+  x1000c2r7b0:
+    environment:
+    - MOCKUPFOLDER=Slingshot_Switch_Blade
+    - XNAME=x1000c2r7b0
+    - AUTH_CONFIG=root:root_password:Administrator
+    - PORT=443
+    hostname: x1000c2r7b0
+    image: artifactory.algol60.net/csm-docker/stable/csm-rie:1.1.0
+    networks:
+    - meds
+  x1000c2s0b0:
+    environment:
+    - MOCKUPFOLDER=EX425
+    - XNAME=x1000c2s0b0
+    - AUTH_CONFIG=root:root_password:Administrator
+    - PORT=443
+    hostname: x1000c2s0b0
+    image: artifactory.algol60.net/csm-docker/stable/csm-rie:1.1.0
+    networks:
+    - meds
+  x1000c2s0b1:
+    environment:
+    - MOCKUPFOLDER=EX425
+    - XNAME=x1000c2s0b1
+    - AUTH_CONFIG=root:root_password:Administrator
+    - PORT=443
+    hostname: x1000c2s0b1
+    image: artifactory.algol60.net/csm-docker/stable/csm-rie:1.1.0
+    networks:
+    - meds
+  x1000c2s1b0:
+    environment:
+    - MOCKUPFOLDER=EX425
+    - XNAME=x1000c2s1b0
+    - AUTH_CONFIG=root:root_password:Administrator
+    - PORT=443
+    hostname: x1000c2s1b0
+    image: artifactory.algol60.net/csm-docker/stable/csm-rie:1.1.0
+    networks:
+    - meds
+  x1000c2s1b1:
+    environment:
+    - MOCKUPFOLDER=EX425
+    - XNAME=x1000c2s1b1
+    - AUTH_CONFIG=root:root_password:Administrator
+    - PORT=443
+    hostname: x1000c2s1b1
+    image: artifactory.algol60.net/csm-docker/stable/csm-rie:1.1.0
+    networks:
+    - meds
+  x1000c2s2b0:
+    environment:
+    - MOCKUPFOLDER=EX425
+    - XNAME=x1000c2s2b0
+    - AUTH_CONFIG=root:root_password:Administrator
+    - PORT=443
+    hostname: x1000c2s2b0
+    image: artifactory.algol60.net/csm-docker/stable/csm-rie:1.1.0
+    networks:
+    - meds
+  x1000c2s2b1:
+    environment:
+    - MOCKUPFOLDER=EX425
+    - XNAME=x1000c2s2b1
+    - AUTH_CONFIG=root:root_password:Administrator
+    - PORT=443
+    hostname: x1000c2s2b1
+    image: artifactory.algol60.net/csm-docker/stable/csm-rie:1.1.0
+    networks:
+    - meds
+  x1000c2s3b0:
+    environment:
+    - MOCKUPFOLDER=EX425
+    - XNAME=x1000c2s3b0
+    - AUTH_CONFIG=root:root_password:Administrator
+    - PORT=443
+    hostname: x1000c2s3b0
+    image: artifactory.algol60.net/csm-docker/stable/csm-rie:1.1.0
+    networks:
+    - meds
+  x1000c2s3b1:
+    environment:
+    - MOCKUPFOLDER=EX425
+    - XNAME=x1000c2s3b1
+    - AUTH_CONFIG=root:root_password:Administrator
+    - PORT=443
+    hostname: x1000c2s3b1
+    image: artifactory.algol60.net/csm-docker/stable/csm-rie:1.1.0
+    networks:
+    - meds
+  x1000c2s4b0:
+    environment:
+    - MOCKUPFOLDER=EX425
+    - XNAME=x1000c2s4b0
+    - AUTH_CONFIG=root:root_password:Administrator
+    - PORT=443
+    hostname: x1000c2s4b0
+    image: artifactory.algol60.net/csm-docker/stable/csm-rie:1.1.0
+    networks:
+    - meds
+  x1000c2s4b1:
+    environment:
+    - MOCKUPFOLDER=EX425
+    - XNAME=x1000c2s4b1
+    - AUTH_CONFIG=root:root_password:Administrator
+    - PORT=443
+    hostname: x1000c2s4b1
+    image: artifactory.algol60.net/csm-docker/stable/csm-rie:1.1.0
+    networks:
+    - meds
+  x1000c2s5b0:
+    environment:
+    - MOCKUPFOLDER=EX425
+    - XNAME=x1000c2s5b0
+    - AUTH_CONFIG=root:root_password:Administrator
+    - PORT=443
+    hostname: x1000c2s5b0
+    image: artifactory.algol60.net/csm-docker/stable/csm-rie:1.1.0
+    networks:
+    - meds
+  x1000c2s5b1:
+    environment:
+    - MOCKUPFOLDER=EX425
+    - XNAME=x1000c2s5b1
+    - AUTH_CONFIG=root:root_password:Administrator
+    - PORT=443
+    hostname: x1000c2s5b1
+    image: artifactory.algol60.net/csm-docker/stable/csm-rie:1.1.0
+    networks:
+    - meds
+  x1000c2s6b0:
+    environment:
+    - MOCKUPFOLDER=EX425
+    - XNAME=x1000c2s6b0
+    - AUTH_CONFIG=root:root_password:Administrator
+    - PORT=443
+    hostname: x1000c2s6b0
+    image: artifactory.algol60.net/csm-docker/stable/csm-rie:1.1.0
+    networks:
+    - meds
+  x1000c2s6b1:
+    environment:
+    - MOCKUPFOLDER=EX425
+    - XNAME=x1000c2s6b1
+    - AUTH_CONFIG=root:root_password:Administrator
+    - PORT=443
+    hostname: x1000c2s6b1
+    image: artifactory.algol60.net/csm-docker/stable/csm-rie:1.1.0
+    networks:
+    - meds
+  x1000c2s7b0:
+    environment:
+    - MOCKUPFOLDER=EX425
+    - XNAME=x1000c2s7b0
+    - AUTH_CONFIG=root:root_password:Administrator
+    - PORT=443
+    hostname: x1000c2s7b0
+    image: artifactory.algol60.net/csm-docker/stable/csm-rie:1.1.0
+    networks:
+    - meds
+  x1000c2s7b1:
+    environment:
+    - MOCKUPFOLDER=EX425
+    - XNAME=x1000c2s7b1
+    - AUTH_CONFIG=root:root_password:Administrator
+    - PORT=443
+    hostname: x1000c2s7b1
+    image: artifactory.algol60.net/csm-docker/stable/csm-rie:1.1.0
+    networks:
+    - meds
+  x1000c3:
+    environment:
+    - MOCKUPFOLDER=CMM
+    - XNAME=x1000c3
+    - AUTH_CONFIG=root:root_password:Administrator
+    - PORT=443
+    hostname: x1000c3
+    image: artifactory.algol60.net/csm-docker/stable/csm-rie:1.1.0
+    networks:
+    - meds
+  x1000c3r0b0:
+    environment:
+    - MOCKUPFOLDER=Slingshot_Switch_Blade
+    - XNAME=x1000c3r0b0
+    - AUTH_CONFIG=root:root_password:Administrator
+    - PORT=443
+    hostname: x1000c3r0b0
+    image: artifactory.algol60.net/csm-docker/stable/csm-rie:1.1.0
+    networks:
+    - meds
+  x1000c3r1b0:
+    environment:
+    - MOCKUPFOLDER=Slingshot_Switch_Blade
+    - XNAME=x1000c3r1b0
+    - AUTH_CONFIG=root:root_password:Administrator
+    - PORT=443
+    hostname: x1000c3r1b0
+    image: artifactory.algol60.net/csm-docker/stable/csm-rie:1.1.0
+    networks:
+    - meds
+  x1000c3r2b0:
+    environment:
+    - MOCKUPFOLDER=Slingshot_Switch_Blade
+    - XNAME=x1000c3r2b0
+    - AUTH_CONFIG=root:root_password:Administrator
+    - PORT=443
+    hostname: x1000c3r2b0
+    image: artifactory.algol60.net/csm-docker/stable/csm-rie:1.1.0
+    networks:
+    - meds
+  x1000c3r3b0:
+    environment:
+    - MOCKUPFOLDER=Slingshot_Switch_Blade
+    - XNAME=x1000c3r3b0
+    - AUTH_CONFIG=root:root_password:Administrator
+    - PORT=443
+    hostname: x1000c3r3b0
+    image: artifactory.algol60.net/csm-docker/stable/csm-rie:1.1.0
+    networks:
+    - meds
+  x1000c3r4b0:
+    environment:
+    - MOCKUPFOLDER=Slingshot_Switch_Blade
+    - XNAME=x1000c3r4b0
+    - AUTH_CONFIG=root:root_password:Administrator
+    - PORT=443
+    hostname: x1000c3r4b0
+    image: artifactory.algol60.net/csm-docker/stable/csm-rie:1.1.0
+    networks:
+    - meds
+  x1000c3r5b0:
+    environment:
+    - MOCKUPFOLDER=Slingshot_Switch_Blade
+    - XNAME=x1000c3r5b0
+    - AUTH_CONFIG=root:root_password:Administrator
+    - PORT=443
+    hostname: x1000c3r5b0
+    image: artifactory.algol60.net/csm-docker/stable/csm-rie:1.1.0
+    networks:
+    - meds
+  x1000c3r6b0:
+    environment:
+    - MOCKUPFOLDER=Slingshot_Switch_Blade
+    - XNAME=x1000c3r6b0
+    - AUTH_CONFIG=root:root_password:Administrator
+    - PORT=443
+    hostname: x1000c3r6b0
+    image: artifactory.algol60.net/csm-docker/stable/csm-rie:1.1.0
+    networks:
+    - meds
+  x1000c3r7b0:
+    environment:
+    - MOCKUPFOLDER=Slingshot_Switch_Blade
+    - XNAME=x1000c3r7b0
+    - AUTH_CONFIG=root:root_password:Administrator
+    - PORT=443
+    hostname: x1000c3r7b0
+    image: artifactory.algol60.net/csm-docker/stable/csm-rie:1.1.0
+    networks:
+    - meds
+  x1000c3s0b0:
+    environment:
+    - MOCKUPFOLDER=EX425
+    - XNAME=x1000c3s0b0
+    - AUTH_CONFIG=root:root_password:Administrator
+    - PORT=443
+    hostname: x1000c3s0b0
+    image: artifactory.algol60.net/csm-docker/stable/csm-rie:1.1.0
+    networks:
+    - meds
+  x1000c3s0b1:
+    environment:
+    - MOCKUPFOLDER=EX425
+    - XNAME=x1000c3s0b1
+    - AUTH_CONFIG=root:root_password:Administrator
+    - PORT=443
+    hostname: x1000c3s0b1
+    image: artifactory.algol60.net/csm-docker/stable/csm-rie:1.1.0
+    networks:
+    - meds
+  x1000c3s1b0:
+    environment:
+    - MOCKUPFOLDER=EX425
+    - XNAME=x1000c3s1b0
+    - AUTH_CONFIG=root:root_password:Administrator
+    - PORT=443
+    hostname: x1000c3s1b0
+    image: artifactory.algol60.net/csm-docker/stable/csm-rie:1.1.0
+    networks:
+    - meds
+  x1000c3s1b1:
+    environment:
+    - MOCKUPFOLDER=EX425
+    - XNAME=x1000c3s1b1
+    - AUTH_CONFIG=root:root_password:Administrator
+    - PORT=443
+    hostname: x1000c3s1b1
+    image: artifactory.algol60.net/csm-docker/stable/csm-rie:1.1.0
+    networks:
+    - meds
+  x1000c3s2b0:
+    environment:
+    - MOCKUPFOLDER=EX425
+    - XNAME=x1000c3s2b0
+    - AUTH_CONFIG=root:root_password:Administrator
+    - PORT=443
+    hostname: x1000c3s2b0
+    image: artifactory.algol60.net/csm-docker/stable/csm-rie:1.1.0
+    networks:
+    - meds
+  x1000c3s2b1:
+    environment:
+    - MOCKUPFOLDER=EX425
+    - XNAME=x1000c3s2b1
+    - AUTH_CONFIG=root:root_password:Administrator
+    - PORT=443
+    hostname: x1000c3s2b1
+    image: artifactory.algol60.net/csm-docker/stable/csm-rie:1.1.0
+    networks:
+    - meds
+  x1000c3s3b0:
+    environment:
+    - MOCKUPFOLDER=EX425
+    - XNAME=x1000c3s3b0
+    - AUTH_CONFIG=root:root_password:Administrator
+    - PORT=443
+    hostname: x1000c3s3b0
+    image: artifactory.algol60.net/csm-docker/stable/csm-rie:1.1.0
+    networks:
+    - meds
+  x1000c3s3b1:
+    environment:
+    - MOCKUPFOLDER=EX425
+    - XNAME=x1000c3s3b1
+    - AUTH_CONFIG=root:root_password:Administrator
+    - PORT=443
+    hostname: x1000c3s3b1
+    image: artifactory.algol60.net/csm-docker/stable/csm-rie:1.1.0
+    networks:
+    - meds
+  x1000c3s4b0:
+    environment:
+    - MOCKUPFOLDER=EX425
+    - XNAME=x1000c3s4b0
+    - AUTH_CONFIG=root:root_password:Administrator
+    - PORT=443
+    hostname: x1000c3s4b0
+    image: artifactory.algol60.net/csm-docker/stable/csm-rie:1.1.0
+    networks:
+    - meds
+  x1000c3s4b1:
+    environment:
+    - MOCKUPFOLDER=EX425
+    - XNAME=x1000c3s4b1
+    - AUTH_CONFIG=root:root_password:Administrator
+    - PORT=443
+    hostname: x1000c3s4b1
+    image: artifactory.algol60.net/csm-docker/stable/csm-rie:1.1.0
+    networks:
+    - meds
+  x1000c3s5b0:
+    environment:
+    - MOCKUPFOLDER=EX425
+    - XNAME=x1000c3s5b0
+    - AUTH_CONFIG=root:root_password:Administrator
+    - PORT=443
+    hostname: x1000c3s5b0
+    image: artifactory.algol60.net/csm-docker/stable/csm-rie:1.1.0
+    networks:
+    - meds
+  x1000c3s5b1:
+    environment:
+    - MOCKUPFOLDER=EX425
+    - XNAME=x1000c3s5b1
+    - AUTH_CONFIG=root:root_password:Administrator
+    - PORT=443
+    hostname: x1000c3s5b1
+    image: artifactory.algol60.net/csm-docker/stable/csm-rie:1.1.0
+    networks:
+    - meds
+  x1000c3s6b0:
+    environment:
+    - MOCKUPFOLDER=EX425
+    - XNAME=x1000c3s6b0
+    - AUTH_CONFIG=root:root_password:Administrator
+    - PORT=443
+    hostname: x1000c3s6b0
+    image: artifactory.algol60.net/csm-docker/stable/csm-rie:1.1.0
+    networks:
+    - meds
+  x1000c3s6b1:
+    environment:
+    - MOCKUPFOLDER=EX425
+    - XNAME=x1000c3s6b1
+    - AUTH_CONFIG=root:root_password:Administrator
+    - PORT=443
+    hostname: x1000c3s6b1
+    image: artifactory.algol60.net/csm-docker/stable/csm-rie:1.1.0
+    networks:
+    - meds
+  x1000c3s7b0:
+    environment:
+    - MOCKUPFOLDER=EX425
+    - XNAME=x1000c3s7b0
+    - AUTH_CONFIG=root:root_password:Administrator
+    - PORT=443
+    hostname: x1000c3s7b0
+    image: artifactory.algol60.net/csm-docker/stable/csm-rie:1.1.0
+    networks:
+    - meds
+  x1000c3s7b1:
+    environment:
+    - MOCKUPFOLDER=EX425
+    - XNAME=x1000c3s7b1
+    - AUTH_CONFIG=root:root_password:Administrator
+    - PORT=443
+    hostname: x1000c3s7b1
+    image: artifactory.algol60.net/csm-docker/stable/csm-rie:1.1.0
+    networks:
+    - meds
+  x1000c4:
+    environment:
+    - MOCKUPFOLDER=CMM
+    - XNAME=x1000c4
+    - AUTH_CONFIG=root:root_password:Administrator
+    - PORT=443
+    hostname: x1000c4
+    image: artifactory.algol60.net/csm-docker/stable/csm-rie:1.1.0
+    networks:
+    - meds
+  x1000c4r0b0:
+    environment:
+    - MOCKUPFOLDER=Slingshot_Switch_Blade
+    - XNAME=x1000c4r0b0
+    - AUTH_CONFIG=root:root_password:Administrator
+    - PORT=443
+    hostname: x1000c4r0b0
+    image: artifactory.algol60.net/csm-docker/stable/csm-rie:1.1.0
+    networks:
+    - meds
+  x1000c4r1b0:
+    environment:
+    - MOCKUPFOLDER=Slingshot_Switch_Blade
+    - XNAME=x1000c4r1b0
+    - AUTH_CONFIG=root:root_password:Administrator
+    - PORT=443
+    hostname: x1000c4r1b0
+    image: artifactory.algol60.net/csm-docker/stable/csm-rie:1.1.0
+    networks:
+    - meds
+  x1000c4r2b0:
+    environment:
+    - MOCKUPFOLDER=Slingshot_Switch_Blade
+    - XNAME=x1000c4r2b0
+    - AUTH_CONFIG=root:root_password:Administrator
+    - PORT=443
+    hostname: x1000c4r2b0
+    image: artifactory.algol60.net/csm-docker/stable/csm-rie:1.1.0
+    networks:
+    - meds
+  x1000c4r3b0:
+    environment:
+    - MOCKUPFOLDER=Slingshot_Switch_Blade
+    - XNAME=x1000c4r3b0
+    - AUTH_CONFIG=root:root_password:Administrator
+    - PORT=443
+    hostname: x1000c4r3b0
+    image: artifactory.algol60.net/csm-docker/stable/csm-rie:1.1.0
+    networks:
+    - meds
+  x1000c4r4b0:
+    environment:
+    - MOCKUPFOLDER=Slingshot_Switch_Blade
+    - XNAME=x1000c4r4b0
+    - AUTH_CONFIG=root:root_password:Administrator
+    - PORT=443
+    hostname: x1000c4r4b0
+    image: artifactory.algol60.net/csm-docker/stable/csm-rie:1.1.0
+    networks:
+    - meds
+  x1000c4r5b0:
+    environment:
+    - MOCKUPFOLDER=Slingshot_Switch_Blade
+    - XNAME=x1000c4r5b0
+    - AUTH_CONFIG=root:root_password:Administrator
+    - PORT=443
+    hostname: x1000c4r5b0
+    image: artifactory.algol60.net/csm-docker/stable/csm-rie:1.1.0
+    networks:
+    - meds
+  x1000c4r6b0:
+    environment:
+    - MOCKUPFOLDER=Slingshot_Switch_Blade
+    - XNAME=x1000c4r6b0
+    - AUTH_CONFIG=root:root_password:Administrator
+    - PORT=443
+    hostname: x1000c4r6b0
+    image: artifactory.algol60.net/csm-docker/stable/csm-rie:1.1.0
+    networks:
+    - meds
+  x1000c4r7b0:
+    environment:
+    - MOCKUPFOLDER=Slingshot_Switch_Blade
+    - XNAME=x1000c4r7b0
+    - AUTH_CONFIG=root:root_password:Administrator
+    - PORT=443
+    hostname: x1000c4r7b0
+    image: artifactory.algol60.net/csm-docker/stable/csm-rie:1.1.0
+    networks:
+    - meds
+  x1000c4s0b0:
+    environment:
+    - MOCKUPFOLDER=EX425
+    - XNAME=x1000c4s0b0
+    - AUTH_CONFIG=root:root_password:Administrator
+    - PORT=443
+    hostname: x1000c4s0b0
+    image: artifactory.algol60.net/csm-docker/stable/csm-rie:1.1.0
+    networks:
+    - meds
+  x1000c4s0b1:
+    environment:
+    - MOCKUPFOLDER=EX425
+    - XNAME=x1000c4s0b1
+    - AUTH_CONFIG=root:root_password:Administrator
+    - PORT=443
+    hostname: x1000c4s0b1
+    image: artifactory.algol60.net/csm-docker/stable/csm-rie:1.1.0
+    networks:
+    - meds
+  x1000c4s1b0:
+    environment:
+    - MOCKUPFOLDER=EX425
+    - XNAME=x1000c4s1b0
+    - AUTH_CONFIG=root:root_password:Administrator
+    - PORT=443
+    hostname: x1000c4s1b0
+    image: artifactory.algol60.net/csm-docker/stable/csm-rie:1.1.0
+    networks:
+    - meds
+  x1000c4s1b1:
+    environment:
+    - MOCKUPFOLDER=EX425
+    - XNAME=x1000c4s1b1
+    - AUTH_CONFIG=root:root_password:Administrator
+    - PORT=443
+    hostname: x1000c4s1b1
+    image: artifactory.algol60.net/csm-docker/stable/csm-rie:1.1.0
+    networks:
+    - meds
+  x1000c4s2b0:
+    environment:
+    - MOCKUPFOLDER=EX425
+    - XNAME=x1000c4s2b0
+    - AUTH_CONFIG=root:root_password:Administrator
+    - PORT=443
+    hostname: x1000c4s2b0
+    image: artifactory.algol60.net/csm-docker/stable/csm-rie:1.1.0
+    networks:
+    - meds
+  x1000c4s2b1:
+    environment:
+    - MOCKUPFOLDER=EX425
+    - XNAME=x1000c4s2b1
+    - AUTH_CONFIG=root:root_password:Administrator
+    - PORT=443
+    hostname: x1000c4s2b1
+    image: artifactory.algol60.net/csm-docker/stable/csm-rie:1.1.0
+    networks:
+    - meds
+  x1000c4s3b0:
+    environment:
+    - MOCKUPFOLDER=EX425
+    - XNAME=x1000c4s3b0
+    - AUTH_CONFIG=root:root_password:Administrator
+    - PORT=443
+    hostname: x1000c4s3b0
+    image: artifactory.algol60.net/csm-docker/stable/csm-rie:1.1.0
+    networks:
+    - meds
+  x1000c4s3b1:
+    environment:
+    - MOCKUPFOLDER=EX425
+    - XNAME=x1000c4s3b1
+    - AUTH_CONFIG=root:root_password:Administrator
+    - PORT=443
+    hostname: x1000c4s3b1
+    image: artifactory.algol60.net/csm-docker/stable/csm-rie:1.1.0
+    networks:
+    - meds
+  x1000c4s4b0:
+    environment:
+    - MOCKUPFOLDER=EX425
+    - XNAME=x1000c4s4b0
+    - AUTH_CONFIG=root:root_password:Administrator
+    - PORT=443
+    hostname: x1000c4s4b0
+    image: artifactory.algol60.net/csm-docker/stable/csm-rie:1.1.0
+    networks:
+    - meds
+  x1000c4s4b1:
+    environment:
+    - MOCKUPFOLDER=EX425
+    - XNAME=x1000c4s4b1
+    - AUTH_CONFIG=root:root_password:Administrator
+    - PORT=443
+    hostname: x1000c4s4b1
+    image: artifactory.algol60.net/csm-docker/stable/csm-rie:1.1.0
+    networks:
+    - meds
+  x1000c4s5b0:
+    environment:
+    - MOCKUPFOLDER=EX425
+    - XNAME=x1000c4s5b0
+    - AUTH_CONFIG=root:root_password:Administrator
+    - PORT=443
+    hostname: x1000c4s5b0
+    image: artifactory.algol60.net/csm-docker/stable/csm-rie:1.1.0
+    networks:
+    - meds
+  x1000c4s5b1:
+    environment:
+    - MOCKUPFOLDER=EX425
+    - XNAME=x1000c4s5b1
+    - AUTH_CONFIG=root:root_password:Administrator
+    - PORT=443
+    hostname: x1000c4s5b1
+    image: artifactory.algol60.net/csm-docker/stable/csm-rie:1.1.0
+    networks:
+    - meds
+  x1000c4s6b0:
+    environment:
+    - MOCKUPFOLDER=EX425
+    - XNAME=x1000c4s6b0
+    - AUTH_CONFIG=root:root_password:Administrator
+    - PORT=443
+    hostname: x1000c4s6b0
+    image: artifactory.algol60.net/csm-docker/stable/csm-rie:1.1.0
+    networks:
+    - meds
+  x1000c4s6b1:
+    environment:
+    - MOCKUPFOLDER=EX425
+    - XNAME=x1000c4s6b1
+    - AUTH_CONFIG=root:root_password:Administrator
+    - PORT=443
+    hostname: x1000c4s6b1
+    image: artifactory.algol60.net/csm-docker/stable/csm-rie:1.1.0
+    networks:
+    - meds
+  x1000c4s7b0:
+    environment:
+    - MOCKUPFOLDER=EX425
+    - XNAME=x1000c4s7b0
+    - AUTH_CONFIG=root:root_password:Administrator
+    - PORT=443
+    hostname: x1000c4s7b0
+    image: artifactory.algol60.net/csm-docker/stable/csm-rie:1.1.0
+    networks:
+    - meds
+  x1000c4s7b1:
+    environment:
+    - MOCKUPFOLDER=EX425
+    - XNAME=x1000c4s7b1
+    - AUTH_CONFIG=root:root_password:Administrator
+    - PORT=443
+    hostname: x1000c4s7b1
+    image: artifactory.algol60.net/csm-docker/stable/csm-rie:1.1.0
+    networks:
+    - meds
+  x1000c5:
+    environment:
+    - MOCKUPFOLDER=CMM
+    - XNAME=x1000c5
+    - AUTH_CONFIG=root:root_password:Administrator
+    - PORT=443
+    hostname: x1000c5
+    image: artifactory.algol60.net/csm-docker/stable/csm-rie:1.1.0
+    networks:
+    - meds
+  x1000c5r0b0:
+    environment:
+    - MOCKUPFOLDER=Slingshot_Switch_Blade
+    - XNAME=x1000c5r0b0
+    - AUTH_CONFIG=root:root_password:Administrator
+    - PORT=443
+    hostname: x1000c5r0b0
+    image: artifactory.algol60.net/csm-docker/stable/csm-rie:1.1.0
+    networks:
+    - meds
+  x1000c5r1b0:
+    environment:
+    - MOCKUPFOLDER=Slingshot_Switch_Blade
+    - XNAME=x1000c5r1b0
+    - AUTH_CONFIG=root:root_password:Administrator
+    - PORT=443
+    hostname: x1000c5r1b0
+    image: artifactory.algol60.net/csm-docker/stable/csm-rie:1.1.0
+    networks:
+    - meds
+  x1000c5r2b0:
+    environment:
+    - MOCKUPFOLDER=Slingshot_Switch_Blade
+    - XNAME=x1000c5r2b0
+    - AUTH_CONFIG=root:root_password:Administrator
+    - PORT=443
+    hostname: x1000c5r2b0
+    image: artifactory.algol60.net/csm-docker/stable/csm-rie:1.1.0
+    networks:
+    - meds
+  x1000c5r3b0:
+    environment:
+    - MOCKUPFOLDER=Slingshot_Switch_Blade
+    - XNAME=x1000c5r3b0
+    - AUTH_CONFIG=root:root_password:Administrator
+    - PORT=443
+    hostname: x1000c5r3b0
+    image: artifactory.algol60.net/csm-docker/stable/csm-rie:1.1.0
+    networks:
+    - meds
+  x1000c5r4b0:
+    environment:
+    - MOCKUPFOLDER=Slingshot_Switch_Blade
+    - XNAME=x1000c5r4b0
+    - AUTH_CONFIG=root:root_password:Administrator
+    - PORT=443
+    hostname: x1000c5r4b0
+    image: artifactory.algol60.net/csm-docker/stable/csm-rie:1.1.0
+    networks:
+    - meds
+  x1000c5r5b0:
+    environment:
+    - MOCKUPFOLDER=Slingshot_Switch_Blade
+    - XNAME=x1000c5r5b0
+    - AUTH_CONFIG=root:root_password:Administrator
+    - PORT=443
+    hostname: x1000c5r5b0
+    image: artifactory.algol60.net/csm-docker/stable/csm-rie:1.1.0
+    networks:
+    - meds
+  x1000c5r6b0:
+    environment:
+    - MOCKUPFOLDER=Slingshot_Switch_Blade
+    - XNAME=x1000c5r6b0
+    - AUTH_CONFIG=root:root_password:Administrator
+    - PORT=443
+    hostname: x1000c5r6b0
+    image: artifactory.algol60.net/csm-docker/stable/csm-rie:1.1.0
+    networks:
+    - meds
+  x1000c5r7b0:
+    environment:
+    - MOCKUPFOLDER=Slingshot_Switch_Blade
+    - XNAME=x1000c5r7b0
+    - AUTH_CONFIG=root:root_password:Administrator
+    - PORT=443
+    hostname: x1000c5r7b0
+    image: artifactory.algol60.net/csm-docker/stable/csm-rie:1.1.0
+    networks:
+    - meds
+  x1000c5s0b0:
+    environment:
+    - MOCKUPFOLDER=EX425
+    - XNAME=x1000c5s0b0
+    - AUTH_CONFIG=root:root_password:Administrator
+    - PORT=443
+    hostname: x1000c5s0b0
+    image: artifactory.algol60.net/csm-docker/stable/csm-rie:1.1.0
+    networks:
+    - meds
+  x1000c5s0b1:
+    environment:
+    - MOCKUPFOLDER=EX425
+    - XNAME=x1000c5s0b1
+    - AUTH_CONFIG=root:root_password:Administrator
+    - PORT=443
+    hostname: x1000c5s0b1
+    image: artifactory.algol60.net/csm-docker/stable/csm-rie:1.1.0
+    networks:
+    - meds
+  x1000c5s1b0:
+    environment:
+    - MOCKUPFOLDER=EX425
+    - XNAME=x1000c5s1b0
+    - AUTH_CONFIG=root:root_password:Administrator
+    - PORT=443
+    hostname: x1000c5s1b0
+    image: artifactory.algol60.net/csm-docker/stable/csm-rie:1.1.0
+    networks:
+    - meds
+  x1000c5s1b1:
+    environment:
+    - MOCKUPFOLDER=EX425
+    - XNAME=x1000c5s1b1
+    - AUTH_CONFIG=root:root_password:Administrator
+    - PORT=443
+    hostname: x1000c5s1b1
+    image: artifactory.algol60.net/csm-docker/stable/csm-rie:1.1.0
+    networks:
+    - meds
+  x1000c5s2b0:
+    environment:
+    - MOCKUPFOLDER=EX425
+    - XNAME=x1000c5s2b0
+    - AUTH_CONFIG=root:root_password:Administrator
+    - PORT=443
+    hostname: x1000c5s2b0
+    image: artifactory.algol60.net/csm-docker/stable/csm-rie:1.1.0
+    networks:
+    - meds
+  x1000c5s2b1:
+    environment:
+    - MOCKUPFOLDER=EX425
+    - XNAME=x1000c5s2b1
+    - AUTH_CONFIG=root:root_password:Administrator
+    - PORT=443
+    hostname: x1000c5s2b1
+    image: artifactory.algol60.net/csm-docker/stable/csm-rie:1.1.0
+    networks:
+    - meds
+  x1000c5s3b0:
+    environment:
+    - MOCKUPFOLDER=EX425
+    - XNAME=x1000c5s3b0
+    - AUTH_CONFIG=root:root_password:Administrator
+    - PORT=443
+    hostname: x1000c5s3b0
+    image: artifactory.algol60.net/csm-docker/stable/csm-rie:1.1.0
+    networks:
+    - meds
+  x1000c5s3b1:
+    environment:
+    - MOCKUPFOLDER=EX425
+    - XNAME=x1000c5s3b1
+    - AUTH_CONFIG=root:root_password:Administrator
+    - PORT=443
+    hostname: x1000c5s3b1
+    image: artifactory.algol60.net/csm-docker/stable/csm-rie:1.1.0
+    networks:
+    - meds
+  x1000c5s4b0:
+    environment:
+    - MOCKUPFOLDER=EX425
+    - XNAME=x1000c5s4b0
+    - AUTH_CONFIG=root:root_password:Administrator
+    - PORT=443
+    hostname: x1000c5s4b0
+    image: artifactory.algol60.net/csm-docker/stable/csm-rie:1.1.0
+    networks:
+    - meds
+  x1000c5s4b1:
+    environment:
+    - MOCKUPFOLDER=EX425
+    - XNAME=x1000c5s4b1
+    - AUTH_CONFIG=root:root_password:Administrator
+    - PORT=443
+    hostname: x1000c5s4b1
+    image: artifactory.algol60.net/csm-docker/stable/csm-rie:1.1.0
+    networks:
+    - meds
+  x1000c5s5b0:
+    environment:
+    - MOCKUPFOLDER=EX425
+    - XNAME=x1000c5s5b0
+    - AUTH_CONFIG=root:root_password:Administrator
+    - PORT=443
+    hostname: x1000c5s5b0
+    image: artifactory.algol60.net/csm-docker/stable/csm-rie:1.1.0
+    networks:
+    - meds
+  x1000c5s5b1:
+    environment:
+    - MOCKUPFOLDER=EX425
+    - XNAME=x1000c5s5b1
+    - AUTH_CONFIG=root:root_password:Administrator
+    - PORT=443
+    hostname: x1000c5s5b1
+    image: artifactory.algol60.net/csm-docker/stable/csm-rie:1.1.0
+    networks:
+    - meds
+  x1000c5s6b0:
+    environment:
+    - MOCKUPFOLDER=EX425
+    - XNAME=x1000c5s6b0
+    - AUTH_CONFIG=root:root_password:Administrator
+    - PORT=443
+    hostname: x1000c5s6b0
+    image: artifactory.algol60.net/csm-docker/stable/csm-rie:1.1.0
+    networks:
+    - meds
+  x1000c5s6b1:
+    environment:
+    - MOCKUPFOLDER=EX425
+    - XNAME=x1000c5s6b1
+    - AUTH_CONFIG=root:root_password:Administrator
+    - PORT=443
+    hostname: x1000c5s6b1
+    image: artifactory.algol60.net/csm-docker/stable/csm-rie:1.1.0
+    networks:
+    - meds
+  x1000c5s7b0:
+    environment:
+    - MOCKUPFOLDER=EX425
+    - XNAME=x1000c5s7b0
+    - AUTH_CONFIG=root:root_password:Administrator
+    - PORT=443
+    hostname: x1000c5s7b0
+    image: artifactory.algol60.net/csm-docker/stable/csm-rie:1.1.0
+    networks:
+    - meds
+  x1000c5s7b1:
+    environment:
+    - MOCKUPFOLDER=EX425
+    - XNAME=x1000c5s7b1
+    - AUTH_CONFIG=root:root_password:Administrator
+    - PORT=443
+    hostname: x1000c5s7b1
+    image: artifactory.algol60.net/csm-docker/stable/csm-rie:1.1.0
+    networks:
+    - meds
+  x1000c6:
+    environment:
+    - MOCKUPFOLDER=CMM
+    - XNAME=x1000c6
+    - AUTH_CONFIG=root:root_password:Administrator
+    - PORT=443
+    hostname: x1000c6
+    image: artifactory.algol60.net/csm-docker/stable/csm-rie:1.1.0
+    networks:
+    - meds
+  x1000c6r0b0:
+    environment:
+    - MOCKUPFOLDER=Slingshot_Switch_Blade
+    - XNAME=x1000c6r0b0
+    - AUTH_CONFIG=root:root_password:Administrator
+    - PORT=443
+    hostname: x1000c6r0b0
+    image: artifactory.algol60.net/csm-docker/stable/csm-rie:1.1.0
+    networks:
+    - meds
+  x1000c6r1b0:
+    environment:
+    - MOCKUPFOLDER=Slingshot_Switch_Blade
+    - XNAME=x1000c6r1b0
+    - AUTH_CONFIG=root:root_password:Administrator
+    - PORT=443
+    hostname: x1000c6r1b0
+    image: artifactory.algol60.net/csm-docker/stable/csm-rie:1.1.0
+    networks:
+    - meds
+  x1000c6r2b0:
+    environment:
+    - MOCKUPFOLDER=Slingshot_Switch_Blade
+    - XNAME=x1000c6r2b0
+    - AUTH_CONFIG=root:root_password:Administrator
+    - PORT=443
+    hostname: x1000c6r2b0
+    image: artifactory.algol60.net/csm-docker/stable/csm-rie:1.1.0
+    networks:
+    - meds
+  x1000c6r3b0:
+    environment:
+    - MOCKUPFOLDER=Slingshot_Switch_Blade
+    - XNAME=x1000c6r3b0
+    - AUTH_CONFIG=root:root_password:Administrator
+    - PORT=443
+    hostname: x1000c6r3b0
+    image: artifactory.algol60.net/csm-docker/stable/csm-rie:1.1.0
+    networks:
+    - meds
+  x1000c6r4b0:
+    environment:
+    - MOCKUPFOLDER=Slingshot_Switch_Blade
+    - XNAME=x1000c6r4b0
+    - AUTH_CONFIG=root:root_password:Administrator
+    - PORT=443
+    hostname: x1000c6r4b0
+    image: artifactory.algol60.net/csm-docker/stable/csm-rie:1.1.0
+    networks:
+    - meds
+  x1000c6r5b0:
+    environment:
+    - MOCKUPFOLDER=Slingshot_Switch_Blade
+    - XNAME=x1000c6r5b0
+    - AUTH_CONFIG=root:root_password:Administrator
+    - PORT=443
+    hostname: x1000c6r5b0
+    image: artifactory.algol60.net/csm-docker/stable/csm-rie:1.1.0
+    networks:
+    - meds
+  x1000c6r6b0:
+    environment:
+    - MOCKUPFOLDER=Slingshot_Switch_Blade
+    - XNAME=x1000c6r6b0
+    - AUTH_CONFIG=root:root_password:Administrator
+    - PORT=443
+    hostname: x1000c6r6b0
+    image: artifactory.algol60.net/csm-docker/stable/csm-rie:1.1.0
+    networks:
+    - meds
+  x1000c6r7b0:
+    environment:
+    - MOCKUPFOLDER=Slingshot_Switch_Blade
+    - XNAME=x1000c6r7b0
+    - AUTH_CONFIG=root:root_password:Administrator
+    - PORT=443
+    hostname: x1000c6r7b0
+    image: artifactory.algol60.net/csm-docker/stable/csm-rie:1.1.0
+    networks:
+    - meds
+  x1000c6s0b0:
+    environment:
+    - MOCKUPFOLDER=EX425
+    - XNAME=x1000c6s0b0
+    - AUTH_CONFIG=root:root_password:Administrator
+    - PORT=443
+    hostname: x1000c6s0b0
+    image: artifactory.algol60.net/csm-docker/stable/csm-rie:1.1.0
+    networks:
+    - meds
+  x1000c6s0b1:
+    environment:
+    - MOCKUPFOLDER=EX425
+    - XNAME=x1000c6s0b1
+    - AUTH_CONFIG=root:root_password:Administrator
+    - PORT=443
+    hostname: x1000c6s0b1
+    image: artifactory.algol60.net/csm-docker/stable/csm-rie:1.1.0
+    networks:
+    - meds
+  x1000c6s1b0:
+    environment:
+    - MOCKUPFOLDER=EX425
+    - XNAME=x1000c6s1b0
+    - AUTH_CONFIG=root:root_password:Administrator
+    - PORT=443
+    hostname: x1000c6s1b0
+    image: artifactory.algol60.net/csm-docker/stable/csm-rie:1.1.0
+    networks:
+    - meds
+  x1000c6s1b1:
+    environment:
+    - MOCKUPFOLDER=EX425
+    - XNAME=x1000c6s1b1
+    - AUTH_CONFIG=root:root_password:Administrator
+    - PORT=443
+    hostname: x1000c6s1b1
+    image: artifactory.algol60.net/csm-docker/stable/csm-rie:1.1.0
+    networks:
+    - meds
+  x1000c6s2b0:
+    environment:
+    - MOCKUPFOLDER=EX425
+    - XNAME=x1000c6s2b0
+    - AUTH_CONFIG=root:root_password:Administrator
+    - PORT=443
+    hostname: x1000c6s2b0
+    image: artifactory.algol60.net/csm-docker/stable/csm-rie:1.1.0
+    networks:
+    - meds
+  x1000c6s2b1:
+    environment:
+    - MOCKUPFOLDER=EX425
+    - XNAME=x1000c6s2b1
+    - AUTH_CONFIG=root:root_password:Administrator
+    - PORT=443
+    hostname: x1000c6s2b1
+    image: artifactory.algol60.net/csm-docker/stable/csm-rie:1.1.0
+    networks:
+    - meds
+  x1000c6s3b0:
+    environment:
+    - MOCKUPFOLDER=EX425
+    - XNAME=x1000c6s3b0
+    - AUTH_CONFIG=root:root_password:Administrator
+    - PORT=443
+    hostname: x1000c6s3b0
+    image: artifactory.algol60.net/csm-docker/stable/csm-rie:1.1.0
+    networks:
+    - meds
+  x1000c6s3b1:
+    environment:
+    - MOCKUPFOLDER=EX425
+    - XNAME=x1000c6s3b1
+    - AUTH_CONFIG=root:root_password:Administrator
+    - PORT=443
+    hostname: x1000c6s3b1
+    image: artifactory.algol60.net/csm-docker/stable/csm-rie:1.1.0
+    networks:
+    - meds
+  x1000c6s4b0:
+    environment:
+    - MOCKUPFOLDER=EX425
+    - XNAME=x1000c6s4b0
+    - AUTH_CONFIG=root:root_password:Administrator
+    - PORT=443
+    hostname: x1000c6s4b0
+    image: artifactory.algol60.net/csm-docker/stable/csm-rie:1.1.0
+    networks:
+    - meds
+  x1000c6s4b1:
+    environment:
+    - MOCKUPFOLDER=EX425
+    - XNAME=x1000c6s4b1
+    - AUTH_CONFIG=root:root_password:Administrator
+    - PORT=443
+    hostname: x1000c6s4b1
+    image: artifactory.algol60.net/csm-docker/stable/csm-rie:1.1.0
+    networks:
+    - meds
+  x1000c6s5b0:
+    environment:
+    - MOCKUPFOLDER=EX425
+    - XNAME=x1000c6s5b0
+    - AUTH_CONFIG=root:root_password:Administrator
+    - PORT=443
+    hostname: x1000c6s5b0
+    image: artifactory.algol60.net/csm-docker/stable/csm-rie:1.1.0
+    networks:
+    - meds
+  x1000c6s5b1:
+    environment:
+    - MOCKUPFOLDER=EX425
+    - XNAME=x1000c6s5b1
+    - AUTH_CONFIG=root:root_password:Administrator
+    - PORT=443
+    hostname: x1000c6s5b1
+    image: artifactory.algol60.net/csm-docker/stable/csm-rie:1.1.0
+    networks:
+    - meds
+  x1000c6s6b0:
+    environment:
+    - MOCKUPFOLDER=EX425
+    - XNAME=x1000c6s6b0
+    - AUTH_CONFIG=root:root_password:Administrator
+    - PORT=443
+    hostname: x1000c6s6b0
+    image: artifactory.algol60.net/csm-docker/stable/csm-rie:1.1.0
+    networks:
+    - meds
+  x1000c6s6b1:
+    environment:
+    - MOCKUPFOLDER=EX425
+    - XNAME=x1000c6s6b1
+    - AUTH_CONFIG=root:root_password:Administrator
+    - PORT=443
+    hostname: x1000c6s6b1
+    image: artifactory.algol60.net/csm-docker/stable/csm-rie:1.1.0
+    networks:
+    - meds
+  x1000c6s7b0:
+    environment:
+    - MOCKUPFOLDER=EX425
+    - XNAME=x1000c6s7b0
+    - AUTH_CONFIG=root:root_password:Administrator
+    - PORT=443
+    hostname: x1000c6s7b0
+    image: artifactory.algol60.net/csm-docker/stable/csm-rie:1.1.0
+    networks:
+    - meds
+  x1000c6s7b1:
+    environment:
+    - MOCKUPFOLDER=EX425
+    - XNAME=x1000c6s7b1
+    - AUTH_CONFIG=root:root_password:Administrator
+    - PORT=443
+    hostname: x1000c6s7b1
+    image: artifactory.algol60.net/csm-docker/stable/csm-rie:1.1.0
+    networks:
+    - meds
+  x1000c7:
+    environment:
+    - MOCKUPFOLDER=CMM
+    - XNAME=x1000c7
+    - AUTH_CONFIG=root:root_password:Administrator
+    - PORT=443
+    hostname: x1000c7
+    image: artifactory.algol60.net/csm-docker/stable/csm-rie:1.1.0
+    networks:
+    - meds
+  x1000c7r0b0:
+    environment:
+    - MOCKUPFOLDER=Slingshot_Switch_Blade
+    - XNAME=x1000c7r0b0
+    - AUTH_CONFIG=root:root_password:Administrator
+    - PORT=443
+    hostname: x1000c7r0b0
+    image: artifactory.algol60.net/csm-docker/stable/csm-rie:1.1.0
+    networks:
+    - meds
+  x1000c7r1b0:
+    environment:
+    - MOCKUPFOLDER=Slingshot_Switch_Blade
+    - XNAME=x1000c7r1b0
+    - AUTH_CONFIG=root:root_password:Administrator
+    - PORT=443
+    hostname: x1000c7r1b0
+    image: artifactory.algol60.net/csm-docker/stable/csm-rie:1.1.0
+    networks:
+    - meds
+  x1000c7r2b0:
+    environment:
+    - MOCKUPFOLDER=Slingshot_Switch_Blade
+    - XNAME=x1000c7r2b0
+    - AUTH_CONFIG=root:root_password:Administrator
+    - PORT=443
+    hostname: x1000c7r2b0
+    image: artifactory.algol60.net/csm-docker/stable/csm-rie:1.1.0
+    networks:
+    - meds
+  x1000c7r3b0:
+    environment:
+    - MOCKUPFOLDER=Slingshot_Switch_Blade
+    - XNAME=x1000c7r3b0
+    - AUTH_CONFIG=root:root_password:Administrator
+    - PORT=443
+    hostname: x1000c7r3b0
+    image: artifactory.algol60.net/csm-docker/stable/csm-rie:1.1.0
+    networks:
+    - meds
+  x1000c7r4b0:
+    environment:
+    - MOCKUPFOLDER=Slingshot_Switch_Blade
+    - XNAME=x1000c7r4b0
+    - AUTH_CONFIG=root:root_password:Administrator
+    - PORT=443
+    hostname: x1000c7r4b0
+    image: artifactory.algol60.net/csm-docker/stable/csm-rie:1.1.0
+    networks:
+    - meds
+  x1000c7r5b0:
+    environment:
+    - MOCKUPFOLDER=Slingshot_Switch_Blade
+    - XNAME=x1000c7r5b0
+    - AUTH_CONFIG=root:root_password:Administrator
+    - PORT=443
+    hostname: x1000c7r5b0
+    image: artifactory.algol60.net/csm-docker/stable/csm-rie:1.1.0
+    networks:
+    - meds
+  x1000c7r6b0:
+    environment:
+    - MOCKUPFOLDER=Slingshot_Switch_Blade
+    - XNAME=x1000c7r6b0
+    - AUTH_CONFIG=root:root_password:Administrator
+    - PORT=443
+    hostname: x1000c7r6b0
+    image: artifactory.algol60.net/csm-docker/stable/csm-rie:1.1.0
+    networks:
+    - meds
+  x1000c7r7b0:
+    environment:
+    - MOCKUPFOLDER=Slingshot_Switch_Blade
+    - XNAME=x1000c7r7b0
+    - AUTH_CONFIG=root:root_password:Administrator
+    - PORT=443
+    hostname: x1000c7r7b0
+    image: artifactory.algol60.net/csm-docker/stable/csm-rie:1.1.0
+    networks:
+    - meds
+  x1000c7s0b0:
+    environment:
+    - MOCKUPFOLDER=EX425
+    - XNAME=x1000c7s0b0
+    - AUTH_CONFIG=root:root_password:Administrator
+    - PORT=443
+    hostname: x1000c7s0b0
+    image: artifactory.algol60.net/csm-docker/stable/csm-rie:1.1.0
+    networks:
+    - meds
+  x1000c7s0b1:
+    environment:
+    - MOCKUPFOLDER=EX425
+    - XNAME=x1000c7s0b1
+    - AUTH_CONFIG=root:root_password:Administrator
+    - PORT=443
+    hostname: x1000c7s0b1
+    image: artifactory.algol60.net/csm-docker/stable/csm-rie:1.1.0
+    networks:
+    - meds
+  x1000c7s1b0:
+    environment:
+    - MOCKUPFOLDER=EX425
+    - XNAME=x1000c7s1b0
+    - AUTH_CONFIG=root:root_password:Administrator
+    - PORT=443
+    hostname: x1000c7s1b0
+    image: artifactory.algol60.net/csm-docker/stable/csm-rie:1.1.0
+    networks:
+    - meds
+  x1000c7s1b1:
+    environment:
+    - MOCKUPFOLDER=EX425
+    - XNAME=x1000c7s1b1
+    - AUTH_CONFIG=root:root_password:Administrator
+    - PORT=443
+    hostname: x1000c7s1b1
+    image: artifactory.algol60.net/csm-docker/stable/csm-rie:1.1.0
+    networks:
+    - meds
+  x1000c7s2b0:
+    environment:
+    - MOCKUPFOLDER=EX425
+    - XNAME=x1000c7s2b0
+    - AUTH_CONFIG=root:root_password:Administrator
+    - PORT=443
+    hostname: x1000c7s2b0
+    image: artifactory.algol60.net/csm-docker/stable/csm-rie:1.1.0
+    networks:
+    - meds
+  x1000c7s2b1:
+    environment:
+    - MOCKUPFOLDER=EX425
+    - XNAME=x1000c7s2b1
+    - AUTH_CONFIG=root:root_password:Administrator
+    - PORT=443
+    hostname: x1000c7s2b1
+    image: artifactory.algol60.net/csm-docker/stable/csm-rie:1.1.0
+    networks:
+    - meds
+  x1000c7s3b0:
+    environment:
+    - MOCKUPFOLDER=EX425
+    - XNAME=x1000c7s3b0
+    - AUTH_CONFIG=root:root_password:Administrator
+    - PORT=443
+    hostname: x1000c7s3b0
+    image: artifactory.algol60.net/csm-docker/stable/csm-rie:1.1.0
+    networks:
+    - meds
+  x1000c7s3b1:
+    environment:
+    - MOCKUPFOLDER=EX425
+    - XNAME=x1000c7s3b1
+    - AUTH_CONFIG=root:root_password:Administrator
+    - PORT=443
+    hostname: x1000c7s3b1
+    image: artifactory.algol60.net/csm-docker/stable/csm-rie:1.1.0
+    networks:
+    - meds
+  x1000c7s4b0:
+    environment:
+    - MOCKUPFOLDER=EX425
+    - XNAME=x1000c7s4b0
+    - AUTH_CONFIG=root:root_password:Administrator
+    - PORT=443
+    hostname: x1000c7s4b0
+    image: artifactory.algol60.net/csm-docker/stable/csm-rie:1.1.0
+    networks:
+    - meds
+  x1000c7s4b1:
+    environment:
+    - MOCKUPFOLDER=EX425
+    - XNAME=x1000c7s4b1
+    - AUTH_CONFIG=root:root_password:Administrator
+    - PORT=443
+    hostname: x1000c7s4b1
+    image: artifactory.algol60.net/csm-docker/stable/csm-rie:1.1.0
+    networks:
+    - meds
+  x1000c7s5b0:
+    environment:
+    - MOCKUPFOLDER=EX425
+    - XNAME=x1000c7s5b0
+    - AUTH_CONFIG=root:root_password:Administrator
+    - PORT=443
+    hostname: x1000c7s5b0
+    image: artifactory.algol60.net/csm-docker/stable/csm-rie:1.1.0
+    networks:
+    - meds
+  x1000c7s5b1:
+    environment:
+    - MOCKUPFOLDER=EX425
+    - XNAME=x1000c7s5b1
+    - AUTH_CONFIG=root:root_password:Administrator
+    - PORT=443
+    hostname: x1000c7s5b1
+    image: artifactory.algol60.net/csm-docker/stable/csm-rie:1.1.0
+    networks:
+    - meds
+  x1000c7s6b0:
+    environment:
+    - MOCKUPFOLDER=EX425
+    - XNAME=x1000c7s6b0
+    - AUTH_CONFIG=root:root_password:Administrator
+    - PORT=443
+    hostname: x1000c7s6b0
+    image: artifactory.algol60.net/csm-docker/stable/csm-rie:1.1.0
+    networks:
+    - meds
+  x1000c7s6b1:
+    environment:
+    - MOCKUPFOLDER=EX425
+    - XNAME=x1000c7s6b1
+    - AUTH_CONFIG=root:root_password:Administrator
+    - PORT=443
+    hostname: x1000c7s6b1
+    image: artifactory.algol60.net/csm-docker/stable/csm-rie:1.1.0
+    networks:
+    - meds
+  x1000c7s7b0:
+    environment:
+    - MOCKUPFOLDER=EX425
+    - XNAME=x1000c7s7b0
+    - AUTH_CONFIG=root:root_password:Administrator
+    - PORT=443
+    hostname: x1000c7s7b0
+    image: artifactory.algol60.net/csm-docker/stable/csm-rie:1.1.0
+    networks:
+    - meds
+  x1000c7s7b1:
+    environment:
+    - MOCKUPFOLDER=EX425
+    - XNAME=x1000c7s7b1
+    - AUTH_CONFIG=root:root_password:Administrator
+    - PORT=443
+    hostname: x1000c7s7b1
+    image: artifactory.algol60.net/csm-docker/stable/csm-rie:1.1.0
+    networks:
+    - meds
+version: '3.7'
+
