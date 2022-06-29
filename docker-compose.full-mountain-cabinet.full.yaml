@@ -1,13 +1,13 @@
 networks:
   meds: {}
 services:
-  x1000c0:
+  x1000c0b0:
     environment:
     - MOCKUPFOLDER=CMM
-    - XNAME=x1000c0
+    - XNAME=x1000c0b0
     - AUTH_CONFIG=root:root_password:Administrator
     - PORT=443
-    hostname: x1000c0
+    hostname: x1000c0b0
     image: artifactory.algol60.net/csm-docker/stable/csm-rie:1.1.0
     networks:
     - meds
@@ -251,13 +251,13 @@ services:
     image: artifactory.algol60.net/csm-docker/stable/csm-rie:1.1.0
     networks:
     - meds
-  x1000c1:
+  x1000c1b0:
     environment:
     - MOCKUPFOLDER=CMM
-    - XNAME=x1000c1
+    - XNAME=x1000c1b0
     - AUTH_CONFIG=root:root_password:Administrator
     - PORT=443
-    hostname: x1000c1
+    hostname: x1000c1b0
     image: artifactory.algol60.net/csm-docker/stable/csm-rie:1.1.0
     networks:
     - meds
@@ -501,13 +501,13 @@ services:
     image: artifactory.algol60.net/csm-docker/stable/csm-rie:1.1.0
     networks:
     - meds
-  x1000c2:
+  x1000c2b0:
     environment:
     - MOCKUPFOLDER=CMM
-    - XNAME=x1000c2
+    - XNAME=x1000c2b0
     - AUTH_CONFIG=root:root_password:Administrator
     - PORT=443
-    hostname: x1000c2
+    hostname: x1000c2b0
     image: artifactory.algol60.net/csm-docker/stable/csm-rie:1.1.0
     networks:
     - meds
@@ -751,13 +751,13 @@ services:
     image: artifactory.algol60.net/csm-docker/stable/csm-rie:1.1.0
     networks:
     - meds
-  x1000c3:
+  x1000c3b0:
     environment:
     - MOCKUPFOLDER=CMM
-    - XNAME=x1000c3
+    - XNAME=x1000c3b0
     - AUTH_CONFIG=root:root_password:Administrator
     - PORT=443
-    hostname: x1000c3
+    hostname: x1000c3b0
     image: artifactory.algol60.net/csm-docker/stable/csm-rie:1.1.0
     networks:
     - meds
@@ -1001,13 +1001,13 @@ services:
     image: artifactory.algol60.net/csm-docker/stable/csm-rie:1.1.0
     networks:
     - meds
-  x1000c4:
+  x1000c4b0:
     environment:
     - MOCKUPFOLDER=CMM
-    - XNAME=x1000c4
+    - XNAME=x1000c4b0
     - AUTH_CONFIG=root:root_password:Administrator
     - PORT=443
-    hostname: x1000c4
+    hostname: x1000c4b0
     image: artifactory.algol60.net/csm-docker/stable/csm-rie:1.1.0
     networks:
     - meds
@@ -1251,13 +1251,13 @@ services:
     image: artifactory.algol60.net/csm-docker/stable/csm-rie:1.1.0
     networks:
     - meds
-  x1000c5:
+  x1000c5b0:
     environment:
     - MOCKUPFOLDER=CMM
-    - XNAME=x1000c5
+    - XNAME=x1000c5b0
     - AUTH_CONFIG=root:root_password:Administrator
     - PORT=443
-    hostname: x1000c5
+    hostname: x1000c5b0
     image: artifactory.algol60.net/csm-docker/stable/csm-rie:1.1.0
     networks:
     - meds
@@ -1501,13 +1501,13 @@ services:
     image: artifactory.algol60.net/csm-docker/stable/csm-rie:1.1.0
     networks:
     - meds
-  x1000c6:
+  x1000c6b0:
     environment:
     - MOCKUPFOLDER=CMM
-    - XNAME=x1000c6
+    - XNAME=x1000c6b0
     - AUTH_CONFIG=root:root_password:Administrator
     - PORT=443
-    hostname: x1000c6
+    hostname: x1000c6b0
     image: artifactory.algol60.net/csm-docker/stable/csm-rie:1.1.0
     networks:
     - meds
@@ -1751,13 +1751,13 @@ services:
     image: artifactory.algol60.net/csm-docker/stable/csm-rie:1.1.0
     networks:
     - meds
-  x1000c7:
+  x1000c7b0:
     environment:
     - MOCKUPFOLDER=CMM
-    - XNAME=x1000c7
+    - XNAME=x1000c7b0
     - AUTH_CONFIG=root:root_password:Administrator
     - PORT=443
-    hostname: x1000c7
+    hostname: x1000c7b0
     image: artifactory.algol60.net/csm-docker/stable/csm-rie:1.1.0
     networks:
     - meds

@@ -21,8 +21,8 @@ endpoints = {}
 for cabinet in ["x1000"]:
     for chassis in ["c0", "c1", "c2", "c3", "c4", "c5", "c6", "c7"]:
         # Chassis BMC
-        chassisXname = cabinet+chassis
-        endpoints[chassisXname] = make_emulator(chassisXname, "CMM", network)
+        chassisBMCXname = cabinet+chassis+"b0"
+        endpoints[chassisBMCXname] = make_emulator(chassisBMCXname, "CMM", network)
 
         for slot in ["s0", "s1", "s2","s3","s4", "s5", "s6", "s7"]:
             for nodeBMC in ["b0", "b1"]:
