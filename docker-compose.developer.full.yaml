@@ -185,6 +185,26 @@ services:
       - MEDS_ROOT_SSH_KEY=""
     networks:
       - meds
+  meds-vault-loader:
+    build:
+      context: .
+    environment:
+      HSM_URL: http://cray-smd:27779/hsm/v1
+      CRAY_VAULT_AUTH_PATH: auth/token/create
+      CRAY_VAULT_ROLE_FILE: configs/namespace
+      CRAY_VAULT_JWT_FILE: configs/token
+      VAULT_ADDR: http://vault:8200
+      VAULT_TOKEN: hms
+      VAULT_KEYPATH: hms-creds
+      VAULT_REDFISH_DEFAULTS: '{"Username": "root", "Password": "root_password"}'
+    command: vault_loader
+    volumes: 
+      - ./configs:/configs
+    depends_on:
+      - vault-kv-enabler
+    networks:
+      - meds
+  
   meds:
     build:
       context: .
