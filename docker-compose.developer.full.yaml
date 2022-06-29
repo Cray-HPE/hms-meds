@@ -29,7 +29,7 @@ services:
     environment:
       - VAULT_ADDR=http://vault:8200
       - VAULT_TOKEN=hms
-      - KV_STORES=hms-creds,reds-creds,secret
+      - KV_STORES=secret
     depends_on:
       - vault
     networks:
@@ -195,7 +195,7 @@ services:
       CRAY_VAULT_JWT_FILE: configs/token
       VAULT_ADDR: http://vault:8200
       VAULT_TOKEN: hms
-      VAULT_KEYPATH: hms-creds
+      VAULT_KEYPATH: secret/hms-creds
       VAULT_REDFISH_DEFAULTS: '{"Username": "root", "Password": "root_password"}'
     command: vault_loader
     volumes: 
