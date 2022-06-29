@@ -88,7 +88,12 @@ services:
       curl  -d '{\"Xname\":\"x1000\",\"Type\":\"comptype_cabinet\",\"Class\":\"Mountain\",\"TypeString\":\"Cabinet\",\"ExtraProperties\":{\"Networks\":{\"cn\":{
         \"HMN\":{\"CIDR\":\"10.104.0.1/22\",\"Gateway\":\"10.104.3.254\",\"VLan\":3001},
         \"NMN\":{\"CIDR\":\"10.100.0.1/22\",\"Gateway\":\"10.100.3.254\",\"VLan\":2001}},
-        \"ncn\":{}}}}' http://cray-sls:8376/v1/hardware"
+        \"ncn\":{}}}}' -X PUT http://cray-sls:8376/v1/hardware/x1000 &&
+
+      for chassis in x1000c0 x1000c1 x1000c2 x1000c3 x1000c4 x1000c5 x1000c6 x1000c7; do
+        echo \"Creating chassis $$chassis\"
+        curl -d $$(jq --arg XNAME $${chassis} -nc '{Xname: $$XNAME, Class: \"Mountain\"}') -X PUT http://cray-sls:8376/v1/hardware/$${chassis}
+      done"
     environment:
       - POSTGRES_HOST=postgres
       - POSTGRES_PORT=5432
