@@ -71,7 +71,7 @@ services:
       - CRAY_VAULT_JWT_FILE=configs/token
       - VAULT_ADDR=http://vault:8200
       - VAULT_TOKEN=hms
-      - VAULT_KEYPATH=hms-creds
+      - VAULT_KEYPATH=secret/hms-creds
     ports:
       - "8376:8376"
     depends_on:
@@ -146,7 +146,7 @@ services:
       - CRAY_VAULT_JWT_FILE=configs/token
       - VAULT_ADDR=http://vault:8200
       - VAULT_TOKEN=hms
-      - VAULT_KEYPATH=hms-creds
+      - VAULT_KEYPATH=secret/hms-creds
       - SMD_WVAULT=true
       - SMD_RVAULT=true
     hostname: cray-smd
@@ -165,26 +165,6 @@ services:
   #
   # MEDS
   #
-  meds-init:
-    build:
-      context: .
-    command: ["vault_loader"]
-    environment:
-      - HSM_URL=http://cray-smd:27779/hsm/v1
-      - MEDS_OPTS=""
-      - CRAY_VAULT_AUTH_PATH=auth/token/create
-      - CRAY_VAULT_ROLE_FILE=configs/namespace
-      - CRAY_VAULT_JWT_FILE=configs/token
-      - VAULT_ADDR=http://vault:8200
-      - VAULT_TOKEN=hms
-      - VAULT_KEYPATH=hms-creds
-      - VAULT_SKIP_VERIFY=true
-      - MEDS_NTP_TARG=""
-      - MEDS_SYSLOG_TARG=""
-      - MEDS_NP_RF_URL="/redfish/v1/Managers/BMC/NetworkProtocol"
-      - MEDS_ROOT_SSH_KEY=""
-    networks:
-      - meds
   meds-vault-loader:
     build:
       context: .
@@ -216,7 +196,7 @@ services:
       - CRAY_VAULT_JWT_FILE=configs/token
       - VAULT_ADDR=http://vault:8200
       - VAULT_TOKEN=hms
-      - VAULT_KEYPATH=hms-creds
+      - VAULT_KEYPATH=hms-creds # MEDS has a hardcode to prepend secret/ to this path.
       - VAULT_SKIP_VERIFY=true
 
       - MEDS_SYSLOG_TARG=localhost:514
