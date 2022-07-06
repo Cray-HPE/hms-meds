@@ -1,6 +1,6 @@
 #  MIT License
 #
-#  (C) Copyright [2019-2021] Hewlett Packard Enterprise Development LP
+#  (C) Copyright [2019-2022] Hewlett Packard Enterprise Development LP
 #
 #  Permission is hereby granted, free of charge, to any person obtaining a
 #  copy of this software and associated documentation files (the "Software"),
@@ -55,7 +55,7 @@ LABEL maintainer="Hewlett Packard Enterprise"
 STOPSIGNAL SIGTERM
 
 # Setup environment variables.
-ENV HSM_URL=https://api-gateway.default.svc.cluster.local/apis/smd/hsm/v1
+ENV HSM_URL=https://api-gateway.default.svc.cluster.local/apis/smd/hsm/v2
 ENV MEDS_OPTS=""
 
 ENV VAULT_ADDR="http://cray-vault.vault:8200"
