@@ -7,7 +7,7 @@ require (
 	github.com/Cray-HPE/hms-bmc-networkprotocol v1.5.2
 	github.com/Cray-HPE/hms-certs v1.3.2
 	github.com/Cray-HPE/hms-compcredentials v1.11.2
-	github.com/Cray-HPE/hms-dns-dhcp v1.5.2
+	github.com/Cray-HPE/hms-dns-dhcp v1.6.0
 	github.com/Cray-HPE/hms-securestorage v1.12.2
 	github.com/Cray-HPE/hms-sls v1.10.4
 	github.com/Cray-HPE/hms-smd v1.30.9

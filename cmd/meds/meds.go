@@ -1,7 +1,7 @@
 /*
  * MIT License
  *
- * (C) Copyright [2019-2021] Hewlett Packard Enterprise Development LP
+ * (C) Copyright [2019-2022] Hewlett Packard Enterprise Development LP
  *
  * Permission is hereby granted, free of charge, to any person obtaining a
  * copy of this software and associated documentation files (the "Software"),
@@ -952,7 +952,7 @@ func init_cabinet(cab GenericHardware) error {
 		log.Println("Failed to get ethernet interfaces from HSM, not processing further: ", err)
 		return err
 	}
-	hsmEthernetInterfacesMap := map[string]sm.CompEthInterface{}
+	hsmEthernetInterfacesMap := map[string]sm.CompEthInterfaceV2{}
 	for _, ei := range hsmEthernetInterfaces {
 		hsmEthernetInterfacesMap[ei.ID] = ei
 	}
@@ -969,7 +969,7 @@ func init_cabinet(cab GenericHardware) error {
 		}
 
 		// Preload HSM EthernetInterfaces with the endpoints.
-		ethernetInterface := sm.CompEthInterface{
+		ethernetInterface := sm.CompEthInterfaceV2{
 			MACAddr: normalizedMAC,
 			CompID:  v.name,
 		}
@@ -1148,8 +1148,8 @@ func main() {
 		"Default SSH key to use when communicating with targets")
 	flag.StringVar(&sls, "sls", "http://cray-sls/v1",
 		"Location of the System Layout Service API, up through the /v1 portion. (Do not include trailing slash)")
-	flag.StringVar(&hsm, "hsm", "http://cray-smd/hsm/v1",
-		"Location of the Hardware State Manager API, up through the /v1 portion. (Do not include trailing slash)")
+	flag.StringVar(&hsm, "hsm", "http://cray-smd/hsm/v2",
+		"Location of the Hardware State Manager API, up through the /v2 portion. (Do not include trailing slash)")
 	flag.StringVar(&syslogTarg, "syslog", "",
 		"Server:Port of the syslog aggregator")
 	flag.StringVar(&ntpTarg, "ntp", "",

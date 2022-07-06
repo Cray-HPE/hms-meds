@@ -165,7 +165,7 @@ services:
       context: .
     command: ["vault_loader"]
     environment:
-      - HSM_URL=http://cray-smd:27779/hsm/v1
+      - HSM_URL=http://cray-smd:27779/hsm/v2
       - MEDS_OPTS=""
       - CRAY_VAULT_AUTH_PATH=auth/token/create
       - CRAY_VAULT_ROLE_FILE=configs/namespace
@@ -184,7 +184,7 @@ services:
     build:
       context: .
     environment:
-      - HSM_URL=http://cray-smd:27779/hsm/v1
+      - HSM_URL=http://cray-smd:27779/hsm/v2
       - "MEDS_OPTS=-sls http://cray-sls:8376/v1"
       - CRAY_VAULT_AUTH_PATH=auth/token/create
       - CRAY_VAULT_ROLE_FILE=configs/namespace

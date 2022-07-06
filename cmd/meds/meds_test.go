@@ -1,7 +1,7 @@
 /*
  * MIT License
  *
- * (C) Copyright [2019-2021] Hewlett Packard Enterprise Development LP
+ * (C) Copyright [2019-2022] Hewlett Packard Enterprise Development LP
  *
  * Permission is hereby granted, free of charge, to any person obtaining a
  * copy of this software and associated documentation files (the "Software"),
@@ -528,7 +528,7 @@ func Test_notifyHSMXnamePresent(t *testing.T) {
 		map[string]HTTPResponse{
 			"/Inventory/RedfishEndpoints": HTTPResponse{
 				201,
-				`[{"URI": "/hsm/v1/Inventory/RedfishEndpoints/x0c0s0b0"}]`,
+				`[{"URI": "/hsm/v2/Inventory/RedfishEndpoints/x0c0s0b0"}]`,
 				json.RawMessage(`{"ID":"x7c5s3b1","FQDN":"x7c5s3b1","MACAddr":"02:00:07:05:33:10","RediscoverOnUpdate":true}`),
 			},
 		},
