@@ -31,7 +31,11 @@ import (
 	"flag"
 	"fmt"
 	"io/ioutil"
-	"log"
+
+	"github.com/Cray-HPE/hms-meds/internal/logger"
+	_ "github.com/Cray-HPE/hms-meds/internal/logger"
+	log "github.com/sirupsen/logrus"
+
 	"math/rand"
 	"net"
 	"net/http"
@@ -252,7 +256,7 @@ func GenerateSwitchCardEndpoints(macprefix string, rack int, chassis int) []*Net
 		ep.hwtype = TYPE_SWITCH_CARD
 		ep.HSMPresence = PRESENCE_NOT_PRESENT
 		endpoints = append(endpoints, ep)
-		// Use "variadic slice append" notation. Go figure...
+		// Use "variadic slice append"notation. Go figure...
 		// (This presents the slice to be appended as a list of
 		// variadic arguments to the append function)
 		endpoints = append(endpoints, GenerateNodeCardEndpoints(
@@ -294,18 +298,18 @@ func patchXNameEnabled(xname string, enabled bool) *error {
 
 	rawPayload, err := json.Marshal(payload)
 	if err != nil {
-		log.Printf("WARNING: Could not encode JSON for %s: %v (%v)", xname, err, payload)
+		log.Warning("Could not encode JSON for %s: %v (%v)", xname, err, payload)
 		return &err
 	}
 
-	log.Printf("DEBUG: PATCH to %s/Inventory/RedfishEndpoints/%s", hsm, xname)
+	log.Debug("PATCH to %s/Inventory/RedfishEndpoints/%s", hsm, xname)
 
 	req, err := http.NewRequest(http.MethodPatch, hsm+"/Inventory/RedfishEndpoints/"+xname, bytes.NewReader(rawPayload))
 	req.Header.Add("Content-Type", "application/json")
 	base.SetHTTPUserAgent(req, serviceName)
 	resp, err := client.Do(req)
 	if err != nil {
-		log.Printf("WARNING: Unable to patch %s: %v", xname, err)
+		log.Warn("Unable to patch %s: %v", xname, err)
 		return &err
 	}
 
@@ -315,9 +319,9 @@ func patchXNameEnabled(xname string, enabled bool) *error {
 	}
 
 	if resp.StatusCode == 200 {
-		log.Printf("INFO: Successfully patched %s", xname)
+		log.Info("Successfully patched %s", xname)
 	} else {
-		log.Printf("WARNING: An error occurred patching %s: %s %v", xname, resp.Status, string(strbody))
+		log.Warning("An error occurred patching %s: %s %v", xname, resp.Status, string(strbody))
 		rerr := fmt.Errorf("Unable to patch information for %s to HSM: %d\n%s", xname, resp.StatusCode, string(strbody))
 		return &rerr
 	}
@@ -335,18 +339,18 @@ func patchXnameFQDN(xname, fqdn, hostname string) error {
 
 	rawPayload, err := json.Marshal(payload)
 	if err != nil {
-		log.Printf("WARNING: Could not encode JSON for %s: %v (%v) with FQDN (%s) and Hostname (%s)", xname, err, payload, fqdn, hostname)
+		log.Warning("Could not encode JSON for %s: %v (%v) with FQDN (%s) and Hostname (%s)", xname, err, payload, fqdn, hostname)
 		return err
 	}
 
-	log.Printf("DEBUG: PATCH to %s/Inventory/RedfishEndpoints/%s", hsm, xname)
+	log.Debug("PATCH to %s/Inventory/RedfishEndpoints/%s", hsm, xname)
 
 	req, err := http.NewRequest(http.MethodPatch, hsm+"/Inventory/RedfishEndpoints/"+xname, bytes.NewReader(rawPayload))
 	req.Header.Add("Content-Type", "application/json")
 	base.SetHTTPUserAgent(req, serviceName)
 	resp, err := client.Do(req)
 	if err != nil {
-		log.Printf("WARNING: Unable to patch %s: %v", xname, err)
+		log.Warning("Unable to patch %s: %v", xname, err)
 		return err
 	}
 
@@ -356,9 +360,9 @@ func patchXnameFQDN(xname, fqdn, hostname string) error {
 	}
 
 	if resp.StatusCode == 200 {
-		log.Printf("INFO: Successfully patched %s", xname)
+		log.Info("Successfully patched %s", xname)
 	} else {
-		log.Printf("WARNING: An error occurred patching %s: %s %v", xname, resp.Status, string(strbody))
+		log.Warning("An error occurred patching %s: %s %v", xname, resp.Status, string(strbody))
 		rerr := fmt.Errorf("Unable to patch information for %s to HSM: %d\n%s", xname, resp.StatusCode, string(strbody))
 		return rerr
 	}
@@ -368,7 +372,7 @@ func patchXnameFQDN(xname, fqdn, hostname string) error {
 func notifyXnamePresent(node NetEndpoint, address string) *error {
 	perNodeCred, err := hcs.GetCompCred(node.name)
 	if err != nil {
-		log.Printf("WARNING: Unable to retrieve key %s from vault: %s", node.name, err)
+		log.Warning("Unable to retrieve key %s from vault: %s", node.name, err)
 		return &err
 	}
 
@@ -378,7 +382,7 @@ func notifyXnamePresent(node NetEndpoint, address string) *error {
 		globalCreds, err := credStorage.FindGlobalCredentials()
 		if err != nil || len(globalCreds.Username) == 0 {
 			if len(defUser) != 0 {
-				log.Printf("WARNING: Unable to retrieve MEDS global credentials (err: %s) or retrieved credentials are "+
+				log.Warning("Unable to retrieve MEDS global credentials (err: %s) or retrieved credentials are "+
 					"empty, using defaults", err)
 				globalCreds = model.MedsCredentials{
 					Username: defUser,
@@ -387,7 +391,7 @@ func notifyXnamePresent(node NetEndpoint, address string) *error {
 			} else {
 				err = fmt.Errorf("Unable to retrieve MEDS global credentials (err: %s) or retrieved credentials are "+
 					"empty. No defaults are set, so refusing to continue adding Xname", err)
-				log.Printf("WARNING: %s", err)
+				log.Warning("%s", err)
 				return &err
 			}
 		}
@@ -397,20 +401,20 @@ func notifyXnamePresent(node NetEndpoint, address string) *error {
 		perNodeCred.Username = globalCreds.Username
 		perNodeCred.Password = globalCreds.Password
 
-		log.Printf("INFO: No creds exist for %s in vault, setting it to the MEDS global defaults", node.name)
+		log.Info("No creds exist for %s in vault, setting it to the MEDS global defaults", node.name)
 
 		err = hcs.StoreCompCred(perNodeCred)
 		if err != nil {
 			// If we fail to store credentials in vault, we'll lose the
 			// credentials and the component endpoints associated with
 			// them will still be successfully in the database.
-			log.Printf("Failed to store credentials for %s in Vault - %s", node.name, err)
+			log.Error("Failed to store credentials for %s in Vault - %s", node.name, err)
 		}
 	}
 
 	bmcCreds, err := credStorage.FindBMCSSHCredentials(node.name)
 	if err != nil || len(bmcCreds.Username) == 0 {
-		log.Printf("WARNING: Unable to retrieve MEDS SSH credentials (err: %s) or retrieved credentials are "+
+		log.Warning("Unable to retrieve MEDS SSH credentials (err: %s) or retrieved credentials are "+
 			"empty, using defaults", err)
 		bmcCreds = model.MedsSSHCredentials{
 			Username:      defUser,
@@ -459,16 +463,16 @@ func notifyHSMXnamePresent(node NetEndpoint, address string) *error {
 
 	rawPayload, err := json.Marshal(payload)
 	if err != nil {
-		log.Printf("WARNING: Could not encode JSON for %s: %v (%v)", node.name, err, payload)
+		log.Warning("Could not encode JSON for %s: %v (%v)", node.name, err, payload)
 		return &err
 	}
 
-	log.Printf("DEBUG: POST to %s/Inventory/RedfishEndpoints with %s", hsm, string(rawPayload))
+	log.Debug("POST to %s/Inventory/RedfishEndpoints with %s", hsm, string(rawPayload))
 
 	url := hsm + "/Inventory/RedfishEndpoints"
 	req, qerr := http.NewRequest(http.MethodPost, url, bytes.NewReader(rawPayload))
 	if qerr != nil {
-		log.Printf("WARNING: Unable to create HTTP request for %s: %v",
+		log.Warning("Unable to create HTTP request for %s: %v",
 			node.name, qerr)
 		return &qerr
 	}
@@ -476,7 +480,7 @@ func notifyHSMXnamePresent(node NetEndpoint, address string) *error {
 	base.SetHTTPUserAgent(req, serviceName)
 	resp, err := client.Do(req)
 	if err != nil {
-		log.Printf("WARNING: Unable to send information for %s: %v", node.name, err)
+		log.Warning("Unable to send information for %s: %v", node.name, err)
 		return &err
 	}
 
@@ -486,21 +490,21 @@ func notifyHSMXnamePresent(node NetEndpoint, address string) *error {
 	}
 
 	if resp.StatusCode == 201 {
-		log.Printf("INFO: Successfully created %s", node.name)
+		log.Info("Successfully created %s", node.name)
 	} else if resp.StatusCode == 409 {
-		log.Printf("INFO: %s alredy present; patching instead", node.name)
+		log.Info("%s alredy present; patching instead", node.name)
 		return patchXNameEnabled(node.name, true)
 	} else {
-		log.Printf("WARNING: An error occurred uploading %s: %s %v", node.name, resp.Status, string(strbody))
-		rerr := errors.New("Unable to upload information for " + node.name + " to HSM: " + fmt.Sprint(resp.StatusCode) + "\n" + string(strbody))
+		log.Warning("An error occurred uploading %s: %s %v", node.name, resp.Status, string(strbody))
+		rerr := errors.New("Unable to upload information for " + node.name + "to HSM: " + fmt.Sprint(resp.StatusCode) + "\n" + string(strbody))
 		return &rerr
 	}
-	log.Printf("INFO: Successfully added %s to HSM", node.name)
+	log.Info("Successfully added %s to HSM", node.name)
 	return nil
 }
 
 func notifyHSMXnameNotPresent(node NetEndpoint) *error {
-	log.Printf("DEBUG: Would remove %s, but MEDS no longer marks redfishEndpoints as disabled. This message is purely for your information; MEDS is operating as expected.", node.name)
+	log.Debug("Would remove %s, but MEDS no longer marks redfishEndpoints as disabled. This message is purely for your information; MEDS is operating as expected.", node.name)
 
 	return nil
 }
@@ -514,31 +518,31 @@ func queryHSMState() error {
 		defer ep.HSMPresLock.Unlock()
 	}
 
-	log.Printf("DEBUG: GET from %s/Inventory/RedfishEndpoints", hsm)
+	log.Debug("GET from %s/Inventory/RedfishEndpoints", hsm)
 
 	url := hsm + "/Inventory/RedfishEndpoints"
 	req, qerr := http.NewRequest(http.MethodGet, url, nil)
 	if qerr != nil {
-		log.Printf("WARNING: Unable to create HTTP request for HSM query: %v",
+		log.Warning("Unable to create HTTP request for HSM query: %v",
 			qerr)
 		return qerr
 	}
 	resp, err := client.Do(req)
 	if err != nil {
-		log.Printf("WARNING: Unable to get RedfishEndpoints from HSM: %v", err)
+		log.Warning("Unable to get RedfishEndpoints from HSM: %v", err)
 		return err
 	}
 
 	if resp.Body == nil {
 		emsg := fmt.Errorf("No response body from querying HSM for RedfishEndpoints.")
-		log.Printf("WARNING: %v", emsg)
+		log.Warning("%v", emsg)
 		return emsg
 	}
 
 	defer resp.Body.Close()
 	bodyBytes, err := ioutil.ReadAll(resp.Body)
 	if err != nil {
-		log.Printf("WARNING: Unable to read HTTP body while querying HSM for RedfishEndpoints: %v", err)
+		log.Warning("Unable to read HTTP body while querying HSM for RedfishEndpoints: %v", err)
 		return err
 	}
 
@@ -546,7 +550,7 @@ func queryHSMState() error {
 		rfEPs := new(HSMNotificationArray)
 		err := json.Unmarshal(bodyBytes, rfEPs)
 		if err != nil {
-			log.Printf("WARNING: Unable to unmarshal HSM data: %v", err)
+			log.Warning("Unable to unmarshal HSM data: %v", err)
 			return err
 		}
 		rfEPMap := make(map[string]HSMNotification, 0)
@@ -558,7 +562,7 @@ func queryHSMState() error {
 			if !ok {
 				// Redfish Endpoint was in the HSM inventory, but no longer present. ie Deleted
 				if ep.HSMPresence != PRESENCE_NOT_PRESENT {
-					log.Printf("DEBUG: %s is now not present in HSM", ep.name)
+					log.Debug("%s is now not present in HSM", ep.name)
 				}
 				ep.HSMPresence = PRESENCE_NOT_PRESENT
 			} else if rfEP.Enabled != nil && *(rfEP.Enabled) != true {
@@ -566,14 +570,14 @@ func queryHSMState() error {
 				// MEDS treats this as if the ENDPOINT is not present/
 				// present and set false
 				if ep.HSMPresence != PRESENCE_NOT_PRESENT {
-					log.Printf("DEBUG: %s is now not present in HSM", ep.name)
+					log.Debug("%s is now not present in HSM", ep.name)
 				}
 				ep.HSMPresence = PRESENCE_NOT_PRESENT
 			} else {
 				// Redfish endpoint is present within HSM inventory and enabled
 				// present and set true OR flag not present
 				if ep.HSMPresence != PRESENCE_PRESENT {
-					log.Printf("DEBUG: %s is now present in HSM", ep.name)
+					log.Debug("%s is now present in HSM", ep.name)
 				}
 				ep.HSMPresence = PRESENCE_PRESENT
 			}
@@ -588,7 +592,7 @@ func queryHSMState() error {
 	}
 
 	// else ...
-	log.Printf("WARNING: Error occurred looking up RedfishEndpoints in HSM (code %d):\n%s", resp.StatusCode, string(bodyBytes))
+	log.Warning("Error occurred looking up RedfishEndpoints in HSM (code %d):\n%s", resp.StatusCode, string(bodyBytes))
 	rerr := errors.New("Unable to retrieve status from HSM: " + fmt.Sprint(resp.StatusCode) + "\n" + string(bodyBytes))
 	return rerr
 }
@@ -650,7 +654,7 @@ func watchForHardware(
 	var prevErr string
 	var loopCount = 0
 
-	log.Printf("INFO: Starting query thread for %s.  It is currently %s in HSM", ne.name,
+	log.Info("Starting query thread for %s.  It is currently %s in HSM", ne.name,
 		HSMEndpointPresenceToString[ne.HSMPresence])
 
 	// Set the time for the fixed (minimum) wait between checkups
@@ -684,17 +688,17 @@ func watchForHardware(
 				if netPresence == PRESENCE_PRESENT && ne.HSMPresence == PRESENCE_NOT_PRESENT && err == nil {
 					err := (onPresent(*ne, *addr))
 					if err != nil {
-						log.Printf("WARNING: Failed to notify HSM that %s is now present: %v", ne.name, *err)
+						log.Warning("Failed to notify HSM that %s is now present: %v", ne.name, *err)
 					} else {
-						log.Printf("INFO: Marked %s ([%s]) present in HSM.", ne.name, *addr)
+						log.Info("Marked %s ([%s]) present in HSM.", ne.name, *addr)
 						ne.HSMPresence = PRESENCE_PRESENT
 					}
 				} else if netPresence == PRESENCE_NOT_PRESENT && ne.HSMPresence == PRESENCE_PRESENT {
 					err := onNotPresent(*ne)
 					if err != nil {
-						log.Printf("WARNING: Failed to notify HSM that %s is NOT present: %v", ne.name, *err)
+						log.Warning("Failed to notify HSM that %s is NOT present: %v", ne.name, *err)
 					} else {
-						log.Printf("INFO: Lost network contact with %s", ne.name)
+						log.Info("Lost network contact with %s", ne.name)
 					}
 				}
 			}()
@@ -703,14 +707,14 @@ func watchForHardware(
 				if loopLimit[0] != 0 {
 					loopCount++
 					if loopCount >= loopLimit[0] {
-						log.Printf("INFO: Quitting monitor thread for %s due to hitting loop count limit", ne.name)
+						log.Info("Quitting monitor thread for %s due to hitting loop count limit", ne.name)
 						ticker.Stop()
 						return
 					}
 				}
 			}
 		case <-quit:
-			log.Printf("INFO: Quitting monitor thread for %s", ne.name)
+			log.Info("Quitting monitor thread for %s", ne.name)
 			ticker.Stop()
 			return
 		}
@@ -718,7 +722,7 @@ func watchForHardware(
 }
 
 func watchForHSMChanges(quit chan struct{}) {
-	log.Printf("INFO: Starting HSM query thread.")
+	log.Info("Starting HSM query thread.")
 
 	// Sync up with HSM every 5 mins
 	ticker := time.NewTicker(300 * time.Second)
@@ -731,7 +735,7 @@ func watchForHSMChanges(quit chan struct{}) {
 	for {
 		select {
 		case <-ticker.C:
-			log.Printf("TRACE: Checking up on HSM....")
+			log.Trace("Checking up on HSM....")
 			for {
 				select {
 				case <-errTicker.C:
@@ -744,7 +748,7 @@ func watchForHSMChanges(quit chan struct{}) {
 				}
 			}
 		case <-quit:
-			log.Printf("INFO: Quitting HSM monitor thread")
+			log.Info("Quitting HSM monitor thread")
 			return
 		}
 	}
@@ -757,7 +761,7 @@ func __setenv_int(envval string, minval int, varp *int) {
 	if envstr != "" {
 		ival, err := strconv.Atoi(envstr)
 		if err != nil {
-			log.Println("ERROR converting env var", envval, ":", err,
+			log.Error("Failed to converting env var", envval, ":", err,
 				"-- setting unchanged.")
 			return
 		}
@@ -823,29 +827,29 @@ func getEnvVars() {
 	//These are for debugging/testing
 	envstr = os.Getenv("MEDS_CA_PKI_URL")
 	if envstr != "" {
-		log.Printf("INFO: Using CA PKI URL: '%s'", envstr)
+		log.Info("Using CA PKI URL: '%s'", envstr)
 		hms_certs.ConfigParams.VaultCAUrl = envstr
 	}
 	envstr = os.Getenv("MEDS_VAULT_PKI_URL")
 	if envstr != "" {
-		log.Printf("INFO: Using VAULT PKI URL: '%s'", envstr)
+		log.Info("Using VAULT PKI URL: '%s'", envstr)
 		hms_certs.ConfigParams.VaultPKIUrl = envstr
 	}
 	envstr = os.Getenv("MEDS_VAULT_JWT_FILE")
 	if envstr != "" {
-		log.Printf("INFO: Using Vault JWT file: '%s'", envstr)
+		log.Info("Using Vault JWT file: '%s'", envstr)
 		hms_certs.ConfigParams.VaultJWTFile = envstr
 	}
 	envstr = os.Getenv("MEDS_K8S_AUTH_URL")
 	if envstr != "" {
-		log.Printf("INFO: Using K8S AUTH URL: '%s'", envstr)
+		log.Info("Using K8S AUTH URL: '%s'", envstr)
 		hms_certs.ConfigParams.K8SAuthUrl = envstr
 	}
 	envstr = os.Getenv("MEDS_LOG_INSECURE_FAILOVER")
 	if envstr != "" {
 		yn, _ := strconv.ParseBool(envstr)
 		if yn == false {
-			log.Printf("INFO: Not logging Redfish insecure failovers.")
+			log.Info("Not logging Redfish insecure failovers.")
 			hms_certs.ConfigParams.LogInsecureFailover = false
 		}
 	}
@@ -874,7 +878,7 @@ func getEnvVars() {
 // 		cabinetChassisList = append(cabinetChassisList, chassisXname.Chassis)
 // 	}
 
-// 	log.Printf("INFO: Cabinet %v has the following chassis: %v", cab.Xname, cabinetChassisList)
+// 	log.Info("Cabinet %v has the following chassis: %v", cab.Xname, cabinetChassisList)
 // }
 
 func init_chassis(cabinet, chassis sls_common.GenericHardware) error {
@@ -902,18 +906,14 @@ func init_chassis(cabinet, chassis sls_common.GenericHardware) error {
 	var cabExtra sls_common.ComptypeCabinet
 	ce, baerr := json.Marshal(cabinet.ExtraPropertiesRaw)
 	if baerr != nil {
-		err := fmt.Errorf("INTERNAL ERROR, can't marshal cab props: %v",
-			baerr)
-		log.Println(err)
-		return err
+		log.WithError(baerr).Error("Failed to marshal cabinet properties")
+		return baerr
 	}
 
 	baerr = json.Unmarshal(ce, &cabExtra)
 	if baerr != nil {
-		err := fmt.Errorf("INTERNAL ERROR, can't unmarshal cab props: %v",
-			baerr)
-		log.Println(err)
-		return err
+		log.WithError(baerr).Error("Failed to unmarshal cabinet properties")
+		return baerr
 	}
 
 	// Make sure the map checks out before reaching into it to avoid panic.
@@ -940,7 +940,7 @@ func init_chassis(cabinet, chassis sls_common.GenericHardware) error {
 	// Determine what ethernet interfaces need to be get added or updated.
 	hsmEthernetInterfaces, err := dhcpdnsClient.GetAllEthernetInterfaces()
 	if err != nil {
-		log.Println("Failed to get ethernet interfaces from HSM, not processing further: ", err)
+		log.WithError(err).Error("Failed to get ethernet interfaces from HSM, not processing further", err)
 		return err
 	}
 	hsmEthernetInterfacesMap := map[string]sm.CompEthInterface{}
@@ -968,10 +968,10 @@ func init_chassis(cabinet, chassis sls_common.GenericHardware) error {
 		// POST/PATCH ethernet interfaces into HSM
 		if hsmEI, ok := hsmEthernetInterfacesMap[ethernetInterface.MACAddr]; ok && hsmEI.CompID == ethernetInterface.CompID {
 			// The MAC address is currently in HSM with the same component ID
-			log.Printf("INFO: Ethernet interface for MAC %s and CompID %s already present in HSM", ethernetInterface.MACAddr, ethernetInterface.CompID)
+			log.Info("Ethernet interface for MAC %s and CompID %s already present in HSM", ethernetInterface.MACAddr, ethernetInterface.CompID)
 		} else if ok && hsmEI.CompID != ethernetInterface.CompID {
 			// The MAC address is currently in HSM with a different component ID
-			log.Printf("INFO: Patching ethernet interface with MAC %s. HSM has CompID %s want %s.", ethernetInterface.MACAddr, hsmEI.CompID, ethernetInterface.CompID)
+			log.Info("Patching ethernet interface with MAC %s. HSM has CompID %s want %s.", ethernetInterface.MACAddr, hsmEI.CompID, ethernetInterface.CompID)
 			patchErr := dhcpdnsClient.PatchEthernetInterface(ethernetInterface)
 
 			if patchErr != nil {
@@ -983,7 +983,7 @@ func init_chassis(cabinet, chassis sls_common.GenericHardware) error {
 				return patchErr
 			}
 
-			log.Printf("INFO: Patched new ethernet interface to HSM: %+v", ethernetInterface.CompID)
+			log.Info("Patched new ethernet interface to HSM: %+v", ethernetInterface.CompID)
 		} else {
 			// Add the new ethernet interface. Patches instead if it's already present just in case
 			addErr := dhcpdnsClient.AddNewEthernetInterface(ethernetInterface, true)
@@ -997,11 +997,11 @@ func init_chassis(cabinet, chassis sls_common.GenericHardware) error {
 				return addErr
 			}
 
-			log.Printf("INFO: Added new ethernet interface to HSM: %+v", ethernetInterface.CompID)
+			log.Info("Added new ethernet interface to HSM: %+v", ethernetInterface.CompID)
 		}
 	}
 
-	log.Printf("INFO: Finished adding EthernetInterfaces to HSM for chassis %s", chassis.Xname)
+	log.Info("Finished adding EthernetInterfaces to HSM for chassis %s", chassis.Xname)
 
 	// Verify that the FQDN/Hostname for RedfishEndpoints in HSM are what we expect
 	verifyCabinetRedfishEndpoints(endpoints)
@@ -1072,7 +1072,7 @@ func verifyCabinetRedfishEndpoints(endpoints []*NetEndpoint) error {
 func deinit_chassis(k string) {
 	// Iterate through the endpoints in the chassis and stop them
 	for endp := range activeChassis[k] {
-		log.Printf("TRACE: quitting %s", activeChassis[k][endp].name)
+		log.Trace("quitting %s", activeChassis[k][endp].name)
 		activeChassis[k][endp].QuitChannel <- struct{}{}
 		delete(activeEndpoints, activeChassis[k][endp].name)
 	}
@@ -1094,18 +1094,23 @@ func setupRFHTTPStuff() error {
 	rfClientLock.Lock()
 	defer rfClientLock.Unlock()
 
-	log.Printf("INFO: All RF threads paused.")
+	log.Info("All RF threads paused.")
 	if hms_ca_uri != "" {
-		log.Printf("INFO: Creating Redfish TLS-secured client, CA URI: '%s'", hms_ca_uri)
+		log.Info("Creating Redfish TLS-secured client, CA URI: '%s'", hms_ca_uri)
 	} else {
-		log.Printf("INFO: Creating non-validated Redfish client, (no CA URI)")
+		log.Info("Creating non-validated Redfish client, (no CA URI)")
 	}
 
 	rfClient, err = hms_certs.CreateHTTPClientPair(hms_ca_uri, clientTimeout)
 	if err != nil {
 		return fmt.Errorf("ERROR: Can't create TLS cert-enabled HTTP client: %v", err)
 	}
-	log.Printf("INFO: TLS-secured Redfish client successfully created.")
+	log.Info("TLS-secured Redfish client successfully created.")
+
+	// Pass in the MEDS logger
+	// TODO make it a option to control the logger level of Redfish HTTP traffic.
+	rfClient.InsecureClient.Logger = logger.NewRetryableHTTPAdapter(log.StandardLogger())
+	rfClient.SecureClient.Logger = logger.NewRetryableHTTPAdapter(log.StandardLogger())
 
 	var nwp bmc_nwprotocol.NWPData
 	nwp.SyslogSpec = syslogTarg
@@ -1120,9 +1125,9 @@ func setupRFHTTPStuff() error {
 }
 
 func caChangeCB(caBundle string) {
-	log.Printf("INFO: CA bundle rolled; waiting for all RF threads to pause...")
+	log.Info("CA bundle rolled; waiting for all RF threads to pause...")
 	setupRFHTTPStuff()
-	log.Printf("INFO: HTTP transports/clients now set up with new CA bundle.")
+	log.Info("HTTP transports/clients now set up with new CA bundle.")
 }
 
 func main() {
@@ -1176,10 +1181,12 @@ func main() {
 
 	//Set up RF HTTP client and NWP stuff
 
-	hms_certs.InitInstance(nil, serviceName)
+	hms_certs.InitInstance(log.StandardLogger(), serviceName)
 
-	log.Printf("INFO: Setting up non-TLS-validated HTTP client for in-service use.")
+	log.Info("Setting up non-TLS-validated HTTP client for in-service use.")
 	client, _ = hms_certs.CreateHTTPClientPair("", clientTimeout)
+	client.InsecureClient.Logger = logger.NewRetryableHTTPAdapter(log.StandardLogger())
+	client.SecureClient.Logger = logger.NewRetryableHTTPAdapter(log.StandardLogger())
 
 	//Fix up syslog/NTP IP/hostnames
 
@@ -1197,7 +1204,7 @@ func main() {
 			if len(toks) > 1 {
 				syslogTarg = syslogTarg + ":" + toks[1]
 			} else {
-				log.Printf("INFO: No port specified in syslog target, using 123.")
+				log.Info("No port specified in syslog target, using 123.")
 				syslogTarg = syslogTarg + ":123"
 			}
 		}
@@ -1213,7 +1220,7 @@ func main() {
 			if len(toks) > 1 {
 				ntpTarg = ntpTarg + ":" + toks[1]
 			} else {
-				log.Printf("INFO: No port specified in NTP target, using 514.")
+				log.Info("No port specified in NTP target, using 514.")
 				ntpTarg = ntpTarg + ":514"
 			}
 		}
@@ -1236,7 +1243,7 @@ func main() {
 	for ix := 1; ix <= 10; ix++ {
 		err := setupRFHTTPStuff()
 		if err == nil {
-			log.Printf("INFO: Successfully set up Redfish transport.")
+			log.Info("Successfully set up Redfish transport.")
 			ok = true
 			break
 		}
@@ -1256,14 +1263,14 @@ func main() {
 	if hms_ca_uri != "" {
 		err = hms_certs.CAUpdateRegister(hms_ca_uri, caChangeCB)
 		if err != nil {
-			log.Printf("WARNING: Unable to register CA bundle watcher for URI: '%s': %v",
+			log.Warning("Unable to register CA bundle watcher for URI: '%s': %v",
 				hms_ca_uri, err)
-			log.Printf("   This means no updates when CA bundle is rolled.")
+			log.Printf("  This means no updates when CA bundle is rolled.")
 		} else {
-			log.Printf("INFO: Registered CA bundle watcher for URI: '%s'", hms_ca_uri)
+			log.Info("Registered CA bundle watcher for URI: '%s'", hms_ca_uri)
 		}
 	} else {
-		log.Printf("WARNING: No CA bundle URI specified, not watching for CA changes.")
+		log.Warning("No CA bundle URI specified, not watching for CA changes.")
 	}
 
 	/* Start up watch for HSM changes early, so we can loop over data */
@@ -1295,12 +1302,12 @@ func main() {
 	maxtime := 5 * time.Minute
 	waittime := basetime
 	for {
-		log.Printf("INFO: Sleeping %d seconds before refreshing data", waittime/time.Second)
+		log.Info("Sleeping %d seconds before refreshing data", waittime/time.Second)
 		time.Sleep(waittime)
 
 		cabinets, err := getSLSCabInfo()
 		if err != nil {
-			log.Printf("WARNING: Can't get cabinet list from SLS: %v\n",
+			log.Warning("Can't get cabinet list from SLS: %v\n",
 				err)
 			waittime += backoffTime
 			if waittime > maxtime {
@@ -1309,7 +1316,7 @@ func main() {
 			continue
 		}
 		if len(cabinets) == 0 {
-			log.Printf("INFO: No cabinets found in SLS.\n")
+			log.Info("No cabinets found in SLS.\n")
 		}
 
 		// List of chassis. We'll remove those we find in SLS from this
@@ -1321,34 +1328,34 @@ func main() {
 		rfClientLock.RLock()
 		activeEndpointsLock.Lock() // Take the lock so we can update!
 		for _, cabinet := range cabinets {
-			log.Printf("TRACE: Handling cabinet %s from SLS", cabinet.Xname)
+			log.Trace("Handling cabinet %s from SLS", cabinet.Xname)
 
 			// Retrieve chassis present in the cabinet
 			cabinetChassis, err := getSLSCabinetChassis(cabinet.Xname)
 			if err != nil {
-				log.Printf("INTERNAL ERROR, failed to query SLS for chassis of '%v': %v", cabinet.Xname, err)
+				log.Error("Failed to query SLS for chassis of '%v': %v", cabinet.Xname, err)
 				continue
 			}
 
 			if len(cabinetChassis) == 0 {
-				log.Printf("INFO: No chassis found for cabinet '%v' in SLS.", cabinet.Xname)
+				log.Info("No chassis found for cabinet '%v' in SLS.", cabinet.Xname)
 			}
 
 			for _, chassis := range cabinetChassis {
-				log.Printf("TRACE: Handling chassis %s from SLS", chassis.Xname)
+				log.Trace("Handling chassis %s from SLS", chassis.Xname)
 
 				if _, ok := activeChassis[chassis.Xname]; !ok {
-					log.Printf("TRACE: Chassis %s is new", chassis.Xname)
+					log.Trace("Chassis %s is new", chassis.Xname)
 					// Cabinet not present, need to set up and init everything
 					err := init_chassis(cabinet, chassis)
 					if err != nil {
-						log.Printf("Error initializing cabinet: %s", err)
+						log.Error("Failed to initialize cabinet: %s", err)
 						continue
 					}
 				} else {
 					// Else this cabinet is already present
 					// Take no action
-					log.Printf("TRACE: Chassis %s is not new", chassis.Xname)
+					log.Trace("Chassis %s is not new", chassis.Xname)
 				}
 
 				// No matter hat though, we need to remove it from oldCabList to account for finding it

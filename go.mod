@@ -13,6 +13,7 @@ require (
 	github.com/Cray-HPE/hms-smd v1.55.0
 	github.com/Cray-HPE/hms-xname v1.1.0
 	github.com/mitchellh/mapstructure v1.4.1
+	github.com/sirupsen/logrus v1.8.1
 )
 
 require (
@@ -31,7 +32,6 @@ require (
 	github.com/mitchellh/go-homedir v1.1.0 // indirect
 	github.com/pierrec/lz4 v2.4.1+incompatible // indirect
 	github.com/ryanuber/go-glob v1.0.0 // indirect
-	github.com/sirupsen/logrus v1.8.1 // indirect
 	golang.org/x/crypto v0.0.0-20200709230013-948cd5f35899 // indirect
 	golang.org/x/net v0.0.0-20200813134508-3edf25e44fcc // indirect
 	golang.org/x/sys v0.0.0-20220627191245-f75cf1eec38b // indirect
