@@ -852,31 +852,6 @@ func getEnvVars() {
 	__setenv_int("MEDS_HTTP_TIMEOUT", 1, &clientTimeout)
 }
 
-// func foo() {
-// 	// Retrieve chassis present in the cabinet
-// 	cabinetChassis, err := getSLSCabinetChassis(cabinet.Xname)
-// 	if err != nil {
-// 		return fmt.Errorf("INTERNAL ERROR, failed to query SLS for chassis of '%v': %v", cab.Xname, err)
-// 	}
-
-// 	var cabinetChassisList []int
-// 	for _, chassis := range cabinetChassis {
-// 		chassisXnameRaw := xnames.FromString(chassis.Xname)
-// 		if chassisXnameRaw == nil {
-// 			return fmt.Errorf("INTERNAL ERROR, unable to parse chassis xname '%v'", chassis.Xname)
-// 		}
-
-// 		chassisXname, ok := chassisXnameRaw.(xnames.Chassis)
-// 		if !ok {
-// 			return fmt.Errorf("INTERNAL ERROR, chassis xname strcture for '%v' is of type '%T' expected 'xnames.Chassis'", chassis.Xname, chassis)
-// 		}
-
-// 		cabinetChassisList = append(cabinetChassisList, chassisXname.Chassis)
-// 	}
-
-// 	log.Printf("INFO: Cabinet %v has the following chassis: %v", cab.Xname, cabinetChassisList)
-// }
-
 func init_chassis(cabinet, chassis sls_common.GenericHardware) error {
 	//
 	// Parse the chassis xname

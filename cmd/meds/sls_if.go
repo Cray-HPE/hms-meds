@@ -35,25 +35,6 @@ import (
 	"github.com/Cray-HPE/hms-xname/xnametypes"
 )
 
-// Generic Hardware data.  NOTE: this is currently replicated.
-// It may move to a common package someday, but for now we'll
-// make our own copy and data types.
-
-// type HMSStringType string
-// type CabinetType string
-
-// type GenericHardware struct {
-// 	Parent             string             `json:"Parent"`
-// 	Children           []string           `json:"Children,omitempty"`
-// 	Xname              string             `json:"Xname"`
-// 	Type               HMSStringType      `json:"Type"`
-// 	Class              CabinetType        `json:"Class"`
-// 	TypeString         xnametypes.HMSType `json:"TypeString"`
-// 	ExtraPropertiesRaw interface{}        `json:"ExtraProperties,omitempty"`
-// }
-
-// type GenericHardwareArray []GenericHardware
-
 // Query SLS for relevant cabinet info.  We need the cabinet XName,
 // cabinet class (mountain), MACPrefix, IPv4 CIDR, IPv6 prefix.
 // If --sls=xxxx or MEDS_SLS=xxx was not specified, then return
