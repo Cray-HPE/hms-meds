@@ -5,6 +5,11 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.20.0] - 2022-07-12
+
+### Changed
+
+- CASMHMS-5567: Allow MEDS to support variable number of Chassis within a Cabinet. Instead of always assuming 8 chassis in a cabinet MEDS will now look to SLS for the chassis present in the system.
 
 ## [1.19.0] - 2022-07-06
 
