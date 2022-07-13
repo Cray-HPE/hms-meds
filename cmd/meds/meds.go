@@ -1,25 +1,27 @@
 /*
- * MIT License
  *
- * (C) Copyright [2019-2022] Hewlett Packard Enterprise Development LP
+ *  MIT License
  *
- * Permission is hereby granted, free of charge, to any person obtaining a
- * copy of this software and associated documentation files (the "Software"),
- * to deal in the Software without restriction, including without limitation
- * the rights to use, copy, modify, merge, publish, distribute, sublicense,
- * and/or sell copies of the Software, and to permit persons to whom the
- * Software is furnished to do so, subject to the following conditions:
+ *  (C) Copyright 2019-2022 Hewlett Packard Enterprise Development LP
  *
- * The above copyright notice and this permission notice shall be included
- * in all copies or substantial portions of the Software.
+ *  Permission is hereby granted, free of charge, to any person obtaining a
+ *  copy of this software and associated documentation files (the "Software"),
+ *  to deal in the Software without restriction, including without limitation
+ *  the rights to use, copy, modify, merge, publish, distribute, sublicense,
+ *  and/or sell copies of the Software, and to permit persons to whom the
+ *  Software is furnished to do so, subject to the following conditions:
  *
- * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
- * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
- * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL
- * THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR
- * OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE,
- * ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR
- * OTHER DEALINGS IN THE SOFTWARE.
+ *  The above copyright notice and this permission notice shall be included
+ *  in all copies or substantial portions of the Software.
+ *
+ *  THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ *  IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ *  FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL
+ *  THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR
+ *  OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE,
+ *  ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR
+ *  OTHER DEALINGS IN THE SOFTWARE.
+ *
  */
 
 package main
@@ -41,10 +43,12 @@ import (
 	"sync"
 	"time"
 
-	base "github.com/Cray-HPE/hms-base"
+	base "github.com/Cray-HPE/hms-base/v2"
 	dns_dhcp "github.com/Cray-HPE/hms-dns-dhcp/pkg"
 	sls_common "github.com/Cray-HPE/hms-sls/pkg/sls-common"
 	"github.com/Cray-HPE/hms-smd/pkg/sm"
+	"github.com/Cray-HPE/hms-xname/xnames"
+	"github.com/Cray-HPE/hms-xname/xnametypes"
 
 	"github.com/Cray-HPE/hms-meds/internal/model"
 
@@ -101,17 +105,6 @@ type NetEndpoint struct {
 	QuitChannel chan struct{}
 }
 
-type RackList []int
-type RackIPList []string
-
-type NetEndpointList struct {
-	ec []*NetEndpoint
-	cc []*NetEndpoint
-	nc []*NetEndpoint
-	sc []*NetEndpoint
-	nd []*NetEndpoint
-}
-
 type EndpointType int
 
 const (
@@ -124,13 +117,6 @@ const (
 type HSMEndpointPresence int
 
 // Used only for passing rack info to initial discovery func
-
-type RackInfo struct {
-	rackList   RackList
-	rackIPList RackIPList
-	ip6prefix  string
-	macprefix  string
-}
 
 const (
 	PRESENCE_PRESENT = iota
@@ -152,13 +138,10 @@ var HSMEndpointPresenceToString map[HSMEndpointPresence]string = map[HSMEndpoint
 var serviceName string
 var hsm string
 var sls string
-var printNodesUnder bool = false
-var printNodes *bool = &printNodesUnder
 var defUser string
 var defPass string
 var defSSHKey string
 var hms_ca_uri string
-var logInsecFailover = true
 var clientTimeout = 5
 var maxInitialHSMSyncAttempts int
 
@@ -187,9 +170,9 @@ var startupVariableWaitMax = checkupFixedWait // In seconds - the maximum each c
 var credStorage *model.MedsCredStore
 
 // Variables for tracking what's around/available
-// List of net endpoints by the cabinet they belong to
-// We'll need this for now, because we have to add/remove endpoints based on cabinet presense
-var activeCabinets map[string][]*NetEndpoint = make(map[string][]*NetEndpoint)
+// List of net endpoints by the chassis they belong to
+// We'll need this for now, because we have to add/remove endpoints based on chassis presence
+var activeChassis map[string][]*NetEndpoint = make(map[string][]*NetEndpoint)
 
 // A full list of endpoints with no cabinet reference
 var activeEndpoints map[string]*NetEndpoint = make(map[string]*NetEndpoint)
@@ -201,39 +184,9 @@ var hsmRedfishEndpointsCacheLock sync.Mutex
 // Lock for modifying the above two structures
 var activeEndpointsLock sync.Mutex
 
-// Implements the flag.Value String() method
-func (r *RackList) String() string {
-	var rackText string
-	for _, rackNumber := range *r {
-		rackText += ", " + fmt.Sprintf("%d", rackNumber)
-	}
-	return rackText
-}
-
-// Set implements the flag.Value Set() method
-func (r *RackList) Set(val string) error {
-	i, err := strconv.Atoi(val)
-	if err != nil {
-		return err
-	}
-	*r = append(*r, i)
-	return nil
-}
-
-// Implements the flag.Value String() method
-func (r *RackIPList) String() string {
-	var rackText string
-	for i := range *r {
-		rackText += ", " + string((*r)[i])
-	}
-	return rackText
-}
-
-// Set implements the flag.Value Set() method
-func (r *RackIPList) Set(val string) error {
-	*r = append(*r, val)
-	return nil
-}
+//
+// MAC Address generation functions
+//
 
 func GenerateMAC(mp string, rack int, chassis int, slt int, idx int) string {
 	return fmt.Sprintf("%s:%02X:%02X:%02X:%02X:%02X", mp,
@@ -312,10 +265,10 @@ func GenerateSwitchCardEndpoints(macprefix string, rack int, chassis int) []*Net
 }
 
 //
-func GenerateChassisEndpoints(macprefix string, rack int) []*NetEndpoint {
+func GenerateChassisEndpoints(macprefix string, rack int, chassisList []int) []*NetEndpoint {
 	endpoints := make([]*NetEndpoint, 0)
 
-	for chassis := 0; chassis < MTN_CHASSIS_COUNT; chassis++ {
+	for _, chassis := range chassisList {
 		cc := new(NetEndpoint)
 		cc.name = fmt.Sprintf("x%dc%db0", rack, chassis)
 		cc.mac = GenerateMACcC(macprefix, rack, chassis)
@@ -901,18 +854,30 @@ func getEnvVars() {
 	__setenv_int("MEDS_HTTP_TIMEOUT", 1, &clientTimeout)
 }
 
-func init_cabinet(cab GenericHardware) error {
-	endpoints := make([]*NetEndpoint, 0)
-
-	rackNum, rerr := strconv.Atoi(cab.Xname[1:])
-	if rerr != nil {
-		err := fmt.Errorf("INTERNAL ERROR, can't convert Xname '%s' to int: %v",
-			cab.Xname, rerr)
-		return err
+func init_chassis(cabinet, chassis sls_common.GenericHardware) error {
+	//
+	// Parse the chassis xname
+	//
+	chassisXnameRaw := xnames.FromString(chassis.Xname)
+	if chassisXnameRaw == nil {
+		return fmt.Errorf("INTERNAL ERROR, unable to parse chassis xname '%v'", chassis.Xname)
 	}
 
+	chassisXname, ok := chassisXnameRaw.(xnames.Chassis)
+	if !ok {
+		return fmt.Errorf("INTERNAL ERROR, chassis xname strcture for '%v' is of type '%T' expected 'xnames.Chassis'", chassis.Xname, chassis)
+	}
+
+	if chassisXname.Parent().String() != cabinet.Xname {
+		return fmt.Errorf("unable to initialize chassis, provided cabinet (%v) is not the parent of provided chassis (%v)",
+			cabinet.Xname, chassis.Parent)
+	}
+
+	//
+	// Extract cabinet specific overrides from SLS
+	//
 	var cabExtra sls_common.ComptypeCabinet
-	ce, baerr := json.Marshal(cab.ExtraPropertiesRaw)
+	ce, baerr := json.Marshal(cabinet.ExtraPropertiesRaw)
 	if baerr != nil {
 		err := fmt.Errorf("INTERNAL ERROR, can't marshal cab props: %v",
 			baerr)
@@ -931,7 +896,7 @@ func init_cabinet(cab GenericHardware) error {
 	// Make sure the map checks out before reaching into it to avoid panic.
 	hmnNetwork, networkExists := cabExtra.Networks["cn"]["HMN"]
 	if !networkExists {
-		err := fmt.Errorf("cabinet doesn't have HMN network for compute nodes: %+v\n", cabExtra)
+		err := fmt.Errorf("cabinet doesn't have HMN network for compute nodes: %+v", cabExtra)
 		return err
 	}
 
@@ -943,8 +908,11 @@ func init_cabinet(cab GenericHardware) error {
 		macPrefix = MAC_PREFIX
 	}
 
-	endpoints = append(endpoints, GenerateEnvironmentalControllerEndpoints(rackNum)...)
-	endpoints = append(endpoints, GenerateChassisEndpoints(macPrefix, rackNum)...)
+	// Generate the list of endpoints that MEDS should look for contained within in this chassis.
+	endpoints := make([]*NetEndpoint, 0)
+	// The CECs haven't ever been populated by HSM, since we don't generate an algorthmic MAC address for them.
+	// endpoints = append(endpoints, GenerateEnvironmentalControllerEndpoints(rackNum)...)
+	endpoints = append(endpoints, GenerateChassisEndpoints(macPrefix, chassisXname.Cabinet, []int{chassisXname.Chassis})...)
 
 	// Determine what ethernet interfaces need to be get added or updated.
 	hsmEthernetInterfaces, err := dhcpdnsClient.GetAllEthernetInterfaces()
@@ -957,7 +925,7 @@ func init_cabinet(cab GenericHardware) error {
 		hsmEthernetInterfacesMap[ei.ID] = ei
 	}
 
-	// Generate MAC addresses for hardware in this cabinet
+	// Generate MAC addresses for hardware in this chassis
 	for _, v := range endpoints {
 		normalizedMAC := strings.ToLower(strings.ReplaceAll(v.mac, ":", ""))
 
@@ -1010,7 +978,7 @@ func init_cabinet(cab GenericHardware) error {
 		}
 	}
 
-	log.Printf("INFO: Finished adding EthernetInterfaces to HSM for cabinet %s", cab.Xname)
+	log.Printf("INFO: Finished adding EthernetInterfaces to HSM for chassis %s", chassis.Xname)
 
 	// Verify that the FQDN/Hostname for RedfishEndpoints in HSM are what we expect
 	verifyCabinetRedfishEndpoints(endpoints)
@@ -1028,7 +996,7 @@ func init_cabinet(cab GenericHardware) error {
 		hsmRedfishEndpointsCacheLock.Unlock()
 
 		// Now add endpoints to activeCabinets and
-		activeCabinets[cab.Xname] = append(activeCabinets[cab.Xname], v)
+		activeChassis[chassis.Xname] = append(activeChassis[chassis.Xname], v)
 		activeEndpoints[v.name] = v
 
 		// Start hardware polling thread
@@ -1050,7 +1018,7 @@ func verifyCabinetRedfishEndpoints(endpoints []*NetEndpoint) error {
 
 			// Verify that ChassisBMC's have the correct FQDN/hostname values set
 			// TODO For authoritative DNS the following check should be changed to handle the FQDN of the system.
-			if base.GetHMSType(rfEP.ID) == base.ChassisBMC && rfEP.ID != rfEP.FQDN {
+			if xnametypes.GetHMSType(rfEP.ID) == xnametypes.ChassisBMC && rfEP.ID != rfEP.FQDN {
 				fqdn = rfEP.ID
 				hostname = rfEP.ID
 				log.Printf("Found ChassisBMC RedfishEndpoint with ID (%s) and FQDN (%s) PATCHING HSM to use FQDN (%s) and Hostname (%s)\n",
@@ -1078,16 +1046,16 @@ func verifyCabinetRedfishEndpoints(endpoints []*NetEndpoint) error {
 	return nil
 }
 
-func deinit_cab(k string) {
-	// Iterate through the endpoints in the cabinet and stop them
-	for endp := range activeCabinets[k] {
-		log.Printf("TRACE: quitting %s", activeCabinets[k][endp].name)
-		activeCabinets[k][endp].QuitChannel <- struct{}{}
-		delete(activeEndpoints, activeCabinets[k][endp].name)
+func deinit_chassis(k string) {
+	// Iterate through the endpoints in the chassis and stop them
+	for endp := range activeChassis[k] {
+		log.Printf("TRACE: quitting %s", activeChassis[k][endp].name)
+		activeChassis[k][endp].QuitChannel <- struct{}{}
+		delete(activeEndpoints, activeChassis[k][endp].name)
 	}
 
 	// Remove from active cabinets
-	delete(activeCabinets, k)
+	delete(activeChassis, k)
 }
 
 // This function is used to set up an HTTP validated/non-validated client
@@ -1138,8 +1106,6 @@ func main() {
 	var credentialsVault string
 	var err error
 
-	printNodes = flag.Bool("print-nodes", false,
-		"Print node records, otherwise print nC/sC/cC")
 	flag.StringVar(&defUser, "default-username", "",
 		"Default username to use when communicating with targets")
 	flag.StringVar(&defPass, "default-password", "",
@@ -1205,7 +1171,7 @@ func main() {
 			log.Printf("Using hostname anyway.")
 		} else {
 			syslogTarg = ip[0].String()
-			if (len(toks) > 1) {
+			if len(toks) > 1 {
 				syslogTarg = syslogTarg + ":" + toks[1]
 			} else {
 				log.Printf("INFO: No port specified in syslog target, using 123.")
@@ -1221,7 +1187,7 @@ func main() {
 			log.Printf("Using hostname anyway.")
 		} else {
 			ntpTarg = ip[0].String()
-			if (len(toks) > 1) {
+			if len(toks) > 1 {
 				ntpTarg = ntpTarg + ":" + toks[1]
 			} else {
 				log.Printf("INFO: No port specified in NTP target, using 514.")
@@ -1323,38 +1289,53 @@ func main() {
 			log.Printf("INFO: No cabinets found in SLS.\n")
 		}
 
-		// List of cabinets. We'll remove those we find in SLS from this
-		oldCabList := make(map[string]bool, 0)
-		for k := range activeCabinets {
-			oldCabList[k] = true
+		// List of chassis. We'll remove those we find in SLS from this
+		oldChassisList := make(map[string]bool, 0)
+		for k := range activeChassis {
+			oldChassisList[k] = true
 		}
 
 		rfClientLock.RLock()
 		activeEndpointsLock.Lock() // Take the lock so we can update!
-		for _, cab := range cabinets {
-			log.Printf("TRACE: Handling cabinet %s from SLS", cab.Xname)
-			if _, ok := activeCabinets[cab.Xname]; !ok {
-				log.Printf("TRACE: Cabinet %s is new", cab.Xname)
-				// Cabinet not present, need to set up and init everything
-				err := init_cabinet(cab)
-				if err != nil {
-					log.Printf("Error initializing cabinet: %s", err)
-					continue
-				}
-			} else {
-				// Else this cabinet is already present
-				// Take no action
-				log.Printf("TRACE: Cabinet %s is not new", cab.Xname)
+		for _, cabinet := range cabinets {
+			log.Printf("TRACE: Handling cabinet %s from SLS", cabinet.Xname)
+
+			// Retrieve chassis present in the cabinet
+			cabinetChassis, err := getSLSCabinetChassis(cabinet.Xname)
+			if err != nil {
+				log.Printf("INTERNAL ERROR, failed to query SLS for chassis of '%v': %v", cabinet.Xname, err)
+				continue
 			}
 
-			// No matter hat though, we need to remove it from oldCabList to account for finding it
-			delete(oldCabList, cab.Xname)
+			if len(cabinetChassis) == 0 {
+				log.Printf("INFO: No chassis found for cabinet '%v' in SLS.", cabinet.Xname)
+			}
 
+			for _, chassis := range cabinetChassis {
+				log.Printf("TRACE: Handling chassis %s from SLS", chassis.Xname)
+
+				if _, ok := activeChassis[chassis.Xname]; !ok {
+					log.Printf("TRACE: Chassis %s is new", chassis.Xname)
+					// Cabinet not present, need to set up and init everything
+					err := init_chassis(cabinet, chassis)
+					if err != nil {
+						log.Printf("Error initializing cabinet: %s", err)
+						continue
+					}
+				} else {
+					// Else this cabinet is already present
+					// Take no action
+					log.Printf("TRACE: Chassis %s is not new", chassis.Xname)
+				}
+
+				// No matter hat though, we need to remove it from oldCabList to account for finding it
+				delete(oldChassisList, chassis.Xname)
+			}
 		}
 
-		// Anything left in oldCabList disappeared.
-		for k := range oldCabList {
-			deinit_cab(k)
+		// Anything left in oldChassisList disappeared.
+		for k := range oldChassisList {
+			deinit_chassis(k)
 		}
 
 		activeEndpointsLock.Unlock()

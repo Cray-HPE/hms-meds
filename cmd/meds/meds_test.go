@@ -37,7 +37,7 @@ import (
 	"testing"
 	"time"
 
-	base "github.com/Cray-HPE/hms-base"
+	base "github.com/Cray-HPE/hms-base/v2"
 	"github.com/Cray-HPE/hms-certs/pkg/hms_certs"
 )
 

@@ -29,7 +29,7 @@ services:
     environment:
       - VAULT_ADDR=http://vault:8200
       - VAULT_TOKEN=hms
-      - KV_STORES=hms-creds,reds-creds,secret
+      - KV_STORES=secret
     depends_on:
       - vault
     networks:
@@ -71,7 +71,7 @@ services:
       - CRAY_VAULT_JWT_FILE=configs/token
       - VAULT_ADDR=http://vault:8200
       - VAULT_TOKEN=hms
-      - VAULT_KEYPATH=hms-creds
+      - VAULT_KEYPATH=secret/hms-creds
     ports:
       - "8376:8376"
     depends_on:
@@ -88,7 +88,12 @@ services:
       curl  -d '{\"Xname\":\"x1000\",\"Type\":\"comptype_cabinet\",\"Class\":\"Mountain\",\"TypeString\":\"Cabinet\",\"ExtraProperties\":{\"Networks\":{\"cn\":{
         \"HMN\":{\"CIDR\":\"10.104.0.1/22\",\"Gateway\":\"10.104.3.254\",\"VLan\":3001},
         \"NMN\":{\"CIDR\":\"10.100.0.1/22\",\"Gateway\":\"10.100.3.254\",\"VLan\":2001}},
-        \"ncn\":{}}}}' http://cray-sls:8376/v1/hardware"
+        \"ncn\":{}}}}' -X PUT http://cray-sls:8376/v1/hardware/x1000 &&
+
+      for chassis in x1000c0 x1000c1 x1000c2 x1000c3 x1000c4 x1000c5 x1000c6 x1000c7; do
+        echo \"Creating chassis $$chassis\"
+        curl -d $$(jq --arg XNAME $${chassis} -nc '{Xname: $$XNAME, Class: \"Mountain\"}') -X PUT http://cray-sls:8376/v1/hardware/$${chassis}
+      done"
     environment:
       - POSTGRES_HOST=postgres
       - POSTGRES_PORT=5432
@@ -141,7 +146,7 @@ services:
       - CRAY_VAULT_JWT_FILE=configs/token
       - VAULT_ADDR=http://vault:8200
       - VAULT_TOKEN=hms
-      - VAULT_KEYPATH=hms-creds
+      - VAULT_KEYPATH=secret/hms-creds
       - SMD_WVAULT=true
       - SMD_RVAULT=true
     hostname: cray-smd
@@ -160,26 +165,26 @@ services:
   #
   # MEDS
   #
-  meds-init:
+  meds-vault-loader:
     build:
       context: .
-    command: ["vault_loader"]
     environment:
-      - HSM_URL=http://cray-smd:27779/hsm/v2
-      - MEDS_OPTS=""
-      - CRAY_VAULT_AUTH_PATH=auth/token/create
-      - CRAY_VAULT_ROLE_FILE=configs/namespace
-      - CRAY_VAULT_JWT_FILE=configs/token
-      - VAULT_ADDR=http://vault:8200
-      - VAULT_TOKEN=hms
-      - VAULT_KEYPATH=hms-creds
-      - VAULT_SKIP_VERIFY=true
-      - MEDS_NTP_TARG=""
-      - MEDS_SYSLOG_TARG=""
-      - MEDS_NP_RF_URL="/redfish/v1/Managers/BMC/NetworkProtocol"
-      - MEDS_ROOT_SSH_KEY=""
+      HSM_URL: http://cray-smd:27779/hsm/v2
+      CRAY_VAULT_AUTH_PATH: auth/token/create
+      CRAY_VAULT_ROLE_FILE: configs/namespace
+      CRAY_VAULT_JWT_FILE: configs/token
+      VAULT_ADDR: http://vault:8200
+      VAULT_TOKEN: hms
+      VAULT_KEYPATH: secret/hms-creds
+      VAULT_REDFISH_DEFAULTS: '{"Username": "root", "Password": "root_password"}'
+    command: vault_loader
+    volumes: 
+      - ./configs:/configs
+    depends_on:
+      - vault-kv-enabler
     networks:
       - meds
+  
   meds:
     build:
       context: .
@@ -191,7 +196,7 @@ services:
       - CRAY_VAULT_JWT_FILE=configs/token
       - VAULT_ADDR=http://vault:8200
       - VAULT_TOKEN=hms
-      - VAULT_KEYPATH=hms-creds
+      - VAULT_KEYPATH=hms-creds # MEDS has a hardcode to prepend secret/ to this path.
       - VAULT_SKIP_VERIFY=true
 
       - MEDS_SYSLOG_TARG=localhost:514
