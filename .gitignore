@@ -3,3 +3,11 @@ go/pkg
 kubernetes/.packaged/
 kubernetes/cray-hms-meds/helm
 .idea/
+
+# Prevent certificates from getting checked in
+*.ca
+*.cer
+*.crt
+*.csr
+*.key
+*.pem
