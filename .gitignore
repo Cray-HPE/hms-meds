@@ -3,6 +3,7 @@ go/pkg
 kubernetes/.packaged/
 kubernetes/cray-hms-meds/helm
 .idea/
+*.swp
 
 # Prevent certificates from getting checked in
 *.ca

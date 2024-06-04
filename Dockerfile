@@ -62,6 +62,7 @@ ENV VAULT_ADDR="http://cray-vault.vault:8200"
 ENV VAULT_SKIP_VERIFY="true"
 
 # These will be seen directly by MEDS, bypassing the cmdline
+ENV MEDS_CONFIGURE_NTP="false"
 ENV MEDS_NTP_TARG=""
 ENV MEDS_SYSLOG_TARG=""
 ENV MEDS_NP_RF_URL="/redfish/v1/Managers/BMC/NetworkProtocol"

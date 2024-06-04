@@ -148,6 +148,7 @@ var maxInitialHSMSyncAttempts int
 // The HSM Credentials store
 var hcs *compcreds.CompCredStore
 var syslogTarg, ntpTarg string
+var configureNtp bool
 var syslogTargUseIP, ntpTargUseIP bool
 var smnTimeoutSecs int = 10
 var redfishNPSuffix string
@@ -207,13 +208,15 @@ func GenerateMACcC(mp string, rack int, chassis int) string {
 }
 
 // GenerateEnvironmentalControllerEndpoints generates the Environmental
-//  Controller (eC) entries for a given rack.
+//
+//	Controller (eC) entries for a given rack.
+//
 // Parameters:
 // - ip6prefix (string): The IPv6 address prefix to use.
 // - rack (int): The number of the rack to generate the Env
 // Returns:
-// - []NetEndpoint: a slice of NetEndpoints representing the eCs available
-//   in this rack
+//   - []NetEndpoint: a slice of NetEndpoints representing the eCs available
+//     in this rack
 func GenerateEnvironmentalControllerEndpoints(rack int) []*NetEndpoint {
 	// eC is a special snowflake with respect to address assignment.
 	ret := make([]*NetEndpoint, 0)
@@ -264,7 +267,6 @@ func GenerateSwitchCardEndpoints(macprefix string, rack int, chassis int) []*Net
 	return endpoints
 }
 
-//
 func GenerateChassisEndpoints(macprefix string, rack int, chassisList []int) []*NetEndpoint {
 	endpoints := make([]*NetEndpoint, 0)
 
@@ -778,6 +780,11 @@ func getEnvVars() {
 	__setenv_int("MEDS_DEBUG", 0, &debugLevel)
 	__setenv_int("MEDS_SMN_TIMEOUT", 1, &smnTimeoutSecs)
 
+	envstr = os.Getenv("MEDS_CONFIGURE_NTP")
+	configureNtp = false
+	if envstr != "" {
+		configureNtp = envstr == "true"
+	}
 	envstr = os.Getenv("MEDS_NTP_TARG")
 	if envstr != "" {
 		ntpTarg = envstr
@@ -1086,7 +1093,11 @@ func setupRFHTTPStuff() error {
 
 	var nwp bmc_nwprotocol.NWPData
 	nwp.SyslogSpec = syslogTarg
-	nwp.NTPSpec = ntpTarg
+	if configureNtp {
+		nwp.NTPSpec = ntpTarg
+	} else {
+		nwp.NTPSpec = ""
+	}
 	nwp.CAChainURI = hms_ca_uri
 	rfNWPStatic, err = bmc_nwprotocol.InitInstance(nwp, redfishNPSuffix, serviceName)
 	if err != nil {
@@ -1197,9 +1208,14 @@ func main() {
 	}
 
 	nwp.SyslogSpec = syslogTarg
-	nwp.NTPSpec = ntpTarg
+	if configureNtp {
+		nwp.NTPSpec = ntpTarg
+	} else {
+		nwp.NTPSpec = ""
+	}
 	log.Printf("Using syslog server: '%s'", syslogTarg)
 	log.Printf("Using NTP server: '%s'", ntpTarg)
+	log.Printf("Configure NTP server on nodes: '%v'", configureNtp)
 
 	rfNWPStatic, err = bmc_nwprotocol.InitInstance(nwp, redfishNPSuffix, serviceName)
 	if err != nil {
