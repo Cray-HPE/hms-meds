@@ -1,6 +1,6 @@
 module github.com/Cray-HPE/hms-meds
 
-go 1.18
+go 1.23
 
 require (
 	github.com/Cray-HPE/hms-base/v2 v2.0.1
