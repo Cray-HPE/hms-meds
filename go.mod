@@ -3,15 +3,15 @@ module github.com/Cray-HPE/hms-meds
 go 1.23
 
 require (
-	github.com/Cray-HPE/hms-base/v2 v2.0.1
+	github.com/Cray-HPE/hms-base/v2 v2.1.0
 	github.com/Cray-HPE/hms-bmc-networkprotocol v1.5.3
-	github.com/Cray-HPE/hms-certs v1.3.3
-	github.com/Cray-HPE/hms-compcredentials v1.11.3
+	github.com/Cray-HPE/hms-certs v1.5.0
+	github.com/Cray-HPE/hms-compcredentials v1.12.0
 	github.com/Cray-HPE/hms-dns-dhcp v1.6.0
-	github.com/Cray-HPE/hms-securestorage v1.13.0
+	github.com/Cray-HPE/hms-securestorage v1.14.0
 	github.com/Cray-HPE/hms-sls v1.20.0
 	github.com/Cray-HPE/hms-smd v1.55.0
-	github.com/Cray-HPE/hms-xname v1.1.0
+	github.com/Cray-HPE/hms-xname v1.4.0
 	github.com/mitchellh/mapstructure v1.4.1
 )
 
