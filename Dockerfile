@@ -45,8 +45,8 @@ FROM base AS builder
 
 # Now build
 RUN set -ex \
-    && go build -o /usr/local/bin/meds github.com/Cray-HPE/hms-meds/cmd/meds \
-    && go build -o /usr/local/bin/vault_loader github.com/Cray-HPE/hms-meds/cmd/vault_loader
+    && go build -v -o /usr/local/bin/meds github.com/Cray-HPE/hms-meds/cmd/meds \
+    && go build -v -o /usr/local/bin/vault_loader github.com/Cray-HPE/hms-meds/cmd/vault_loader
 
 
 ### Final Stage ###
