@@ -4,10 +4,10 @@ go 1.23
 
 require (
 	github.com/Cray-HPE/hms-base/v2 v2.1.0
-	github.com/Cray-HPE/hms-bmc-networkprotocol v1.5.3
+	github.com/Cray-HPE/hms-bmc-networkprotocol v1.6.0
 	github.com/Cray-HPE/hms-certs v1.5.0
 	github.com/Cray-HPE/hms-compcredentials v1.12.0
-	github.com/Cray-HPE/hms-dns-dhcp v1.6.0
+	github.com/Cray-HPE/hms-dns-dhcp v1.7.0
 	github.com/Cray-HPE/hms-securestorage v1.14.0
 	github.com/Cray-HPE/hms-sls v1.20.0
 	github.com/Cray-HPE/hms-smd v1.55.0
