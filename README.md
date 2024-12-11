@@ -53,13 +53,13 @@ This is a list of work that is either known to be coming or that should get done
 
 ## Testing with Docker Compose
 
-A `docker-compose` environment can be set up by running:
+A `docker compose` environment can be set up by running:
 
-`docker-compose -f docker-compose.developer.full.yaml up -d --build`
+`docker compose -f docker compose.developer.full.yaml up -d --build`
 
 and torn down with:
 
-`docker-compose -f docker-compose.developer.full.yaml down --remove-orphans`
+`docker compose -f docker compose.developer.full.yaml down --remove-orphans`
 
 This will set up an environment with one dummy endpoint, named `x1000c1s1b0`.  It will *not* automatically be in SLS, you will have to add it using a command like:
 

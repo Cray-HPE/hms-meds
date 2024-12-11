@@ -22,7 +22,7 @@
 # Dockerfile for building hms-meds.
 
 ## Prepare Builder ##
-FROM artifactory.algol60.net/docker.io/library/golang:1.18-alpine AS build-base
+FROM artifactory.algol60.net/docker.io/library/golang:1.23-alpine AS build-base
 
 RUN set -ex \
     && apk -U upgrade \
@@ -45,8 +45,8 @@ FROM base AS builder
 
 # Now build
 RUN set -ex \
-    && go build -i -o /usr/local/bin/meds github.com/Cray-HPE/hms-meds/cmd/meds \
-    && go build -i -o /usr/local/bin/vault_loader github.com/Cray-HPE/hms-meds/cmd/vault_loader
+    && go build -v -o /usr/local/bin/meds github.com/Cray-HPE/hms-meds/cmd/meds \
+    && go build -v -o /usr/local/bin/vault_loader github.com/Cray-HPE/hms-meds/cmd/vault_loader
 
 
 ### Final Stage ###
