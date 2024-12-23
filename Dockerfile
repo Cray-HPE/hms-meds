@@ -1,6 +1,6 @@
 #  MIT License
 #
-#  (C) Copyright [2019-2022] Hewlett Packard Enterprise Development LP
+#  (C) Copyright [2019-2022,2025] Hewlett Packard Enterprise Development LP
 #
 #  Permission is hereby granted, free of charge, to any person obtaining a
 #  copy of this software and associated documentation files (the "Software"),
@@ -43,11 +43,19 @@ COPY vendor $GOPATH/src/github.com/Cray-HPE/hms-meds/vendor
 ### Builder Stage ###
 FROM base AS builder
 
-# Now build
-RUN set -ex \
-    && go build -v -o /usr/local/bin/meds github.com/Cray-HPE/hms-meds/cmd/meds \
-    && go build -v -o /usr/local/bin/vault_loader github.com/Cray-HPE/hms-meds/cmd/vault_loader
+# Set profiling to disabled by default
+ARG ENABLE_PPROF=true
 
+# Conditionally build with the pprof tag if profiling is enabled
+RUN if [ "$ENABLE_PPROF" = "true" ]; then \
+        set -ex \
+            && go build -v -tags pprof -o /usr/local/bin/meds github.com/Cray-HPE/hms-meds/cmd/meds \
+            && go build -v -tags pprof -o /usr/local/bin/vault_loader github.com/Cray-HPE/hms-meds/cmd/vault_loader; \
+    else \
+        set -ex \
+            && go build -v -o /usr/local/bin/meds github.com/Cray-HPE/hms-meds/cmd/meds \
+            && go build -v -o /usr/local/bin/vault_loader github.com/Cray-HPE/hms-meds/cmd/vault_loader; \
+    fi
 
 ### Final Stage ###
 FROM artifactory.algol60.net/docker.io/alpine:3.15
