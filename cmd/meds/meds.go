@@ -2,7 +2,7 @@
  *
  *  MIT License
  *
- *  (C) Copyright 2019-2022 Hewlett Packard Enterprise Development LP
+ *  (C) Copyright 2019-2022,2025 Hewlett Packard Enterprise Development LP
  *
  *  Permission is hereby granted, free of charge, to any person obtaining a
  *  copy of this software and associated documentation files (the "Software"),
@@ -821,27 +821,6 @@ func getEnvVars() {
 	envstr = os.Getenv("MEDS_CA_URI")
 	if envstr != "" {
 		hms_ca_uri = envstr
-	}
-	//These are for debugging/testing
-	envstr = os.Getenv("MEDS_CA_PKI_URL")
-	if envstr != "" {
-		log.Printf("INFO: Using CA PKI URL: '%s'", envstr)
-		hms_certs.ConfigParams.VaultCAUrl = envstr
-	}
-	envstr = os.Getenv("MEDS_VAULT_PKI_URL")
-	if envstr != "" {
-		log.Printf("INFO: Using VAULT PKI URL: '%s'", envstr)
-		hms_certs.ConfigParams.VaultPKIUrl = envstr
-	}
-	envstr = os.Getenv("MEDS_VAULT_JWT_FILE")
-	if envstr != "" {
-		log.Printf("INFO: Using Vault JWT file: '%s'", envstr)
-		hms_certs.ConfigParams.VaultJWTFile = envstr
-	}
-	envstr = os.Getenv("MEDS_K8S_AUTH_URL")
-	if envstr != "" {
-		log.Printf("INFO: Using K8S AUTH URL: '%s'", envstr)
-		hms_certs.ConfigParams.K8SAuthUrl = envstr
 	}
 	envstr = os.Getenv("MEDS_LOG_INSECURE_FAILOVER")
 	if envstr != "" {
