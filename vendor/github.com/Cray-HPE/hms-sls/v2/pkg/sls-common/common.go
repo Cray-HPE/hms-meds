@@ -74,6 +74,7 @@ Valid values for NetworkType
 */
 const (
 	NetworkTypeSS10       NetworkType = "slingshot10"
+	NetworkTypeSS11       NetworkType = "slingshot11"
 	NetworkTypeCassini    NetworkType = "cassini"
 	NetworkTypeEthernet   NetworkType = "ethernet"
 	NetworkTypeOPA        NetworkType = "opa"
@@ -92,7 +93,6 @@ func (hts HMSStringType) String() string {
 }
 
 /*
-
  */
 const (
 	CDU                      HMSStringType = "comptype_cdu"                   // dD
@@ -117,6 +117,7 @@ const (
 	NodeEnclosure      HMSStringType = "comptype_node_enclosure"          // xXcCsSeE
 	NodePowerConnector HMSStringType = "comptype_compmod_power_connector" // xXcCsSvV
 	Node               HMSStringType = "comptype_node"                    // xXcCsSbBnN
+	VirtualNode        HMSStringType = "comptype_virtual_node"            // xXcCsSbBnNvV
 	Processor          HMSStringType = "comptype_node_processor"          // xXcCsSbBnNpP
 	NodeNIC            HMSStringType = "comptype_node_nic"                // xXcCsSbBnNiI
 	NodeHsnNIC         HMSStringType = "comptype_node_hsn_nic"            // xXcCsSbBnNhH
@@ -298,6 +299,11 @@ var hmsTypeHMSStringTypeTable = map[string]hmsTypeConverter{
 		"node",
 		xnametypes.Node,
 		Node,
+	},
+	"virtualnode": {
+		"node",
+		xnametypes.VirtualNode,
+		VirtualNode,
 	},
 	"nodenic": {
 		"nodenic",

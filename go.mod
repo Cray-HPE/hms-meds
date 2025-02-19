@@ -9,7 +9,7 @@ require (
 	github.com/Cray-HPE/hms-compcredentials v1.13.1-0.20250218165734-ab82ae2b4168
 	github.com/Cray-HPE/hms-dns-dhcp v1.7.1-0.20250219181617-fab742c9e93d
 	github.com/Cray-HPE/hms-securestorage v1.15.1-0.20250218164114-1ff7317deeec
-	github.com/Cray-HPE/hms-sls v1.20.0
+	github.com/Cray-HPE/hms-sls/v2 v2.8.0
 	github.com/Cray-HPE/hms-smd/v2 v2.33.0
 	github.com/Cray-HPE/hms-xname v1.4.0
 	github.com/mitchellh/mapstructure v1.5.0

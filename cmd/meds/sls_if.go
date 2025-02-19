@@ -2,7 +2,7 @@
  *
  *  MIT License
  *
- *  (C) Copyright 2019-2022 Hewlett Packard Enterprise Development LP
+ *  (C) Copyright 2019-2022,2025 Hewlett Packard Enterprise Development LP
  *
  *  Permission is hereby granted, free of charge, to any person obtaining a
  *  copy of this software and associated documentation files (the "Software"),
@@ -33,7 +33,7 @@ import (
 	"log"
 	"net/http"
 
-	sls_common "github.com/Cray-HPE/hms-sls/pkg/sls-common"
+	sls_common "github.com/Cray-HPE/hms-sls/v2/pkg/sls-common"
 	"github.com/Cray-HPE/hms-xname/xnametypes"
 )
 

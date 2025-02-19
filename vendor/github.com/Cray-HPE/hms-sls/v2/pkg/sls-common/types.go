@@ -24,6 +24,7 @@ package sls_common
 
 import (
 	"encoding/json"
+	"fmt"
 	"net"
 
 	"github.com/Cray-HPE/hms-xname/xnametypes"
@@ -47,6 +48,19 @@ type GenericHardware struct {
 }
 
 type GenericHardwareArray []GenericHardware
+
+func NewGenericHardware(xname string, class CabinetType, extraProperties interface{}) GenericHardware {
+	return GenericHardware{
+		Xname:              xnametypes.NormalizeHMSCompID(xname),
+		Class:              class,
+		ExtraPropertiesRaw: extraProperties,
+
+		// Calculate derived fields
+		Parent:     xnametypes.GetHMSCompParent(xname),
+		TypeString: xnametypes.GetHMSType(xname),
+		Type:       HMSTypeToHMSStringType(xnametypes.GetHMSType(xname)),
+	}
+}
 
 /*
 GetParent returns the string xname of the parent of this object.
@@ -107,26 +121,29 @@ func (gh *GenericHardware) FromJson(in string) error {
 
 /*
 ComptypeCabinet represents an object of type comptype_cabinet.
-    "x3000": {
-      "Class":  "River",
-      "ExtraProperties": {
-        "Networks": {
-          "cn": {
-            "HMN": {"CIDR": "10.254.0.0/22"},
-            "NMN": {"CIDR": "10.252.0.0/22"}
-          },
-          "ncn": {
-            "HMN": {"CIDR": "10.254.0.0/22"},
-            "NMN": {"CIDR": "10.252.0.0/22"}
-          }
-        }
-      },
-      "Parent": "s0",
-      "Type":   "comptype_cabinet",
-      "Xname":  "x3000"
-    },
+
+	"x3000": {
+	  "Class":  "River",
+	  "ExtraProperties": {
+	    "Networks": {
+	      "cn": {
+	        "HMN": {"CIDR": "10.254.0.0/22"},
+	        "NMN": {"CIDR": "10.252.0.0/22"}
+	      },
+	      "ncn": {
+	        "HMN": {"CIDR": "10.254.0.0/22"},
+	        "NMN": {"CIDR": "10.252.0.0/22"}
+	      }
+	    }
+	  },
+	  "Parent": "s0",
+	  "Type":   "comptype_cabinet",
+	  "Xname":  "x3000"
+	},
 */
 type ComptypeCabinet struct {
+	Model string `json:"Model,omitempty"`
+
 	// Networks has at the top the hardware type, then inside of that the network ID, then inside of that the object.
 	Networks          map[string]map[string]CabinetNetworks
 	DHCPRelaySwitches []string `json:",omitempty"`
@@ -159,13 +176,14 @@ type ComptypeHSNConnector struct {
 /*
 ComptypeMgmtSwitch represents a comptype_mgmt_switch (aka: a switch on the
 management (NMN or HMN) network(s))
-				        "IP4addr":          "127.0.0.1",
-				        "Model":            "S3048T-ON",
-				        "SNMPAuthPassword": "vault://hms-creds/x3000c0w22",
-				        "SNMPAuthProtocol": "MD5",
-				        "SNMPPrivPassword": "vault://hms-creds/x3000c0w22",
-				        "SNMPPrivProtocol": "DES",
-				        "SNMPUsername":     "testuser"
+
+	"IP4addr":          "127.0.0.1",
+	"Model":            "S3048T-ON",
+	"SNMPAuthPassword": "vault://hms-creds/x3000c0w22",
+	"SNMPAuthProtocol": "MD5",
+	"SNMPPrivPassword": "vault://hms-creds/x3000c0w22",
+	"SNMPPrivProtocol": "DES",
+	"SNMPUsername":     "testuser"
 */
 type ComptypeMgmtSwitch struct {
 	IP6Addr          string `json:"IP6addr,omitempty"`
@@ -324,6 +342,16 @@ type ComptypeNode struct {
 }
 
 /*
+ComptypeVirtualNode is a comptype_virtual_node, representing a virtual node running on a River node blade.
+*/
+type ComptypeVirtualNode struct {
+	NID     int      `json:"NID,omitempty"`
+	Role    string   `json:"Role,omitempty"`
+	SubRole string   `json:"SubRole,omitempty"`
+	Aliases []string `json:"Aliases,omitempty"`
+}
+
+/*
 The Network object represents an abstract network.  For example, the
 High Speed Network.
 */
@@ -348,6 +376,29 @@ type NetworkExtraProperties struct {
 
 	Subnets            []IPV4Subnet `json:"Subnets"`
 	SystemDefaultRoute string       `json:"SystemDefaultRoute,omitempty"`
+}
+
+// LookupSubnet returns a subnet by name
+func (network *NetworkExtraProperties) LookupSubnet(name string) (IPV4Subnet, int, error) {
+	var found []IPV4Subnet
+	if len(network.Subnets) == 0 {
+		return IPV4Subnet{}, 0, fmt.Errorf("subnet not found (%v)", name)
+	}
+	var index int
+	for i, v := range network.Subnets {
+		if v.Name == name {
+			index = i
+			found = append(found, v)
+		}
+	}
+	if len(found) == 1 {
+		// The Index is valid since, only one match was found!
+		return found[0], index, nil
+	}
+	if len(found) > 1 {
+		return found[0], 0, fmt.Errorf("found %v subnets instead of just one", len(found))
+	}
+	return IPV4Subnet{}, 0, fmt.Errorf("subnet not found (%v)", name)
 }
 
 // IPReservation is a type for managing IP Reservations
@@ -375,15 +426,13 @@ type IPV4Subnet struct {
 	MetalLBPoolName  string          `json:"MetalLBPoolName,omitempty"`
 }
 
-type NetworkArray []Network
-
-// SLSGeneratorInputState is given to the SLS config generator in order to generator the SLS config file
-type SLSGeneratorInputState struct {
-	ManagementSwitches  map[string]GenericHardware `json:"ManagementSwitches"` // SLS Type: comptype_mgmt_switch
-	RiverCabinets       map[string]GenericHardware `json:"RiverCabinets"`      // SLS Type: comptype_cabinet
-	HillCabinets        map[string]GenericHardware `json:"HillCabinets"`       // SLS Type: comptype_cabinet
-	MountainCabinets    map[string]GenericHardware `json:"MountainCabinets"`   // SLS Type: comptype_cabinet
-	MountainStartingNid int                        `json:"MountainStartingNid"`
-
-	Networks map[string]Network `json:"Networks"`
+// ReservationsByName presents the IPReservations in a map by name
+func (subnet *IPV4Subnet) ReservationsByName() map[string]IPReservation {
+	reservations := make(map[string]IPReservation)
+	for _, v := range subnet.IPReservations {
+		reservations[v.Name] = v
+	}
+	return reservations
 }
+
+type NetworkArray []Network
