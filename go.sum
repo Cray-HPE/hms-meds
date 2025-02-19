@@ -43,8 +43,8 @@ github.com/Cray-HPE/hms-base v1.15.0 h1:VaQj6cY9OAs6rcD1miE133eqQnRTkEcX1lnwJA/S
 github.com/Cray-HPE/hms-base v1.15.0/go.mod h1:+G8KFLPtanLC5lQ602hrf3MDfLTmIXedTavVCOdz5XA=
 github.com/Cray-HPE/hms-base/v2 v2.2.0 h1:UIC5edpFL4kg9RrUCAZzqz7nhXyR12b4s8ks4NqdxqA=
 github.com/Cray-HPE/hms-base/v2 v2.2.0/go.mod h1:ljyY+aRYOzYJsSYfo7I9umGMLmowLgTqtxbmruTlsEo=
-github.com/Cray-HPE/hms-bmc-networkprotocol v1.5.3 h1:Luya4nCIN9PGFWqtx1bzxl5fe6+L4r5Y2Xi4qsXHEGA=
-github.com/Cray-HPE/hms-bmc-networkprotocol v1.5.3/go.mod h1:aYMIYTJIEMzyb2mcpsM9uzlC42YAbGyjT1uETWTpZZg=
+github.com/Cray-HPE/hms-bmc-networkprotocol v1.6.1-0.20250219163304-1bf5a52816cb h1:rK1BJ+yfUNAAht2kmeqhpDH77jAsTemvF2vL1ejWvJs=
+github.com/Cray-HPE/hms-bmc-networkprotocol v1.6.1-0.20250219163304-1bf5a52816cb/go.mod h1:bptQ0STv95ebgVrP/xz5bxdb8RdG4e0812oyf8VH43Q=
 github.com/Cray-HPE/hms-certs v1.3.2/go.mod h1:6DymilWScLtbQkaQRMuf55K1MzEi0kYCoXfT212yLjY=
 github.com/Cray-HPE/hms-certs v1.5.1-0.20250218164821-ce1ef86a1860 h1:iHOciBtC7SWasxWCUudBCrGMz6yrRLctBRKkfSTxwkE=
 github.com/Cray-HPE/hms-certs v1.5.1-0.20250218164821-ce1ef86a1860/go.mod h1:Yil53YErdaNdHssns9Hpg420uUklOqBfIWxQbaj26jg=
