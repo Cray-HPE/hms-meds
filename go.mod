@@ -10,14 +10,12 @@ require (
 	github.com/Cray-HPE/hms-dns-dhcp v1.7.1-0.20250219181617-fab742c9e93d
 	github.com/Cray-HPE/hms-securestorage v1.15.1-0.20250218164114-1ff7317deeec
 	github.com/Cray-HPE/hms-sls v1.20.0
-	github.com/Cray-HPE/hms-smd v1.55.0
+	github.com/Cray-HPE/hms-smd/v2 v2.33.0
 	github.com/Cray-HPE/hms-xname v1.4.0
 	github.com/mitchellh/mapstructure v1.5.0
 )
 
 require (
-	github.com/Cray-HPE/hms-base v1.15.1 // indirect
-	github.com/Cray-HPE/hms-smd/v2 v2.33.0 // indirect
 	github.com/cenkalti/backoff/v4 v4.3.0 // indirect
 	github.com/fsnotify/fsnotify v1.8.0 // indirect
 	github.com/go-jose/go-jose/v4 v4.0.4 // indirect

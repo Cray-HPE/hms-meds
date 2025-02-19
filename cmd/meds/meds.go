@@ -46,7 +46,7 @@ import (
 	base "github.com/Cray-HPE/hms-base/v2"
 	dns_dhcp "github.com/Cray-HPE/hms-dns-dhcp/pkg"
 	sls_common "github.com/Cray-HPE/hms-sls/pkg/sls-common"
-	"github.com/Cray-HPE/hms-smd/pkg/sm"
+	"github.com/Cray-HPE/hms-smd/v2/pkg/sm"
 	"github.com/Cray-HPE/hms-xname/xnames"
 	"github.com/Cray-HPE/hms-xname/xnametypes"
 
