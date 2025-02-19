@@ -39,8 +39,9 @@ github.com/Azure/go-ansiterm v0.0.0-20170929234023-d6e3b3328b78/go.mod h1:LmzpDX
 github.com/BurntSushi/toml v0.3.1/go.mod h1:xHWCNGjB5oqiDr8zfno3MHue2Ht5sIBksp03qcyfWMU=
 github.com/BurntSushi/xgb v0.0.0-20160522181843-27f122750802/go.mod h1:IVnqGOEym/WlBOVXweHU+Q+/VP0lqqI8lqeDx9IjBqo=
 github.com/ClickHouse/clickhouse-go v1.3.12/go.mod h1:EaI/sW7Azgz9UATzd5ZdZHRUhHgv5+JMS9NSr2smCJI=
-github.com/Cray-HPE/hms-base v1.15.0 h1:VaQj6cY9OAs6rcD1miE133eqQnRTkEcX1lnwJA/SUuU=
 github.com/Cray-HPE/hms-base v1.15.0/go.mod h1:+G8KFLPtanLC5lQ602hrf3MDfLTmIXedTavVCOdz5XA=
+github.com/Cray-HPE/hms-base v1.15.1 h1:+f9cl9BsDWvewvGBPzinmBSU//I7yhwaSUTaNUwxwxQ=
+github.com/Cray-HPE/hms-base v1.15.1/go.mod h1:+G8KFLPtanLC5lQ602hrf3MDfLTmIXedTavVCOdz5XA=
 github.com/Cray-HPE/hms-base/v2 v2.2.0 h1:UIC5edpFL4kg9RrUCAZzqz7nhXyR12b4s8ks4NqdxqA=
 github.com/Cray-HPE/hms-base/v2 v2.2.0/go.mod h1:ljyY+aRYOzYJsSYfo7I9umGMLmowLgTqtxbmruTlsEo=
 github.com/Cray-HPE/hms-bmc-networkprotocol v1.6.1-0.20250219163304-1bf5a52816cb h1:rK1BJ+yfUNAAht2kmeqhpDH77jAsTemvF2vL1ejWvJs=
@@ -51,8 +52,8 @@ github.com/Cray-HPE/hms-certs v1.5.1-0.20250218164821-ce1ef86a1860/go.mod h1:Yil
 github.com/Cray-HPE/hms-compcredentials v1.11.2/go.mod h1:tmurR+zsOtB61n6j3GlEfsl7wmNIAGJqErFymOUb0Hw=
 github.com/Cray-HPE/hms-compcredentials v1.13.1-0.20250218165734-ab82ae2b4168 h1:nlfoa/zSzKA+1GFWJJ2ae/NfGwVedWP2yDCUDRlRzH0=
 github.com/Cray-HPE/hms-compcredentials v1.13.1-0.20250218165734-ab82ae2b4168/go.mod h1:eyXRbwBoODiJc60Tzzxnh9oyT+5LwGOGkbompPiWE8s=
-github.com/Cray-HPE/hms-dns-dhcp v1.7.0 h1:/gRuVbuDb3cx+g7lHoYQZdCyR6wd1ca/7k9s6JmBJtw=
-github.com/Cray-HPE/hms-dns-dhcp v1.7.0/go.mod h1:EuxLr7YPQr/iQ4Y+7t5TZd+6b4FqKu3Ct0j+WMZckrg=
+github.com/Cray-HPE/hms-dns-dhcp v1.7.1-0.20250219181617-fab742c9e93d h1:23t8hzMBDFfjQPEIqnIK+s6CRZEh2fb9cFGoSGPHEYE=
+github.com/Cray-HPE/hms-dns-dhcp v1.7.1-0.20250219181617-fab742c9e93d/go.mod h1:1/KmJ3KNUg8HGKscn0RETqc/RVgWmSU5DLwBkD8wooE=
 github.com/Cray-HPE/hms-go-http-lib v1.5.3/go.mod h1:BKlB4HKAGW5GgS3x01y7zxxYFLaJM2byACUunmes2z8=
 github.com/Cray-HPE/hms-msgbus v1.11.0/go.mod h1:cxn+lUOq3tpY3+KdFml6L56ZQo8sqN2VoZ6gGxds6o8=
 github.com/Cray-HPE/hms-s3 v1.9.2/go.mod h1:p5pVsMDeOdXKssd9qyFtXo4ztrn2lhD04nrO8+NOi7g=
@@ -63,6 +64,8 @@ github.com/Cray-HPE/hms-sls v1.20.0 h1:Vu8J7pbVct5v1xNeeN7610ieufIgbTzHhIk74UNxL
 github.com/Cray-HPE/hms-sls v1.20.0/go.mod h1:CbBCBXEhoJyWCGahFajUgDcqOtAnbIY+Atl8WITz3L8=
 github.com/Cray-HPE/hms-smd v1.55.0 h1:a6XnnLtohVsjpkkQif+Ti17BDOvjUj2fGSmr/zBP+uo=
 github.com/Cray-HPE/hms-smd v1.55.0/go.mod h1:7J7taeRXmceyLPHdKlLbucb10lqTrJxTUo3RhaTGMhs=
+github.com/Cray-HPE/hms-smd/v2 v2.33.0 h1:eKzJc7mOH9X4Pv/zwAHYVHkMfrd72ckn6VztIkq+B3g=
+github.com/Cray-HPE/hms-smd/v2 v2.33.0/go.mod h1:ORxguvuifadD+G8AyTTkEQQQHxNBEpa3Q/TLxkU4OS0=
 github.com/Cray-HPE/hms-xname v1.0.1/go.mod h1:3A70QF0ddmkt/nz0jis5o8UIB4zAmsgsUiN71dr97n4=
 github.com/Cray-HPE/hms-xname v1.4.0 h1:i47YmE8rbSfJ64simKCCC6ZVcGid3rDIX6/jfVbISAM=
 github.com/Cray-HPE/hms-xname v1.4.0/go.mod h1:wH7t1UXYck0VdHSWjrMsxZmaCK5W1lmwgNnsYAFPTus=
