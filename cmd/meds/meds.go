@@ -822,6 +822,7 @@ func getEnvVars() {
 	if envstr != "" {
 		hms_ca_uri = envstr
 	}
+TODO: Add back other vault stuff
 	envstr = os.Getenv("MEDS_LOG_INSECURE_FAILOVER")
 	if envstr != "" {
 		yn, _ := strconv.ParseBool(envstr)
