@@ -822,7 +822,21 @@ func getEnvVars() {
 	if envstr != "" {
 		hms_ca_uri = envstr
 	}
-TODO: Add back other vault stuff
+	envstr = os.Getenv("MEDS_VAULT_CA_CHAIN_PATH")
+	if (envstr != "") {
+		log.Printf("Replacing default Vault CA Chain with: '%s'",envstr)
+		hms_certs.ConfigParams.CAChainPath = envstr
+	}
+	envstr = os.Getenv("MEDS_VAULT_PKI_BASE")
+	if (envstr != "") {
+		log.Printf("Replacing default Vault PKI Base with: '%s'",envstr)
+		hms_certs.ConfigParams.VaultPKIBase = envstr
+	}
+	envstr = os.Getenv("MEDS_VAULT_PKI_PATH")
+	if (envstr != "") {
+		log.Printf("Replacing default Vault PKI Path with: '%s'",envstr)
+		hms_certs.ConfigParams.PKIPath = envstr
+	}
 	envstr = os.Getenv("MEDS_LOG_INSECURE_FAILOVER")
 	if envstr != "" {
 		yn, _ := strconv.ParseBool(envstr)
