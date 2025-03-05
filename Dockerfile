@@ -1,6 +1,6 @@
 #  MIT License
 #
-#  (C) Copyright [2019-2022] Hewlett Packard Enterprise Development LP
+#  (C) Copyright [2019-2022,2025] Hewlett Packard Enterprise Development LP
 #
 #  Permission is hereby granted, free of charge, to any person obtaining a
 #  copy of this software and associated documentation files (the "Software"),
@@ -50,7 +50,7 @@ RUN set -ex \
 
 
 ### Final Stage ###
-FROM artifactory.algol60.net/docker.io/alpine:3.15
+FROM artifactory.algol60.net/docker.io/alpine:3.21
 LABEL maintainer="Hewlett Packard Enterprise"
 STOPSIGNAL SIGTERM
 
@@ -80,4 +80,4 @@ COPY --from=builder /usr/local/bin/vault_loader /usr/local/bin
 USER 65534:65534
 
 # Set up the command to start the service, the run the init script.
-CMD meds -hsm ${HSM_URL} ${MEDS_OPTS}
+CMD ["meds", "-hsm", "${HSM_URL}", "${MEDS_OPTS}"]
