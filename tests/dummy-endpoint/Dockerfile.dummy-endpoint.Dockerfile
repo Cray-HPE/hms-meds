@@ -20,7 +20,7 @@
 #  ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR
 #  OTHER DEALINGS IN THE SOFTWARE.
 
-FROM artifactory.algol60.net/docker.io/alpine:3.15 AS build-base
+FROM artifactory.algol60.net/docker.io/alpine:3.21 AS build-base
 
 # set a directory for the app
 WORKDIR /usr/src/app
