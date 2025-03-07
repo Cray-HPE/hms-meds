@@ -1,7 +1,7 @@
 # github.com/Cray-HPE/hms-base/v2 v2.2.0
 ## explicit; go 1.23
 github.com/Cray-HPE/hms-base/v2
-# github.com/Cray-HPE/hms-bmc-networkprotocol v1.6.1-0.20250304230552-367c4d85ae0d
+# github.com/Cray-HPE/hms-bmc-networkprotocol v1.7.0
 ## explicit; go 1.23.0
 github.com/Cray-HPE/hms-bmc-networkprotocol/pkg
 # github.com/Cray-HPE/hms-certs v1.6.0
@@ -10,7 +10,7 @@ github.com/Cray-HPE/hms-certs/pkg/hms_certs
 # github.com/Cray-HPE/hms-compcredentials v1.14.0
 ## explicit; go 1.23.0
 github.com/Cray-HPE/hms-compcredentials
-# github.com/Cray-HPE/hms-dns-dhcp v1.7.1-0.20250304230435-a8998c966d83
+# github.com/Cray-HPE/hms-dns-dhcp v1.8.0
 ## explicit; go 1.23.0
 github.com/Cray-HPE/hms-dns-dhcp/pkg
 # github.com/Cray-HPE/hms-securestorage v1.16.0
@@ -19,7 +19,7 @@ github.com/Cray-HPE/hms-securestorage
 # github.com/Cray-HPE/hms-sls/v2 v2.8.0
 ## explicit; go 1.23
 github.com/Cray-HPE/hms-sls/v2/pkg/sls-common
-# github.com/Cray-HPE/hms-smd/v2 v2.34.0
+# github.com/Cray-HPE/hms-smd/v2 v2.35.0
 ## explicit; go 1.23.0
 github.com/Cray-HPE/hms-smd/v2/pkg/redfish
 github.com/Cray-HPE/hms-smd/v2/pkg/sm
@@ -55,7 +55,7 @@ github.com/hashicorp/go-retryablehttp
 # github.com/hashicorp/go-rootcerts v1.0.2
 ## explicit; go 1.12
 github.com/hashicorp/go-rootcerts
-# github.com/hashicorp/go-secure-stdlib/parseutil v0.1.9
+# github.com/hashicorp/go-secure-stdlib/parseutil v0.2.0
 ## explicit; go 1.20
 github.com/hashicorp/go-secure-stdlib/parseutil
 # github.com/hashicorp/go-secure-stdlib/strutil v0.1.2
@@ -90,26 +90,26 @@ github.com/ryanuber/go-glob
 # github.com/sirupsen/logrus v1.9.3
 ## explicit; go 1.13
 github.com/sirupsen/logrus
-# golang.org/x/crypto v0.35.0
+# golang.org/x/crypto v0.36.0
 ## explicit; go 1.23.0
 golang.org/x/crypto/pbkdf2
-# golang.org/x/net v0.36.0
+# golang.org/x/net v0.37.0
 ## explicit; go 1.23.0
 golang.org/x/net/http/httpguts
 golang.org/x/net/http2
 golang.org/x/net/http2/hpack
 golang.org/x/net/idna
 golang.org/x/net/internal/httpcommon
-# golang.org/x/sys v0.30.0
-## explicit; go 1.18
+# golang.org/x/sys v0.31.0
+## explicit; go 1.23.0
 golang.org/x/sys/unix
 golang.org/x/sys/windows
-# golang.org/x/text v0.22.0
-## explicit; go 1.18
+# golang.org/x/text v0.23.0
+## explicit; go 1.23.0
 golang.org/x/text/secure/bidirule
 golang.org/x/text/transform
 golang.org/x/text/unicode/bidi
 golang.org/x/text/unicode/norm
-# golang.org/x/time v0.10.0
-## explicit; go 1.18
+# golang.org/x/time v0.11.0
+## explicit; go 1.23.0
 golang.org/x/time/rate
