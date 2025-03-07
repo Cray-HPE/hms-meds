@@ -1,7 +1,7 @@
 /*
  * MIT License
  *
- * (C) Copyright [2019-2022] Hewlett Packard Enterprise Development LP
+ * (C) Copyright [2019-2022,2025] Hewlett Packard Enterprise Development LP
  *
  * Permission is hereby granted, free of charge, to any person obtaining a
  * copy of this software and associated documentation files (the "Software"),
@@ -142,7 +142,7 @@ func Test_GenerateSwitchCardEndpoints(t *testing.T) {
 }
 
 func Test_GenerateChassisEndpoints(t *testing.T) {
-	ret := GenerateChassisEndpoints("02", 7)
+	ret := GenerateChassisEndpoints("02", 7, []int{0, 1, 2, 3, 4, 5, 6, 7})
 
 	cha1 := NetEndpoint{
 		name:   "x7c0b0",

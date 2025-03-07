@@ -1,6 +1,6 @@
 #  MIT License
 #
-#  (C) Copyright [2019-2021] Hewlett Packard Enterprise Development LP
+#  (C) Copyright [2019-2021,2025] Hewlett Packard Enterprise Development LP
 #
 #  Permission is hereby granted, free of charge, to any person obtaining a
 #  copy of this software and associated documentation files (the "Software"),
@@ -20,7 +20,7 @@
 #  ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR
 #  OTHER DEALINGS IN THE SOFTWARE.
 
-FROM artifactory.algol60.net/docker.io/alpine:3.15 AS build-base
+FROM artifactory.algol60.net/docker.io/alpine:3.21 AS build-base
 
 # set a directory for the app
 WORKDIR /usr/src/app
@@ -49,7 +49,7 @@ RUN pip3 install --upgrade pip \
 # define the port number the container should expose
 EXPOSE 80
 
-ENV FLASK_APP endpoint.py
+ENV FLASK_APP=endpoint.py
 
 # run the command
 #CMD ["flask", "run"]
