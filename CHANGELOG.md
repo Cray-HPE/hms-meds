@@ -5,6 +5,14 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.24.0] - 2025-04-04
+
+### Updated
+
+- Added support for pprof builds
+- Updated image and module dependencies
+- Updated from Go 1.23 to 1.24
+
 ## [1.23.0] - 2025-03-07
 
 ### Changed

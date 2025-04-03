@@ -1,8 +1,6 @@
 module github.com/Cray-HPE/hms-meds
 
-go 1.23.0
-
-toolchain go1.23.5
+go 1.24.0
 
 require (
 	github.com/Cray-HPE/hms-base/v2 v2.2.0
@@ -35,7 +33,7 @@ require (
 	github.com/ryanuber/go-glob v1.0.0 // indirect
 	github.com/sirupsen/logrus v1.9.3 // indirect
 	golang.org/x/crypto v0.36.0 // indirect
-	golang.org/x/net v0.37.0 // indirect
+	golang.org/x/net v0.38.0 // indirect
 	golang.org/x/sys v0.31.0 // indirect
 	golang.org/x/text v0.23.0 // indirect
 	golang.org/x/time v0.11.0 // indirect
