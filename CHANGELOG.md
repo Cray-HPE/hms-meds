@@ -11,7 +11,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - Added support for pprof builds
 - Updated image and module dependencies
-- Updated from Go 1.23 to 1.24
+- Updated from Go 1.23 to 1.24 and fixed build warnings due to that
 
 ## [1.23.0] - 2025-03-07
 

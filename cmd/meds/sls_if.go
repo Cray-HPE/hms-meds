@@ -66,7 +66,7 @@ func getSLSCabInfo() ([]sls_common.GenericHardware, error) {
 	if rsp.StatusCode != http.StatusOK {
 		emsg := fmt.Sprintf("Bad error code from hardware SLS /search GET: %d/%s\n",
 			rsp.StatusCode, http.StatusText(rsp.StatusCode))
-		return nil, fmt.Errorf(emsg)
+		return nil, fmt.Errorf("%s", emsg)
 	}
 
 	if berr != nil {
@@ -99,7 +99,7 @@ func getSLSCabInfo() ([]sls_common.GenericHardware, error) {
 	if rsp.StatusCode != http.StatusOK {
 		emsg := fmt.Sprintf("Bad error code from hardware SLS /search GET: %d/%s\n",
 			rsp.StatusCode, http.StatusText(rsp.StatusCode))
-		return nil, fmt.Errorf(emsg)
+		return nil, fmt.Errorf("%s", emsg)
 	}
 
 	if berr != nil {
@@ -148,7 +148,7 @@ func getSLSCabinetChassis(cabinetXname string) ([]sls_common.GenericHardware, er
 	if rsp.StatusCode != http.StatusOK {
 		emsg := fmt.Sprintf("Bad error code from hardware SLS /search GET: %d/%s\n",
 			rsp.StatusCode, http.StatusText(rsp.StatusCode))
-		return nil, fmt.Errorf(emsg)
+		return nil, fmt.Errorf("%s", emsg)
 	}
 
 	if berr != nil {
