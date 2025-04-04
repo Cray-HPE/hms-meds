@@ -1146,6 +1146,9 @@ func main() {
 	//Set up DNS/DHCP
 	dhcpdnsClient = dns_dhcp.NewDHCPDNSHelperInstance(hsm, nil, serviceName)
 
+	// Initialize pprof if enabled
+	PProfInit()
+
 	//Set up RF HTTP client and NWP stuff
 
 	hms_certs.InitInstance(nil, serviceName)

@@ -26,3 +26,7 @@
  */
 
 package main
+
+func PProfInit() {
+	// noop when not enabled
+}
