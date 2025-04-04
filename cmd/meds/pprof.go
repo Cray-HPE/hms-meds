@@ -36,7 +36,7 @@ import (
 // Because MEDS does not start an HTTP server we need to create one when
 // pprof is enabled.
 func PProfInit() {
-	err := http.ListenAndServe("localhost:80", nil)
+	err := http.ListenAndServe(":80", nil)
 	if err != http.ErrServerClosed {
 		log.Printf("Failed to start pprof HTTP server: %v", err)
 	}
