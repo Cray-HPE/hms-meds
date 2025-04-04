@@ -38,7 +38,7 @@ import (
 func PProfInit() {
 	err := http.ListenAndServe("localhost:80", nil)
 	if err != http.ErrServerClosed {
-		log.Printf("Failed to start pprof server: %v", err)
+		log.Printf("Failed to start pprof HTTP server: %v", err)
 	}
 
 	log.Printf("Started pprof HTTP server")
