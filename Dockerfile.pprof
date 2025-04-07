@@ -19,7 +19,8 @@
 #  OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE,
 #  ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR
 #  OTHER DEALINGS IN THE SOFTWARE.
-# Dockerfile for building hms-meds.
+# Dockerfile for building hms-meds with pprof support.
+# The only difference from primary dockerfile is building with the pprof tag
 
 ## Prepare Builder ##
 FROM artifactory.algol60.net/docker.io/library/golang:1.24-alpine AS build-base
@@ -45,7 +46,7 @@ FROM base AS builder
 
 # Now build
 RUN set -ex \
-    && go build -v -o /usr/local/bin/meds github.com/Cray-HPE/hms-meds/cmd/meds \
+    && go build -v -tags pprof -o /usr/local/bin/meds github.com/Cray-HPE/hms-meds/cmd/meds \
     && go build -v -o /usr/local/bin/vault_loader github.com/Cray-HPE/hms-meds/cmd/vault_loader
 
 
