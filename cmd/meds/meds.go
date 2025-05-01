@@ -306,6 +306,7 @@ func patchXNameEnabled(xname string, enabled bool) *error {
 	req.Header.Add("Content-Type", "application/json")
 	base.SetHTTPUserAgent(req, serviceName)
 	resp, err := client.Do(req)
+	defer base.DrainAndCloseResponseBody(resp)
 	if err != nil {
 		log.Printf("WARNING: Unable to patch %s: %v", xname, err)
 		return &err
@@ -313,7 +314,6 @@ func patchXNameEnabled(xname string, enabled bool) *error {
 
 	if resp.Body != nil {
 		strbody, _ = ioutil.ReadAll(resp.Body)
-		resp.Body.Close()
 	}
 
 	if resp.StatusCode == 200 {
@@ -347,6 +347,7 @@ func patchXnameFQDN(xname, fqdn, hostname string) error {
 	req.Header.Add("Content-Type", "application/json")
 	base.SetHTTPUserAgent(req, serviceName)
 	resp, err := client.Do(req)
+	defer base.DrainAndCloseResponseBody(resp)
 	if err != nil {
 		log.Printf("WARNING: Unable to patch %s: %v", xname, err)
 		return err
@@ -354,7 +355,6 @@ func patchXnameFQDN(xname, fqdn, hostname string) error {
 
 	if resp.Body != nil {
 		strbody, _ = ioutil.ReadAll(resp.Body)
-		resp.Body.Close()
 	}
 
 	if resp.StatusCode == 200 {
@@ -477,6 +477,7 @@ func notifyHSMXnamePresent(node NetEndpoint, address string) *error {
 	req.Header.Add("Content-Type", "application/json")
 	base.SetHTTPUserAgent(req, serviceName)
 	resp, err := client.Do(req)
+	defer base.DrainAndCloseResponseBody(resp)
 	if err != nil {
 		log.Printf("WARNING: Unable to send information for %s: %v", node.name, err)
 		return &err
@@ -484,7 +485,6 @@ func notifyHSMXnamePresent(node NetEndpoint, address string) *error {
 
 	if resp.Body != nil {
 		strbody, _ = ioutil.ReadAll(resp.Body)
-		resp.Body.Close()
 	}
 
 	if resp.StatusCode == 201 {
@@ -526,6 +526,7 @@ func queryHSMState() error {
 		return qerr
 	}
 	resp, err := client.Do(req)
+	defer base.DrainAndCloseResponseBody(resp)
 	if err != nil {
 		log.Printf("WARNING: Unable to get RedfishEndpoints from HSM: %v", err)
 		return err
@@ -537,7 +538,6 @@ func queryHSMState() error {
 		return emsg
 	}
 
-	defer resp.Body.Close()
 	bodyBytes, err := ioutil.ReadAll(resp.Body)
 	if err != nil {
 		log.Printf("WARNING: Unable to read HTTP body while querying HSM for RedfishEndpoints: %v", err)
@@ -600,6 +600,7 @@ func queryNetworkStatusViaAddress(address string) (HSMEndpointPresence, *error) 
 	rfClientLock.RLock()
 	resp, err := rfClient.Get("https://" + address + "/redfish/v1/")
 	rfClientLock.RUnlock()
+	defer base.DrainAndCloseResponseBody(resp)
 
 	if err != nil {
 		return PRESENCE_NOT_PRESENT, &err
@@ -609,7 +610,6 @@ func queryNetworkStatusViaAddress(address string) (HSMEndpointPresence, *error) 
 
 	var strbody []byte
 	if resp.Body != nil {
-		defer resp.Body.Close()
 		strbody, _ = ioutil.ReadAll(resp.Body)
 	}
 

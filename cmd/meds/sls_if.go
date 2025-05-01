@@ -33,6 +33,7 @@ import (
 	"log"
 	"net/http"
 
+	base "github.com/Cray-HPE/hms-base/v2"
 	sls_common "github.com/Cray-HPE/hms-sls/v2/pkg/sls-common"
 	"github.com/Cray-HPE/hms-xname/xnametypes"
 )
@@ -54,13 +55,14 @@ func getSLSCabInfo() ([]sls_common.GenericHardware, error) {
 	rsp, err := client.InsecureClient.Get(sls + "/search/hardware?type=comptype_cabinet&class=Mountain")
 
 	if err != nil {
+		base.DrainAndCloseResponseBody(rsp)
 		log.Printf("ERROR in GET of hardware search: %v\n", err)
 		return nil, err
 	}
 
 	if rsp.Body != nil {
 		body, berr = ioutil.ReadAll(rsp.Body)
-		defer rsp.Body.Close()
+		base.DrainAndCloseResponseBody(rsp)
 	}
 
 	if rsp.StatusCode != http.StatusOK {
@@ -85,6 +87,7 @@ func getSLSCabInfo() ([]sls_common.GenericHardware, error) {
 	//Search:  /search/hardware?type=comptype_cabinet&class=Hill
 
 	rsp, err = client.InsecureClient.Get(sls + "/search/hardware?type=comptype_cabinet&class=Hill")
+	defer base.DrainAndCloseResponseBody(rsp)
 
 	if err != nil {
 		log.Printf("ERROR in GET of hardware search: %v\n", err)
@@ -93,7 +96,6 @@ func getSLSCabInfo() ([]sls_common.GenericHardware, error) {
 
 	if rsp.Body != nil {
 		body, berr = ioutil.ReadAll(rsp.Body)
-		defer rsp.Body.Close()
 	}
 
 	if rsp.StatusCode != http.StatusOK {
@@ -135,6 +137,7 @@ func getSLSCabinetChassis(cabinetXname string) ([]sls_common.GenericHardware, er
 	var body []byte
 	var berr error
 	rsp, err := client.InsecureClient.Get(sls + fmt.Sprintf("/search/hardware?type=comptype_chassis&parent=%s", cabinetXname))
+	defer base.DrainAndCloseResponseBody(rsp)
 	if err != nil {
 		log.Printf("ERROR in GET of hardware search: %v\n", err)
 		return nil, err
@@ -142,7 +145,6 @@ func getSLSCabinetChassis(cabinetXname string) ([]sls_common.GenericHardware, er
 
 	if rsp.Body != nil {
 		body, berr = ioutil.ReadAll(rsp.Body)
-		defer rsp.Body.Close()
 	}
 
 	if rsp.StatusCode != http.StatusOK {

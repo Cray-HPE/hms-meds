@@ -24,7 +24,7 @@ services:
     networks:
       - meds
   vault-kv-enabler:
-    image: artifactory.algol60.net/csm-docker/stable/vault-kv-enabler:1.25.0
+    image: artifactory.algol60.net/csm-docker/stable/vault-kv-enabler:1.29.0
     environment:
       - VAULT_ADDR=http://vault:8200
       - VAULT_TOKEN=hms
@@ -124,7 +124,7 @@ services:
     networks:
       - meds
   cray-smd-init:
-    image: artifactory.algol60.net/csm-docker/stable/cray-smd:2.35.0
+    image: artifactory.algol60.net/csm-docker/stable/cray-smd:2.38.0
     environment:
       - SMD_DBHOST=cray-smd-postgres
       - SMD_DBPORT=5432
@@ -134,7 +134,7 @@ services:
       - meds
     command: /entrypoint.sh smd-init
   cray-smd:
-    image: artifactory.algol60.net/csm-docker/stable/cray-smd:2.35.0
+    image: artifactory.algol60.net/csm-docker/stable/cray-smd:2.38.0
     environment:
       - POSTGRES_HOST=cray-smd-postgres
       - SMD_DBHOST=cray-smd-postgres
