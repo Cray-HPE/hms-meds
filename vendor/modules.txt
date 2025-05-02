@@ -1,10 +1,10 @@
 # github.com/Cray-HPE/hms-base/v2 v2.3.0
 ## explicit; go 1.24.0
 github.com/Cray-HPE/hms-base/v2
-# github.com/Cray-HPE/hms-bmc-networkprotocol v1.7.1-0.20250501181503-e8ba55fb0324
+# github.com/Cray-HPE/hms-bmc-networkprotocol v1.8.0
 ## explicit; go 1.24.0
 github.com/Cray-HPE/hms-bmc-networkprotocol/pkg
-# github.com/Cray-HPE/hms-certs v1.7.0
+# github.com/Cray-HPE/hms-certs v1.7.1
 ## explicit; go 1.24.0
 github.com/Cray-HPE/hms-certs/pkg/hms_certs
 # github.com/Cray-HPE/hms-compcredentials v1.15.0
@@ -16,7 +16,7 @@ github.com/Cray-HPE/hms-dns-dhcp/pkg
 # github.com/Cray-HPE/hms-securestorage v1.17.0
 ## explicit; go 1.24.0
 github.com/Cray-HPE/hms-securestorage
-# github.com/Cray-HPE/hms-sls/v2 v2.8.1-0.20250501163653-243d5662fe60
+# github.com/Cray-HPE/hms-sls/v2 v2.9.0
 ## explicit; go 1.24.0
 github.com/Cray-HPE/hms-sls/v2/pkg/sls-common
 # github.com/Cray-HPE/hms-smd/v2 v2.38.0

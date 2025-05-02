@@ -49,7 +49,7 @@ services:
     networks:
       - meds
   cray-sls-init:
-    image: artifactory.algol60.net/csm-docker/stable/cray-sls:2.8.0
+    image: artifactory.algol60.net/csm-docker/stable/cray-sls:2.9.0
     command: ["sls-init"]
     environment:
       - POSTGRES_HOST=sls-postgres
@@ -60,7 +60,7 @@ services:
     networks:
       - meds
   cray-sls:
-    image: artifactory.algol60.net/csm-docker/stable/cray-sls:2.8.0
+    image: artifactory.algol60.net/csm-docker/stable/cray-sls:2.9.0
     environment:
       - POSTGRES_HOST=cray-sls-postgres
       - DBOPTS=sslmode=disable
@@ -81,7 +81,7 @@ services:
       - meds
 
   cray-sls-preload:
-    image: artifactory.algol60.net/csm-docker/stable/cray-sls:2.8.0
+    image: artifactory.algol60.net/csm-docker/stable/cray-sls:2.9.0
     command: >
       sh -c "sleep 5 &&
       curl  -d '{\"Xname\":\"x1000\",\"Type\":\"comptype_cabinet\",\"Class\":\"Mountain\",\"TypeString\":\"Cabinet\",\"ExtraProperties\":{\"Networks\":{\"cn\":{

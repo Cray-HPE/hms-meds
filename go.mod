@@ -4,12 +4,12 @@ go 1.24.0
 
 require (
 	github.com/Cray-HPE/hms-base/v2 v2.3.0
-	github.com/Cray-HPE/hms-bmc-networkprotocol v1.7.1-0.20250501181503-e8ba55fb0324
-	github.com/Cray-HPE/hms-certs v1.7.0
+	github.com/Cray-HPE/hms-bmc-networkprotocol v1.8.0
+	github.com/Cray-HPE/hms-certs v1.7.1
 	github.com/Cray-HPE/hms-compcredentials v1.15.0
 	github.com/Cray-HPE/hms-dns-dhcp v1.8.0
 	github.com/Cray-HPE/hms-securestorage v1.17.0
-	github.com/Cray-HPE/hms-sls/v2 v2.8.1-0.20250501163653-243d5662fe60
+	github.com/Cray-HPE/hms-sls/v2 v2.9.0
 	github.com/Cray-HPE/hms-smd/v2 v2.38.0
 	github.com/Cray-HPE/hms-xname v1.4.0
 	github.com/mitchellh/mapstructure v1.5.0
