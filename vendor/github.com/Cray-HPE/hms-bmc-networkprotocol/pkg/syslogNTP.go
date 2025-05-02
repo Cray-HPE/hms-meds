@@ -1,17 +1,17 @@
 // MIT License
-// 
-// (C) Copyright [2019-2021] Hewlett Packard Enterprise Development LP
-// 
+//
+// (C) Copyright [2019-2021,2025] Hewlett Packard Enterprise Development LP
+//
 // Permission is hereby granted, free of charge, to any person obtaining a
 // copy of this software and associated documentation files (the "Software"),
 // to deal in the Software without restriction, including without limitation
 // the rights to use, copy, modify, merge, publish, distribute, sublicense,
 // and/or sell copies of the Software, and to permit persons to whom the
 // Software is furnished to do so, subject to the following conditions:
-// 
+//
 // The above copyright notice and this permission notice shall be included
 // in all copies or substantial portions of the Software.
-// 
+//
 // THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
 // IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
 // FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL
@@ -26,13 +26,14 @@ import (
 	"bytes"
 	"encoding/json"
 	"fmt"
-	"io/ioutil"
 	"log"
 	"net"
 	"net/http"
 	"os"
 	"strconv"
 	"strings"
+
+	base "github.com/Cray-HPE/hms-base/v2"
 	hms_certs "github.com/Cray-HPE/hms-certs/pkg/hms_certs"
 )
 
@@ -243,7 +244,7 @@ func Init(nwpData NWPData, rfSuffix string) (RedfishNWProtocol, error) {
 	//TODO: boot order, once it's figured out.
 
 	if len(errstrs) > 0 {
-		return nwProtoInfo, fmt.Errorf(errstrs)
+		return nwProtoInfo, fmt.Errorf("%s", errstrs)
 	}
 
 	return nwProtoInfo, nil
@@ -297,16 +298,12 @@ func SetXNameNWPInfo(nwProtoInfo RedfishNWProtocol, targAddress, RFUsername, RFP
 	req.SetBasicAuth(RFUsername, RFPassword)
 	req.Header.Set("Content-Type", "application/json")
 	rsp, rsperr := http_client.Do(req)
+	defer base.DrainAndCloseResponseBody(rsp)
 
 	if rsperr != nil {
 		rerr := fmt.Errorf("ERROR sending NTP/syslog info to '%s': %v",
 			targAddress, rsperr)
 		return rerr
-	}
-
-	if (rsp.Body != nil) {
-		_,_ = ioutil.ReadAll(rsp.Body)
-		defer rsp.Body.Close()
 	}
 
 	if (rsp.StatusCode != http.StatusOK) && (rsp.StatusCode != http.StatusNoContent) {
