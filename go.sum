@@ -10,12 +10,8 @@ github.com/Cray-HPE/hms-dns-dhcp v1.8.0 h1:9G+hj9KKpGtFmu9z4WuOMIPJnSPaFx23+AAPX
 github.com/Cray-HPE/hms-dns-dhcp v1.8.0/go.mod h1:SDYp9XTkjpTu57SjsgqNbeowaAFmYtdttsz/d7pgJD8=
 github.com/Cray-HPE/hms-securestorage v1.17.0 h1:9Dr96LITvt9hqs+/CIDFNOauUPSTobU8TC3jEfd8I/A=
 github.com/Cray-HPE/hms-securestorage v1.17.0/go.mod h1:XYnykBCkkdWCLsMNjoMNmYfFn9UDFc02UN16k8ZHktE=
-github.com/Cray-HPE/hms-sls/v2 v2.9.0 h1:L5UZtHlvpp9vRS41VXi+ulvc1D0KMj0EtJod6ZBJhGs=
-github.com/Cray-HPE/hms-sls/v2 v2.9.0/go.mod h1:HM73R+hGmMz00RW954VWhLVTGpBof6ABjBdWTB83P9k=
 github.com/Cray-HPE/hms-sls/v2 v2.12.0 h1:lMNTF9knrcc81+Uppd2hz0gibZOV5IRQZQao7rveRNQ=
 github.com/Cray-HPE/hms-sls/v2 v2.12.0/go.mod h1:HM73R+hGmMz00RW954VWhLVTGpBof6ABjBdWTB83P9k=
-github.com/Cray-HPE/hms-smd/v2 v2.38.0 h1:+p0G6J/Xmllc6wW8thCC89ncNmP1gyfPyWqRmQsQ9Jo=
-github.com/Cray-HPE/hms-smd/v2 v2.38.0/go.mod h1:Ycj7uV/QQJX1MFlBFLkrHoQrVlL25n2Ol5IBclXz2QY=
 github.com/Cray-HPE/hms-smd/v2 v2.45.0 h1:LM1QkP7D9FYacNAt8FvhQlvIFCjT+OwjahAqsIbeiGQ=
 github.com/Cray-HPE/hms-smd/v2 v2.45.0/go.mod h1:z9iC/pyxXzDlAPMTW3H+KN4zRhuiiu+p/eGJb4t8+as=
 github.com/Cray-HPE/hms-xname v1.4.0 h1:i47YmE8rbSfJ64simKCCC6ZVcGid3rDIX6/jfVbISAM=
@@ -79,8 +75,7 @@ github.com/stretchr/testify v1.10.0/go.mod h1:r2ic/lqez/lEtzL7wO/rwa5dbSLXVDPFyf
 golang.org/x/net v0.39.0 h1:ZCu7HMWDxpXpaiKdhzIfaltL9Lp31x/3fCP11bc6/fY=
 golang.org/x/net v0.39.0/go.mod h1:X7NRbYVEA+ewNkCNyJ513WmMdQ3BineSwVtN2zD/d+E=
 golang.org/x/sys v0.0.0-20220715151400-c0bba94af5f8/go.mod h1:oPkhp1MJrh7nUepCBck5+mAzfO9JrbApNNgaTdGDITg=
-golang.org/x/sys v0.32.0 h1:s77OFDvIQeibCmezSnk/q6iAfkdiQaJi4VzroCFrN20=
-golang.org/x/sys v0.32.0/go.mod h1:BJP2sWEmIv4KK5OTEluFJCKSidICx8ciO85XgH3Ak8k=
+golang.org/x/sys v0.33.0 h1:q3i8TbbEz+JRD9ywIRlyRAQbM0qF7hu24q3teo2hbuw=
 golang.org/x/sys v0.33.0/go.mod h1:BJP2sWEmIv4KK5OTEluFJCKSidICx8ciO85XgH3Ak8k=
 golang.org/x/text v0.24.0 h1:dd5Bzh4yt5KYA8f9CJHCP4FB4D51c2c6JvN37xJJkJ0=
 golang.org/x/text v0.24.0/go.mod h1:L8rBsPeo2pSS+xqN0d5u2ikmjtmoJbDBT1b7nHvFCdU=
