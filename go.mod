@@ -9,8 +9,8 @@ require (
 	github.com/Cray-HPE/hms-compcredentials v1.15.0
 	github.com/Cray-HPE/hms-dns-dhcp v1.8.0
 	github.com/Cray-HPE/hms-securestorage v1.17.0
-	github.com/Cray-HPE/hms-sls/v2 v2.9.0
-	github.com/Cray-HPE/hms-smd/v2 v2.38.0
+	github.com/Cray-HPE/hms-sls/v2 v2.12.0
+	github.com/Cray-HPE/hms-smd/v2 v2.45.0
 	github.com/Cray-HPE/hms-xname v1.4.0
 	github.com/mitchellh/mapstructure v1.5.0
 )
@@ -33,7 +33,7 @@ require (
 	github.com/ryanuber/go-glob v1.0.0 // indirect
 	github.com/sirupsen/logrus v1.9.3 // indirect
 	golang.org/x/net v0.39.0 // indirect
-	golang.org/x/sys v0.32.0 // indirect
+	golang.org/x/sys v0.33.0 // indirect
 	golang.org/x/text v0.24.0 // indirect
 	golang.org/x/time v0.11.0 // indirect
 )
