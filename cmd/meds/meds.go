@@ -814,6 +814,10 @@ func getEnvVars() {
 	if envstr != "" {
 		hsm = envstr
 	}
+        envstr = os.Getenv("HSM_URL")
+        if envstr != "" {
+                hsm = envstr
+        }
 	envstr = os.Getenv("MEDS_SLS")
 	if envstr != "" {
 		sls = envstr
