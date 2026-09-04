@@ -80,4 +80,4 @@ COPY --from=builder /usr/local/bin/vault_loader /usr/local/bin
 USER 65534:65534
 
 # Set up the command to start the service, the run the init script.
-CMD ["/bin/sh", "-c", "meds -hsm ${HSM_URL} ${MEDS_OPTS}"]
+CMD ["meds", "-hsm", "${HSM_URL}", "${MEDS_OPTS}"]
